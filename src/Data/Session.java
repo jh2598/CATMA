@@ -23,7 +23,7 @@ public class Session implements Serializable {
 		this.sampleInfoPath = samplePath;
 		deg = new Deg();	
 	}
-	public void Save(){
+	public void save(){
 		//자신을 직렬화해서 filePath에 저장
 		try{
 			FileOutputStream fos = new FileOutputStream(filePath+"/"+ name+".ser");
@@ -31,6 +31,7 @@ public class Session implements Serializable {
 			oos.writeObject(this);
 			oos.flush(); 
 			fos.close();
+			oos.close();
 		}catch(IOException e){
 			System.err.println(e);
 		}
@@ -41,7 +42,7 @@ public class Session implements Serializable {
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
-	public String Loaded() {
+	public String loaded() {
 		// TODO Auto-generated method stub
 		System.out.println("::"+name);
 		return "Successfully opened.";
