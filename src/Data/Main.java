@@ -8,6 +8,7 @@ public class Main {
 		System.out.println("Jobs done.");
 		//Collision Test
 		//Another Test
+		System.out.println("TEST");
 	}
 	//Comment HELLO
 }
