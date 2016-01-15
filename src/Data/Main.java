@@ -18,12 +18,13 @@ public class Main {
 //		System.out.println(session.Loaded());
 		
 		//Session created.
-		Session session = menu.createSession("NAME_TEST", "C:/Users/JH/Desktop/CATMA/path", "C:/Users/JH/Desktop/CATMA/data/celfiles", "C:/Users/JH/Desktop/CATMA/data");
+		Session session = menu.createSession("NAME_TEST", "C:/Users/JH/Desktop/CATMA/path", "C:/Users/JH/Desktop/CATMA/data/celfiles", "C:/Users/JH/Desktop/CATMA/data/sample.csv");
 		menu.loadSession(session); // the session is loaded on program.
 		DataProcess process = new DataProcess(session); // session을 넘겨줘서 해당 세션의 path에 따라 R에서 데이터를 처리하도록 한다.
 		try {
 			process.setLibrary();//Library setting
 			process.setPath();
+			process.readData();
 		} catch (RserveException | REXPMismatchException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

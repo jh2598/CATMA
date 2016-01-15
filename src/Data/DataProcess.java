@@ -23,11 +23,13 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 	}
+	//1
 	public void setLibrary() throws RserveException, REXPMismatchException {
 		// Setting Library - affy, limma
 		c.eval("library(affy)");
 		c.eval("library(limma)");
 	}
+	//2
 	public void setPath() throws RserveException, REXPMismatchException {
 		//Path 설정.
 		c.eval("setwd(\""+session.celFilePath+"\")");
@@ -37,8 +39,18 @@ public class DataProcess {
 //		c.eval("fns <- list.celfiles(path=\"./\",full.names=TRUE)");
 		c.eval("fns <- list.celfiles(path=\""+session.celFilePath+"\",full.names=TRUE)");
 		x = c.eval("fns");
-		for(String str : x.asStrings())
-			System.out.println(str);
+		for(String str : x.asStrings()){
+			System.out.println(str);}
+		//Sample.csv 불러오기
+		c.eval("pheno = read.csv(\""+ session.sampleInfoPath +"\", sep=\",\", header=TRUE)");
+	}
+	//3
+	public void readData() throws RserveException{
+		String userDir = System.getProperty("user.dir");
+		userDir = userDir.replaceAll("\\\\", "/");
+		userDir += "/R_Code.txt";
+		System.out.println("R code is at :: "+ userDir);
+		c.eval("source(\"" + userDir + "\")");
 	}
 	public Deg findDEG(double pValue, double foldChange, int ranking) {
 		return null;
