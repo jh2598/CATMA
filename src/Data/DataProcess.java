@@ -26,12 +26,15 @@ public class DataProcess {
 	//1
 	public void setLibrary() throws RserveException, REXPMismatchException {
 		// Setting Library - affy, limma
+		System.out.println("R :: Library setting...");
 		c.eval("library(affy)");
 		c.eval("library(limma)");
+		System.out.println("R :: Library setting is done.");
 	}
 	//2
 	public void setPath() throws RserveException, REXPMismatchException {
 		//Path 설정.
+		System.out.println("R :: Path Setting...");
 		c.eval("setwd(\""+session.celFilePath+"\")");
 		System.out.println("Cel files at :: "+session.celFilePath);
 		
@@ -39,31 +42,40 @@ public class DataProcess {
 //		c.eval("fns <- list.celfiles(path=\"./\",full.names=TRUE)");
 		c.eval("fns <- list.celfiles(path=\""+session.celFilePath+"\",full.names=TRUE)");
 		x = c.eval("fns");
-		for(String str : x.asStrings()){
-			System.out.println(str);}
+//		for(String str : x.asStrings()){
+//			System.out.println(str);}
 		//Sample.csv 불러오기
 		c.eval("pheno = read.csv(\""+ session.sampleInfoPath +"\", sep=\",\", header=TRUE)");
+		System.out.println("R :: Sample info path is setted.");
 	}
 	//3
 	public void setSearchValue(double pValue, double foldChange) throws RserveException{
 		double[] value = new double[2];
 		value[0] = pValue;
 		value[1] = foldChange;
-		
+		System.out.println("P Value="+pValue +", FoldChange="+foldChange);
+		System.out.println("R :: Search Value Setting...");
 		try {
 			c.assign("searchValue", value);
+			
 		} catch (REngineException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	//4
-	public void readData() throws RserveException{
+	public void readData(){
 		String userDir = System.getProperty("user.dir");
 		userDir = userDir.replaceAll("\\\\", "/");
 		userDir += "/R.txt";
 		System.out.println("R code is at :: "+ userDir);
-		c.eval("source(\"" + userDir + "\")");
+		try {
+			c.eval("source(\"" + userDir + "\")");
+			System.out.println("R Source code is executed successfully.");
+		} catch (RserveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public Deg findDEG(double pValue, double foldChange, int ranking) {
 		return null;

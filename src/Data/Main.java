@@ -26,6 +26,7 @@ public class Main {
 			process.setPath();//Path setting
 			process.setSearchValue(0.05, 1.5);//Search Value setting
 			process.readData();//data processing with R
+			System.out.println("R Process is done.");
 		} catch (RserveException | REXPMismatchException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
