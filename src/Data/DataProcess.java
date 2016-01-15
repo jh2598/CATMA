@@ -45,10 +45,23 @@ public class DataProcess {
 		c.eval("pheno = read.csv(\""+ session.sampleInfoPath +"\", sep=\",\", header=TRUE)");
 	}
 	//3
+	public void setSearchValue(double pValue, double foldChange) throws RserveException{
+		double[] value = new double[2];
+		value[0] = pValue;
+		value[1] = foldChange;
+		
+		try {
+			c.assign("searchValue", value);
+		} catch (REngineException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	//4
 	public void readData() throws RserveException{
 		String userDir = System.getProperty("user.dir");
 		userDir = userDir.replaceAll("\\\\", "/");
-		userDir += "/R_Code.txt";
+		userDir += "/R.txt";
 		System.out.println("R code is at :: "+ userDir);
 		c.eval("source(\"" + userDir + "\")");
 	}
