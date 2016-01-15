@@ -69,6 +69,7 @@ public class DataProcess {
 		userDir = userDir.replaceAll("\\\\", "/");
 		userDir += "/R.txt";
 		System.out.println("R code is at :: "+ userDir);
+		System.out.println("R :: Source code is executing...");
 		try {
 			c.eval("source(\"" + userDir + "\")");
 			System.out.println("R Source code is executed successfully.");

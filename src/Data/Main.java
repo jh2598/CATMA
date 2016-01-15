@@ -18,7 +18,7 @@ public class Main {
 		//System.out.println(session.Loaded());
 		
 		//Session created.
-		Session session = menu.createSession(/*Session name*/"NAME_TEST", /*Session file path*/"C:/Users/JH/Desktop/CATMA/path", /*Cel file path*/"C:/Users/JH/Desktop/CATMA/data/celfiles", /*Sample info path*/"C:/Users/JH/Desktop/CATMA/data/sample.csv");
+		Session session = menu.createSession(/*Session name*/"NAME_TEST", /*Session file path*/"C:/Data", /*Cel file path*/"C:/data/celfiles", /*Sample info path*/"C:/data/sample.csv");
 		menu.loadSession(session); // the session is loaded on program.
 		DataProcess process = new DataProcess(session); // session을 넘겨줘서 해당 세션의 path에 따라 R에서 데이터를 처리하도록 한다.
 		try {
