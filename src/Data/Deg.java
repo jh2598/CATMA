@@ -7,4 +7,8 @@ public class Deg implements Serializable{
 	public Deg(){
 		System.out.println("Deg instance created. :: "+this);
 	}
+	
+	public void setDEG(DataProcess process){
+		
+	}
 }
