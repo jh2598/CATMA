@@ -2,6 +2,8 @@ package GUI;
 
 import javax.swing.JFileChooser;
 
+import Data.MenuBar;
+import Data.Session;
 import g4p_controls.*;
 import processing.core.*;
 
@@ -28,6 +30,7 @@ public class MainWindow extends PApplet{
 		
 		//Init. variables
 		frameCount = 0;
+		menu = new MenuBar();
 			
 		//Using G4P Library
 		createMainGUI();
@@ -232,7 +235,12 @@ public class MainWindow extends PApplet{
 			}
 			
 			//Update Label
-			System.out.println("Load Session>> Selected session file :" + fc.getSelectedFile().getAbsolutePath()+"\\"+fc.getSelectedFile().getName());
+			System.out.println("Load Session>> Selected session file :" + fc.getSelectedFile().getAbsolutePath());
+			
+			Session session = menu.openSession(fc.getSelectedFile().getAbsolutePath());
+			menu.loadSession(session);
+			System.out.println(menu.getSession().name);
+			
 		} //_CODE_:button_loadSession:712387:
 
 		synchronized public void statusWin_draw(PApplet appc, GWinData data) { //_CODE_:statusWindow:699836:
@@ -278,10 +286,19 @@ public class MainWindow extends PApplet{
 			//Update Label
 			System.out.println("Create Sesson>> Selected sampler info file :" + fc.getSelectedFile().getName());
 			label_samplerFilePath.setText(fc.getSelectedFile().getAbsolutePath()+"\\"+fc.getSelectedFile().getName());
+			
+			
 		} //_CODE_:button_loadSamplerInfo:769632:
 
 		public void button_createSessionClicked(GButton source, GEvent event) { //_CODE_:button_createSession:714695:
-		  println("button_createSession - GButton >> GEvent." + event + " @ " + millis());
+			//
+			Session session = menu.createSession(textfield_sessionName.getText(), label_celFilePathDisplay.getText(), label_samplerFilePath.getText());
+			System.out.println("Main Window>> New Session Created: "+ session.name);
+			menu.loadSession(session); // the session is loaded on program.
+			//
+			session.filePath = "C:/Data";
+			menu.saveSession();
+			
 		} //_CODE_:button_createSession:714695:
 	
 			public void button_findDEGClicked(GButton source, GEvent event) { //_CODE_:button_findDEG:563441:
@@ -326,5 +343,7 @@ public class MainWindow extends PApplet{
 	GWindow win_clustering;
 	GLabel label_clusteringTool; 
 	GButton button_findDEG; 
+	
+	MenuBar menu;
 }
 

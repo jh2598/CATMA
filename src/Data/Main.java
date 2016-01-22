@@ -5,8 +5,9 @@ import org.rosuda.REngine.Rserve.RserveException;
 
 public class Main {
 
+	/*
 	public static void main(String[] args) {
-		MenuBar menu = new MenuBar();
+		//MenuBar menu = new MenuBar();
 		//Save용 테스트 코드
 		//Session session = menu.createSession("NAME_TEST", "C:/Users/JH/Desktop/CATMA/path", "C:/Users/JH/Desktop/CATMA/data/celfile", "C:/Users/JH/Desktop/CATMA/data");
 		//menu.LoadSession(session);
@@ -17,9 +18,11 @@ public class Main {
 		//menu.LoadSession(session);
 		//System.out.println(session.Loaded());
 
+		
 		//Session created.
-		Session session = menu.createSession(/*Session name*/"SessionName", /*Session file path*/"C:/Data", /*Cel file path*/"C:/data/celfiles", /*Sample info path*/"C:/data/sample.csv");
+		Session session = menu.createSession("SessionName", "C:/data/celfiles", "C:/data/sample.csv");
 		menu.loadSession(session); // the session is loaded on program.
+		
 		DataProcess process = new DataProcess(session); // session을 넘겨줘서 해당 세션의 path에 따라 R에서 데이터를 처리하도록 한다.
 		GOdb go;
 		//DEG Finding
@@ -45,5 +48,9 @@ public class Main {
 //		}catch(Exception e){
 //			e.printStackTrace();
 //		}
+	}
+*/
+	public void findDEG(Session session){
+		DataProcess process = new DataProcess(session);
 	}
 }

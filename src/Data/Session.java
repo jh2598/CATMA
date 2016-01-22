@@ -15,10 +15,9 @@ public class Session implements Serializable {
 	public String sampleInfoPath;
 	Deg deg;
 
-	public Session(String name, String file, String celPath, String samplePath){
+	public Session(String name, String celPath, String samplePath){
 		System.out.println("Session Created. :: "+this);
 		this.name = name;
-		this.filePath = file;
 		this.celFilePath = celPath;
 		this.sampleInfoPath = samplePath;
 		deg = new Deg();	

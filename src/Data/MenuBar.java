@@ -11,15 +11,16 @@ public class MenuBar {
 		System.out.println("MenuBar Called.");
 	}
 	
-	public Session createSession(String name, String file, String cel, String sample){
+	public Session createSession(String name, String cel, String sample){
 		System.out.println("MenuBar is creating Session.");
-		Session session = new Session(name, file, cel, sample);
+		Session session = new Session(name, cel, sample);
 		System.out.println("MenuBar just has created Session.");
 		return session;
 	}
 	public Session openSession(String path){
 		//경로에서 직렬화 되어있는 세션을 불러옴.
 		System.out.println("MenuBar is Opening Session from '"+path+"'");
+		//path = path.replaceAll("\\\\", "/");
 		try{
 		FileInputStream fis = new FileInputStream(path);
 		ObjectInputStream ois = new ObjectInputStream(fis);
