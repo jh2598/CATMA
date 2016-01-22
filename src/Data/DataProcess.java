@@ -27,16 +27,16 @@ public class DataProcess {
 	//1
 	public void setLibrary() throws RserveException, REXPMismatchException {
 		// Setting Library - affy, limma, GO.db
-		c.eval("library(affy)");
 		System.out.println("R :: Library setting... : affy");
-		c.eval("library(limma)");
+		c.eval("library(affy)");
 		System.out.println("R :: Library setting... : limma");
-		c.eval("library(GO.db)");
+		c.eval("library(limma)");
 		System.out.println("R :: Library setting... : GO.db");
-		c.eval("library(clusterProfiler)");
+		c.eval("library(GO.db)");
 		System.out.println("R :: Library setting... : clusterProfiler");
-		c.eval("library(hgu133a.db)");
+		c.eval("library(clusterProfiler)");
 		System.out.println("R :: Library setting... : hgu133a.db");
+		c.eval("library(hgu133a.db)");
 		System.out.println("R :: Library setting is done.");
 	}
 	//2

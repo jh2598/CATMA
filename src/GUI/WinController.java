@@ -1,9 +1,8 @@
 package GUI;
 
-public class WindowController {
+public class WinController {
 
 	public static void main(String[] args) {
-		ProgramWindow.run();
+		MainWindow.run();
 	}
-
 }
