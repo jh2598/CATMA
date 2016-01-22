@@ -2,8 +2,9 @@ package GUI;
 
 import javax.swing.JFileChooser;
 
-import Data.MenuBar;
-import Data.Session;
+import org.rosuda.REngine.Rserve.RserveException;
+
+import Data.*;
 import g4p_controls.*;
 import processing.core.*;
 
@@ -38,7 +39,6 @@ public class MainWindow extends PApplet{
 	
 	public void draw(){
 		background(255);
-		
 		textSize(15);
 		fill(0);
 		text("Clustering Analysis Tool for Microarray",width/2,height/2-50);
@@ -265,7 +265,11 @@ public class MainWindow extends PApplet{
 			
 			Session session = menu.openSession(fc.getSelectedFile().getAbsolutePath());
 			menu.loadSession(session);
+			
+			process = new DataProcess(session);
 			System.out.println(menu.getSession().name);
+			System.out.println(menu.getSession().celFilePath);
+			System.out.println(menu.getSession().sampleInfoPath);
 			
 			updateStatusWindow(session);
 			
@@ -313,7 +317,7 @@ public class MainWindow extends PApplet{
 			
 			//Update Label
 			System.out.println("Create Sesson>> Selected sampler info file :" + fc.getSelectedFile().getName());
-			label_samplerFilePath.setText(fc.getSelectedFile().getAbsolutePath()+"\\"+fc.getSelectedFile().getName());
+			label_samplerFilePath.setText(fc.getSelectedFile().getAbsolutePath());
 			
 			
 		} //_CODE_:button_loadSamplerInfo:769632:
@@ -323,6 +327,7 @@ public class MainWindow extends PApplet{
 			Session session = menu.createSession(textfield_sessionName.getText(), label_celFilePathDisplay.getText(), label_samplerFilePath.getText());
 			System.out.println("Main Window>> New Session Created: "+ session.name);
 			menu.loadSession(session); // the session is loaded on program.
+			process = new DataProcess(session);
 			//
 			session.filePath = "C:/Data";
 			menu.saveSession();
@@ -331,7 +336,7 @@ public class MainWindow extends PApplet{
 			
 		} //_CODE_:button_createSession:714695:
 	
-		public void button_findDEGClicked(GButton source, GEvent event) { //_CODE_:button_findDEG:563441:
+		public void button_findDEGClicked(GButton source, GEvent event) throws RserveException { //_CODE_:button_findDEG:563441:
 			
 			double pValue;
 			double foldChange;
@@ -341,9 +346,11 @@ public class MainWindow extends PApplet{
 			pValue = Double.valueOf(textfield_pValue.getText());
 			foldChange = Double.valueOf(textfield_foldChange.getText());
 			ranking = Double.valueOf(textfield_ranking.getText());
+			process.init();
+			process.setSearchValue(pValue, foldChange);
 			
 			System.out.println("Clustering Window>> Start finding DEG at - [P-Value:"+pValue+"] [Fold Change:"+foldChange+"] [Ranking:"+ranking+"]");
-			
+			process.findDEG();
 		} //_CODE_:button_findDEG:563441:
 			
 		public void textfield_pValueChange(GTextField source, GEvent event) { //_CODE_:textfield_pValue:914850:
@@ -411,5 +418,6 @@ public class MainWindow extends PApplet{
 	GTextField textfield_ranking; 
 	
 	MenuBar menu;
+	DataProcess process;
 }
 

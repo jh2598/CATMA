@@ -56,7 +56,7 @@ fit2 <- eBayes(fit2, 0.01)
 
 #------------------------------------------------
 tab <- topTable(fit2, adjust = "fdr", n = nrow(exprs(eset)))
-condi.2 = tab[,4] < searchValue[1] & (abs(tab[,1]) > log(searchValue[2])) ####Error here
+condi.2 = tab[,4] < searchValue[1] & (abs(tab[,1]) > log(searchValue[2])) #searchValue[1] = pValue, searchValue[2] = foldChange
 tab = tab[condi.2,]
 # sort tab by logFC
 up   = tab[tab[,"logFC"]>0,]

@@ -13,6 +13,8 @@ public class MenuBar {
 	
 	public Session createSession(String name, String cel, String sample){
 		System.out.println("MenuBar is creating Session.");
+		cel = cel.replaceAll("\\\\", "/");
+		sample = sample.replaceAll("\\\\", "/");
 		Session session = new Session(name, cel, sample);
 		System.out.println("MenuBar just has created Session.");
 		return session;
@@ -20,7 +22,7 @@ public class MenuBar {
 	public Session openSession(String path){
 		//경로에서 직렬화 되어있는 세션을 불러옴.
 		System.out.println("MenuBar is Opening Session from '"+path+"'");
-		//path = path.replaceAll("\\\\", "/");
+//		path = path.replaceAll("\\\\", "/");
 		try{
 		FileInputStream fis = new FileInputStream(path);
 		ObjectInputStream ois = new ObjectInputStream(fis);

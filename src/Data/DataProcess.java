@@ -28,7 +28,6 @@ public class DataProcess {
 		try {
 			setLibrary();
 			setPath();
-			setSearchValue(0.05, 1.5);
 		} catch (RserveException | REXPMismatchException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
