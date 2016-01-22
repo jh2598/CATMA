@@ -24,6 +24,16 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 	}
+	public void init(){
+		try {
+			setLibrary();
+			setPath();
+			setSearchValue(0.05, 1.5);
+		} catch (RserveException | REXPMismatchException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	//1
 	public void setLibrary() throws RserveException, REXPMismatchException {
 		// Setting Library - affy, limma, GO.db
@@ -104,6 +114,7 @@ public class DataProcess {
 //		c.eval("write.csv(tab,\""+session.filePath+"/"+session.name+".csv\")");
 //		System.out.println("DEG information is saved at "+session.filePath+"/"+session.name+".csv");
 //	}
+	//5
 	public void mapId(){
 		System.out.println("Mapping Probe ID to ENTREZ, SYMBOL ID.");
 		String userDir = System.getProperty("user.dir");
