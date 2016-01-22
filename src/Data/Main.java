@@ -4,7 +4,6 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 public class Main {
-
 	/*
 	public static void main(String[] args) {
 		//MenuBar menu = new MenuBar();
@@ -50,7 +49,5 @@ public class Main {
 //		}
 	}
 */
-	public void findDEG(Session session){
-		DataProcess process = new DataProcess(session);
-	}
+
 }

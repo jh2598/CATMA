@@ -152,6 +152,7 @@ public class MainWindow extends PApplet{
 		  label_goDisplay.setLocalColorScheme(GCScheme.GREEN_SCHEME);
 		  label_goDisplay.setOpaque(true);
 		  
+		  //Clustering GUI
 		  win_clustering = GWindow.getWindow(this, "Clustering", 0, 0, 300, 300, JAVA2D);
 		  win_clustering.noLoop();
 		  win_clustering.setActionOnClose(G4P.CLOSE_WINDOW);
@@ -161,9 +162,33 @@ public class MainWindow extends PApplet{
 		  label_clusteringTool.setTextBold();
 		  label_clusteringTool.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
 		  label_clusteringTool.setOpaque(true);
-		  button_findDEG = new GButton(win_clustering, 100, 74, 100, 30);
+		  button_findDEG = new GButton(win_clustering, 100, 200, 100, 30);
 		  button_findDEG.setText("Generate DEG");
 		  button_findDEG.addEventHandler(this, "button_findDEGClicked");
+		  label_pVaue = new GLabel(win_clustering, 30, 75, 80, 20);
+		  label_pVaue.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_pVaue.setText("P-Value >");
+		  label_pVaue.setOpaque(false);
+		  label_foldChange = new GLabel(win_clustering, 30, 100, 80, 20);
+		  label_foldChange.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_foldChange.setText("Fold Change <");
+		  label_foldChange.setOpaque(false);
+		  label_ranking = new GLabel(win_clustering, 30, 135, 80, 20);
+		  label_ranking.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_ranking.setText("Ranking:");
+		  label_ranking.setOpaque(false);
+		  textfield_pValue = new GTextField(win_clustering, 110, 75, 160, 20, G4P.SCROLLBARS_NONE);
+		  textfield_pValue.setPromptText("0.05");
+		  textfield_pValue.setOpaque(true);
+		  textfield_pValue.addEventHandler(this, "textfield_pValueChange");
+		  textfield_foldChange = new GTextField(win_clustering, 110, 100, 160, 20, G4P.SCROLLBARS_NONE);
+		  textfield_foldChange.setPromptText("1.5");
+		  textfield_foldChange.setOpaque(true);
+		  textfield_foldChange.addEventHandler(this, "textfield_foldChangeChange");
+		  textfield_ranking = new GTextField(win_clustering, 110, 135, 160, 20, G4P.SCROLLBARS_NONE);
+		  textfield_ranking.setPromptText("500");
+		  textfield_ranking.setOpaque(true);
+		  textfield_ranking.addEventHandler(this, "textfield_rankingChange");
 		  
 		  statusWindow.loop();
 		  win_clustering.loop();
@@ -213,6 +238,7 @@ public class MainWindow extends PApplet{
 		  button_createSession.setLocalColorScheme(GCScheme.RED_SCHEME);
 		  button_createSession.addEventHandler(this, "button_createSessionClicked");
 		  
+		  
 		  win_newSession.noLoop();
 		  win_newSession.setActionOnClose(G4P.CLOSE_WINDOW);
 		  win_newSession.addDrawHandler(this, "win_newSessionDraw");
@@ -240,6 +266,8 @@ public class MainWindow extends PApplet{
 			Session session = menu.openSession(fc.getSelectedFile().getAbsolutePath());
 			menu.loadSession(session);
 			System.out.println(menu.getSession().name);
+			
+			updateStatusWindow(session);
 			
 		} //_CODE_:button_loadSession:712387:
 
@@ -299,12 +327,44 @@ public class MainWindow extends PApplet{
 			session.filePath = "C:/Data";
 			menu.saveSession();
 			
+			updateStatusWindow(session);
+			
 		} //_CODE_:button_createSession:714695:
 	
-			public void button_findDEGClicked(GButton source, GEvent event) { //_CODE_:button_findDEG:563441:
-			  println("button_findDEG - GButton >> GEvent." + event + " @ " + millis());
-			} //_CODE_:button_findDEG:563441:
+		public void button_findDEGClicked(GButton source, GEvent event) { //_CODE_:button_findDEG:563441:
+			
+			double pValue;
+			double foldChange;
+			double ranking;
+			
+			//Receive, Convert User input
+			pValue = Double.valueOf(textfield_pValue.getText());
+			foldChange = Double.valueOf(textfield_foldChange.getText());
+			ranking = Double.valueOf(textfield_ranking.getText());
+			
+			System.out.println("Clustering Window>> Start finding DEG at - [P-Value:"+pValue+"] [Fold Change:"+foldChange+"] [Ranking:"+ranking+"]");
+			
+		} //_CODE_:button_findDEG:563441:
+			
+		public void textfield_pValueChange(GTextField source, GEvent event) { //_CODE_:textfield_pValue:914850:
+			System.out.println("textfield1 - GTextField >> GEvent." + event + " @ " + millis());
+		} //_CODE_:textfield_pValue:914850:
+
+		public void textfield_foldChangeChange(GTextField source, GEvent event) { //_CODE_:textfield_foldChange:719517:
+			System.out.println("textfield1 - GTextField >> GEvent." + event + " @ " + millis());
+		} //_CODE_:textfield_foldChange:719517:
+
+		public void textfield_rankingChange(GTextField source, GEvent event) { //_CODE_:textfield_ranking:603506:
+			System.out.println("textfield_ranking - GTextField >> GEvent." + event + " @ " + millis());
+		} //_CODE_:textfield_ranking:603506:
 	
+	/**************************************
+	* 			Custom Methods
+	**************************************/				
+	public void updateStatusWindow(Session session){
+		label_sessionNameDisplay.setText(session.name);
+	}				
+				
 	/**************************************
 	 * 	  		Instance Variables
 	 **************************************/
@@ -343,6 +403,12 @@ public class MainWindow extends PApplet{
 	GWindow win_clustering;
 	GLabel label_clusteringTool; 
 	GButton button_findDEG; 
+	GLabel label_pVaue; 
+	GLabel label_foldChange; 
+	GLabel label_ranking; 
+	GTextField textfield_pValue; 
+	GTextField textfield_foldChange; 
+	GTextField textfield_ranking; 
 	
 	MenuBar menu;
 }
