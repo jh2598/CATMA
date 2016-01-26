@@ -13,14 +13,14 @@ public class Session implements Serializable {
 	public String filePath;
 	public String celFilePath;
 	public String sampleInfoPath;
-	Deg deg;
+	Database db;
 
 	public Session(String name, String celPath, String samplePath){
 		System.out.println("Session Created. :: "+this);
 		this.name = name;
 		this.celFilePath = celPath;
 		this.sampleInfoPath = samplePath;
-		deg = new Deg();	
+//		db = new Database();	
 	}
 	public void save(){
 		//자신을 직렬화해서 filePath에 저장

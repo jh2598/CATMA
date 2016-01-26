@@ -19,7 +19,6 @@ public class DataProcess {
 			x = c.eval("R.version.string");
 			System.out.println("R Connected successfully :: " + x.asString());
 		} catch (RserveException | REXPMismatchException e) {
-			// TODO Auto-generated catch block
 			System.out.println("RConnection not Constructed.");
 			e.printStackTrace();
 		}
@@ -29,7 +28,6 @@ public class DataProcess {
 			setLibrary();
 			setPath();
 		} catch (RserveException | REXPMismatchException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -82,7 +80,6 @@ public class DataProcess {
 			c.assign("searchValue", value);
 			
 		} catch (REngineException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -91,18 +88,17 @@ public class DataProcess {
 		System.out.println("Find DEG from cel files. and Save it as table.");
 		String userDir = System.getProperty("user.dir");
 		userDir = userDir.replaceAll("\\\\", "/");
-		userDir += "/R_Finding_DEG.txt";
+		userDir += "/R_Finding_DEG.R";
 		System.out.println("R code is at :: "+ userDir);
 		System.out.println("R :: Source code is executing...");
 		try {
 			c.eval("source(\"" + userDir + "\")");
 			System.out.println("R Source code is executed successfully.");
 		} catch (RserveException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	public Deg findDEG(double pValue, double foldChange, int ranking) {
+	public Database findDEG(double pValue, double foldChange, int ranking) {
 		return null;
 	}
 	public String getGOdb(){
@@ -118,15 +114,84 @@ public class DataProcess {
 		System.out.println("Mapping Probe ID to ENTREZ, SYMBOL ID.");
 		String userDir = System.getProperty("user.dir");
 		userDir = userDir.replaceAll("\\\\", "/");
-		userDir += "/R_Mapping_ID.txt";
+		userDir += "/R_Mapping_ID.R";
 		System.out.println("R code is at :: "+ userDir);
 		System.out.println("R :: Source code is executing...");
 		try {
 			c.eval("source(\"" + userDir + "\")");
 			System.out.println("R Source code is executed successfully.");
 		} catch (RserveException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Database database = new Database(this);
+		database.saveSample();
+	}
+	public String[][] getSampleId(){ // Mapped ID 0:PROBES, 1:ENTREZ, 2:SYMBOL
+		String[][] str = new String[3][getSampleLength()];
+		try {
+			str[0] = getSampleProbes();
+			str[1] = getSampleEntrez();
+			str[2] = getSampleSymbol();
+		} catch (RserveException | REXPMismatchException e) {
+			e.printStackTrace();
+		}
+		return str;
+	}
+	public String[][] getSampleExp(){ // Expression set
+		int num = getSampleNumber();// # of Samples
+		int len = getSampleLength();// # of Selected Probes
+		String[][] str = new String[num][len];
+		for(int i=0;i<num;i++){
+			for(int j=0;j<len;j++){
+				try {
+					x = c.eval("esetSel["+(j+1)+","+(i+1)+"]");
+					str[i][j] = x.asString();
+				} catch (RserveException | REXPMismatchException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return str;
+	}
+	public String[] getSampleNames(){
+		try {
+			x = c.eval("colnames(esetSel)");
+			return x.asStrings();
+		} catch (RserveException | REXPMismatchException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public int getSampleNumber(){//# of Samples
+		try {
+			x = c.eval("ncol(esetSel)");
+			return x.asInteger();
+		} catch (RserveException | REXPMismatchException e) {
+			e.printStackTrace();
+			return -1;
+		}
+		
+	}
+	public int getSampleLength(){// # of Selected Probes
+		try {
+			x = c.eval("length(PROBES)");
+			return x.asInteger();
+		} catch (RserveException | REXPMismatchException e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	private String[] getSampleProbes() throws RserveException, REXPMismatchException{
+		x = c.eval("PROBES");
+		return x.asStrings();
+	}
+	private String[] getSampleEntrez() throws RserveException, REXPMismatchException {
+		x = c.eval("ENTREZID");
+		return x.asStrings();
+	}
+	private String[] getSampleSymbol() throws RserveException, REXPMismatchException {
+		x = c.eval("SYMBOLID");
+		return x.asStrings();
 	}
 }
