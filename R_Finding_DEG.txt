@@ -66,3 +66,6 @@ down = tab[tab[,"logFC"]<0,]
 attach(down)
 down = down[order(logFC),]
 tab = rbind(up,down)
+
+esetSel = exprs(eset)
+esetSel = esetSel[c(rownames(tab)),]

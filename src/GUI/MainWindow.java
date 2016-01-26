@@ -18,7 +18,7 @@ public class MainWindow extends PApplet{
 	
 	public void settings(){
 		//From Processing 3.x, method size()&smooth() must be inside settings 
-		size(500,300,JAVA2D);
+		size(800,500,JAVA2D);
 		smooth();
 	}
 	
@@ -39,9 +39,6 @@ public class MainWindow extends PApplet{
 	
 	public void draw(){
 		background(255);
-		textSize(15);
-		fill(0);
-		text("Clustering Analysis Tool for Microarray",width/2,height/2-50);
 		
 		//Update frameCount
 		frameCount ++;
@@ -69,129 +66,128 @@ public class MainWindow extends PApplet{
 		  G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
 		  G4P.setCursor(ARROW);
 		  surface.setTitle("Clustering Analysis Tool for Microarray");
-		  button_newSession = new GButton(this, 120, 130, 107, 46);
+		  panel_file = new GPanel(this, 0, -22, 800, 60, "File");
+		  panel_file.setCollapsible(false);
+		  panel_file.setDraggable(false);
+		  panel_file.setText("File");
+		  panel_file.setOpaque(true);
+		  panel_file.addEventHandler(this, "panel_fileEvent");
+		  button_newSession = new GButton(this, 13, 30, 80, 20);
 		  button_newSession.setText("New Session");
-		  button_newSession.setTextBold();
-		  button_newSession.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+		  button_newSession.setLocalColorScheme(GCScheme.RED_SCHEME);
 		  button_newSession.addEventHandler(this, "button_newSessionClicked");
-		  button_loadSession = new GButton(this, 252, 130, 106, 46);
+		  button_loadSession = new GButton(this, 107, 30, 80, 20);
 		  button_loadSession.setText("Load Session");
-		  button_loadSession.setTextBold();
-		  button_loadSession.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
+		  button_loadSession.setLocalColorScheme(GCScheme.CYAN_SCHEME);
 		  button_loadSession.addEventHandler(this, "button_loadSessionClicked");
-		  
-		  //Status GUI
-		  statusWindow = GWindow.getWindow(this, "Status Window", 0, 0, 350, 250, JAVA2D);
-
-		  statusWindow.noLoop();
-		  statusWindow.setActionOnClose(G4P.CLOSE_WINDOW);
-		  statusWindow.addDrawHandler(this, "statusWin_draw");
-		  label_statusWindow = new GLabel(statusWindow, 2, 0, 350, 30);
-		  label_statusWindow.setText("Status Window");
-		  label_statusWindow.setTextBold();
-		  label_statusWindow.setLocalColorScheme(GCScheme.RED_SCHEME);
-		  label_statusWindow.setOpaque(true);
-		  label_sessionName = new GLabel(statusWindow, 20, 45, 110, 20);
-		  label_sessionName.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_sessionName.setText("Session Name:");
-		  label_sessionName.setLocalColorScheme(GCScheme.CYAN_SCHEME);
-		  label_sessionName.setOpaque(false);
-		  label_maType = new GLabel(statusWindow, 20, 80, 110, 20);
+		  button_saveSession = new GButton(this, 200, 30, 80, 20);
+		  button_saveSession.setText("Save Session");
+		  button_saveSession.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+		  button_saveSession.addEventHandler(this, "button_saveSessionClicked");
+		  panel_file.addControl(button_newSession);
+		  panel_file.addControl(button_loadSession);
+		  panel_file.addControl(button_saveSession);
+		  panel_status = new GPanel(this, 5, 43, 368, 452, "Status View");
+		  panel_status.setText("Status View");
+		  panel_status.setLocalColorScheme(GCScheme.GOLD_SCHEME);
+		  panel_status.setOpaque(true);
+		  panel_status.addEventHandler(this, "panel_statusEvent");
+		  label_maType = new GLabel(this, 20, 80, 110, 20);
 		  label_maType.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
 		  label_maType.setText("Microarray Type:");
-		  label_maType.setLocalColorScheme(GCScheme.GOLD_SCHEME);
+		  label_maType.setLocalColorScheme(GCScheme.RED_SCHEME);
 		  label_maType.setOpaque(false);
-		  label_organism = new GLabel(statusWindow, 20, 100, 110, 20);
-		  label_organism.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_organism.setText("Organism");
-		  label_organism.setLocalColorScheme(GCScheme.GOLD_SCHEME);
-		  label_organism.setOpaque(false);
-		  label_numOfSamples = new GLabel(statusWindow, 20, 120, 110, 20);
-		  label_numOfSamples.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_numOfSamples.setText("# of samples:");
-		  label_numOfSamples.setLocalColorScheme(GCScheme.GOLD_SCHEME);
-		  label_numOfSamples.setOpaque(false);
-		  label_deg = new GLabel(statusWindow, 20, 160, 110, 20);
-		  label_deg.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_deg.setText("DEG data:");
-		  label_deg.setLocalColorScheme(GCScheme.GREEN_SCHEME);
-		  label_deg.setOpaque(false);
-		  label_go = new GLabel(statusWindow, 20, 180, 110, 20);
-		  label_go.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_go.setText("GO data:");
-		  label_go.setLocalColorScheme(GCScheme.GREEN_SCHEME);
-		  label_go.setOpaque(false);
-		  label_sessionNameDisplay = new GLabel(statusWindow, 140, 45, 160, 20);
+		  label_sessionName = new GLabel(this, 20, 40, 110, 20);
+		  label_sessionName.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_sessionName.setText("Session:");
+		  label_sessionName.setOpaque(false);
+		  label_sessionNameDisplay = new GLabel(this, 135, 40, 200, 20);
 		  label_sessionNameDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_sessionNameDisplay.setText("NOT SET");
-		  label_sessionNameDisplay.setLocalColorScheme(GCScheme.CYAN_SCHEME);
-		  label_sessionNameDisplay.setOpaque(true);
-		  label_maTypeDisplay = new GLabel(statusWindow, 140, 80, 160, 20);
+		  label_sessionNameDisplay.setText("NOT LOADED");
+		  label_sessionNameDisplay.setOpaque(false);
+		  label_maTypeDisplay = new GLabel(this, 135, 80, 200, 20);
 		  label_maTypeDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
 		  label_maTypeDisplay.setText("NOT LOADED");
-		  label_maTypeDisplay.setLocalColorScheme(GCScheme.GOLD_SCHEME);
-		  label_maTypeDisplay.setOpaque(true);
-		  label_organismDisplay = new GLabel(statusWindow, 140, 100, 160, 20);
+		  label_maTypeDisplay.setLocalColorScheme(GCScheme.RED_SCHEME);
+		  label_maTypeDisplay.setOpaque(false);
+		  label_organism = new GLabel(this, 19, 100, 110, 20);
+		  label_organism.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_organism.setText("Organism:");
+		  label_organism.setLocalColorScheme(GCScheme.RED_SCHEME);
+		  label_organism.setOpaque(false);
+		  label_numOfSamples = new GLabel(this, 19, 120, 110, 20);
+		  label_numOfSamples.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_numOfSamples.setText("# of samples:");
+		  label_numOfSamples.setLocalColorScheme(GCScheme.RED_SCHEME);
+		  label_numOfSamples.setOpaque(false);
+		  label_organismDisplay = new GLabel(this, 135, 100, 200, 20);
 		  label_organismDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
 		  label_organismDisplay.setText("NOT LOADED");
-		  label_organismDisplay.setLocalColorScheme(GCScheme.GOLD_SCHEME);
-		  label_organismDisplay.setOpaque(true);
-		  label_numOfSamplesDisplay = new GLabel(statusWindow, 140, 120, 160, 20);
+		  label_organismDisplay.setLocalColorScheme(GCScheme.RED_SCHEME);
+		  label_organismDisplay.setOpaque(false);
+		  label_numOfSamplesDisplay = new GLabel(this, 135, 120, 200, 20);
 		  label_numOfSamplesDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
 		  label_numOfSamplesDisplay.setText("NOT LOADED");
-		  label_numOfSamplesDisplay.setLocalColorScheme(GCScheme.GOLD_SCHEME);
-		  label_numOfSamplesDisplay.setOpaque(true);
-		  label_degDisplay = new GLabel(statusWindow, 140, 160, 160, 20);
-		  label_degDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_degDisplay.setText("NO DATA");
-		  label_degDisplay.setLocalColorScheme(GCScheme.GREEN_SCHEME);
-		  label_degDisplay.setOpaque(true);
-		  label_goDisplay = new GLabel(statusWindow, 140, 180, 160, 20);
-		  label_goDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_goDisplay.setText("NO DATA");
-		  label_goDisplay.setLocalColorScheme(GCScheme.GREEN_SCHEME);
-		  label_goDisplay.setOpaque(true);
+		  label_numOfSamplesDisplay.setLocalColorScheme(GCScheme.RED_SCHEME);
+		  label_numOfSamplesDisplay.setOpaque(false);
+		  label_degInfo = new GLabel(this, 19, 160, 110, 20);
+		  label_degInfo.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_degInfo.setText("DEG Info.");
+		  label_degInfo.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+		  label_degInfo.setOpaque(false);
+		  label_degInfoDisplay = new GLabel(this, 135, 160, 200, 20);
+		  label_degInfoDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_degInfoDisplay.setText("NO DATA");
+		  label_degInfoDisplay.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+		  label_degInfoDisplay.setOpaque(false);
+		  label_degValue = new GLabel(this, 135, 180, 200, 20);
+		  label_degValue.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_degValue.setText("Clustering Nedded");
+		  label_degValue.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+		  label_degValue.setOpaque(false);
+		  label_goInfo = new GLabel(this, 19, 210, 80, 20);
+		  label_goInfo.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_goInfo.setText("GO info.");
+		  label_goInfo.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+		  label_goInfo.setOpaque(false);
+		  panel_status.addControl(label_maType);
+		  panel_status.addControl(label_sessionName);
+		  panel_status.addControl(label_sessionNameDisplay);
+		  panel_status.addControl(label_maTypeDisplay);
+		  panel_status.addControl(label_organism);
+		  panel_status.addControl(label_numOfSamples);
+		  panel_status.addControl(label_organismDisplay);
+		  panel_status.addControl(label_numOfSamplesDisplay);
+		  panel_status.addControl(label_degInfo);
+		  panel_status.addControl(label_degInfoDisplay);
+		  panel_status.addControl(label_degValue);
+		  panel_status.addControl(label_goInfo);
+		  panel_clustering = new GPanel(this, 381, 43, 410, 200, "Clustering Tool");
+		  panel_clustering.setText("Clustering Tool");
+		  panel_clustering.setLocalColorScheme(GCScheme.RED_SCHEME);
+		  panel_clustering.setOpaque(true);
+		  panel_clustering.addEventHandler(this, "panel_clusteringClicked");
+		  button_degFinding = new GButton(this, 112, 82, 91, 47);
+		  button_degFinding.setText("DEG");
+		  button_degFinding.setLocalColorScheme(GCScheme.RED_SCHEME);
+		  button_degFinding.addEventHandler(this, "button_degFindClicked");
+		  button_goFinding = new GButton(this, 219, 81, 92, 47);
+		  button_goFinding.setText("Gene Ontology");
+		  button_goFinding.setLocalColorScheme(GCScheme.RED_SCHEME);
+		  button_goFinding.addEventHandler(this, "button_goFindingClicked");
+		  panel_clustering.addControl(button_degFinding);
+		  panel_clustering.addControl(button_goFinding);
+		  panel_visualization = new GPanel(this, 382, 251, 408, 242, "Visualization Tool");
+		  panel_visualization.setText("Visualization Tool");
+		  panel_visualization.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+		  panel_visualization.setOpaque(true);
+		  panel_visualization.addEventHandler(this, "panel_visClicked");
+		  button_heatmapVis = new GButton(this, 164, 106, 80, 30);
+		  button_heatmapVis.setText("Heatmap");
+		  button_heatmapVis.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+		  button_heatmapVis.addEventHandler(this, "button_heatmapVisClicked");
+		  panel_visualization.addControl(button_heatmapVis);
 		  
-		  //Clustering GUI
-		  win_clustering = GWindow.getWindow(this, "Clustering", 0, 0, 300, 300, JAVA2D);
-		  win_clustering.noLoop();
-		  win_clustering.setActionOnClose(G4P.CLOSE_WINDOW);
-		  win_clustering.addDrawHandler(this, "win_clusteringDraw");
-		  label_clusteringTool = new GLabel(win_clustering, 0, 0, 300, 40);
-		  label_clusteringTool.setText("Clustering Tool");
-		  label_clusteringTool.setTextBold();
-		  label_clusteringTool.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
-		  label_clusteringTool.setOpaque(true);
-		  button_findDEG = new GButton(win_clustering, 100, 200, 100, 30);
-		  button_findDEG.setText("Generate DEG");
-		  button_findDEG.addEventHandler(this, "button_findDEGClicked");
-		  label_pVaue = new GLabel(win_clustering, 30, 75, 80, 20);
-		  label_pVaue.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_pVaue.setText("P-Value >");
-		  label_pVaue.setOpaque(false);
-		  label_foldChange = new GLabel(win_clustering, 30, 100, 80, 20);
-		  label_foldChange.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_foldChange.setText("Fold Change <");
-		  label_foldChange.setOpaque(false);
-		  label_ranking = new GLabel(win_clustering, 30, 135, 80, 20);
-		  label_ranking.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_ranking.setText("Ranking:");
-		  label_ranking.setOpaque(false);
-		  textfield_pValue = new GTextField(win_clustering, 110, 75, 160, 20, G4P.SCROLLBARS_NONE);
-		  textfield_pValue.setPromptText("0.05");
-		  textfield_pValue.setOpaque(true);
-		  textfield_pValue.addEventHandler(this, "textfield_pValueChange");
-		  textfield_foldChange = new GTextField(win_clustering, 110, 100, 160, 20, G4P.SCROLLBARS_NONE);
-		  textfield_foldChange.setPromptText("1.5");
-		  textfield_foldChange.setOpaque(true);
-		  textfield_foldChange.addEventHandler(this, "textfield_foldChangeChange");
-		  textfield_ranking = new GTextField(win_clustering, 110, 135, 160, 20, G4P.SCROLLBARS_NONE);
-		  textfield_ranking.setPromptText("500");
-		  textfield_ranking.setOpaque(true);
-		  textfield_ranking.addEventHandler(this, "textfield_rankingChange");
-		  
-		  statusWindow.loop();
-		  win_clustering.loop();
 	}
 	
 	public void createGUI_newSession(){
@@ -245,6 +241,45 @@ public class MainWindow extends PApplet{
 		  win_newSession.loop();	
 	}
 	
+	public void createGUI_DEGFinding(){
+		  win_clustering = GWindow.getWindow(this, "Clustering", 0, 0, 300, 300, JAVA2D);
+		  win_clustering.noLoop();
+		  win_clustering.setActionOnClose(G4P.CLOSE_WINDOW);
+		  win_clustering.addDrawHandler(this, "win_clusteringDraw");
+		  win_clustering.addPreHandler(this, "CLOSE_WINDOW");
+		  label_degFinding = new GLabel(win_clustering, 0, 0, 300, 40);
+		  label_degFinding.setText("Clustering Tool");
+		  label_degFinding.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
+		  label_degFinding.setOpaque(true);
+		  button_findDEG = new GButton(win_clustering, 96, 212, 100, 30);
+		  button_findDEG.setText("Generate DEG");
+		  button_findDEG.addEventHandler(this, "button_findDEGClicked");
+		  label_pVaue = new GLabel(win_clustering, 30, 75, 80, 20);
+		  label_pVaue.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_pVaue.setText("P-Value >");
+		  label_pVaue.setOpaque(false);
+		  label_foldChange = new GLabel(win_clustering, 30, 100, 80, 20);
+		  label_foldChange.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_foldChange.setText("Fold Change <");
+		  label_foldChange.setOpaque(false);
+		  label_ranking = new GLabel(win_clustering, 30, 135, 80, 20);
+		  label_ranking.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_ranking.setText("Ranking:");
+		  label_ranking.setOpaque(false);
+		  textfield_pValue = new GTextField(win_clustering, 110, 75, 160, 20, G4P.SCROLLBARS_NONE);
+		  textfield_pValue.setText("0.05");
+		  textfield_pValue.setOpaque(true);
+		  textfield_pValue.addEventHandler(this, "textfield_pValueChange");
+		  textfield_foldChange = new GTextField(win_clustering, 110, 100, 160, 20, G4P.SCROLLBARS_NONE);
+		  textfield_foldChange.setText("1.5");
+		  textfield_foldChange.setOpaque(true);
+		  textfield_foldChange.addEventHandler(this, "textfield_foldChangeChange");
+		  textfield_ranking = new GTextField(win_clustering, 110, 135, 160, 20, G4P.SCROLLBARS_NONE);
+		  textfield_ranking.setText("500");
+		  textfield_ranking.setOpaque(true);
+		  textfield_ranking.addEventHandler(this, "textfield_rankingChange");
+		  win_clustering.loop();
+	}
 	//Event Handlers
 	public void button_newSessionClicked(GButton source, GEvent event) { //_CODE_:button_newSession:698566:
 			createGUI_newSession();
@@ -275,6 +310,10 @@ public class MainWindow extends PApplet{
 			
 		} //_CODE_:button_loadSession:712387:
 
+		public void button_saveSessionClicked(GButton source, GEvent event) { //_CODE_:button_saveSession:309169:
+			  println("button_saveSession - GButton >> GEvent." + event + " @ " + millis());
+			} //_CODE_:button_saveSession:309169:
+		
 		synchronized public void statusWin_draw(PApplet appc, GWinData data) { //_CODE_:statusWindow:699836:
 		  appc.background(230);
 		} //_CODE_:statusWindow:699836:
@@ -333,6 +372,7 @@ public class MainWindow extends PApplet{
 			menu.saveSession();
 			
 			updateStatusWindow(session);
+			win_newSession.close();
 			
 		} //_CODE_:button_createSession:714695:
 	
@@ -350,7 +390,11 @@ public class MainWindow extends PApplet{
 			process.setSearchValue(pValue, foldChange);
 			
 			System.out.println("Clustering Window>> Start finding DEG at - [P-Value:"+pValue+"] [Fold Change:"+foldChange+"] [Ranking:"+ranking+"]");
+			
 			process.findDEG();
+			label_degInfoDisplay.setText("Data Generated");
+			label_degValue.setText("P-Value: "+pValue+" / Fold Change: "+foldChange);
+			
 		} //_CODE_:button_findDEG:563441:
 			
 		public void textfield_pValueChange(GTextField source, GEvent event) { //_CODE_:textfield_pValue:914850:
@@ -364,13 +408,48 @@ public class MainWindow extends PApplet{
 		public void textfield_rankingChange(GTextField source, GEvent event) { //_CODE_:textfield_ranking:603506:
 			System.out.println("textfield_ranking - GTextField >> GEvent." + event + " @ " + millis());
 		} //_CODE_:textfield_ranking:603506:
+		
+		public void panel_fileEvent(GPanel source, GEvent event) { //_CODE_:panel_file:299723:
+			  println("panel_file - GPanel >> GEvent." + event + " @ " + millis());
+			} //_CODE_:panel_file:299723:
+		public void panel_statusEvent(GPanel source, GEvent event) { //_CODE_:panel_status:201490:
+			  println("panel_status - GPanel >> GEvent." + event + " @ " + millis());
+			} //_CODE_:panel_status:201490:
+
+		public void panel_clusteringClicked(GPanel source, GEvent event) { //_CODE_:panel_clustering:469419:
+			
+		} //_CODE_:panel_clustering:469419:
+		
+		public void button_degFindClicked(GButton source, GEvent event) { //_CODE_:button_degFinding:435031:
+			createGUI_DEGFinding();
+		} //_CODE_:button_degFinding:435031:
+
+		public void button_goFindingClicked(GButton source, GEvent event) { //_CODE_:button_goFinding:481867:
+		  println("button_goFinding - GButton >> GEvent." + event + " @ " + millis());
+		} //_CODE_:button_goFinding:481867:
+
+		public void panel_visClicked(GPanel source, GEvent event) { //_CODE_:panel_visualization:685902:
+		  println("panel1 - GPanel >> GEvent." + event + " @ " + millis());
+		} //_CODE_:panel_visualization:685902:
+		
+		synchronized public void win_clusteringDraw(PApplet appc, GWinData data) { //_CODE_:win_clustering:221035:
+			  appc.background(230);
+		} //_CODE_:win_clustering:221035:
+
+		synchronized public void CLOSE_WINDOW(PApplet appc, GWinData data) { //_CODE_:win_clustering:378825:
+
+		} //_CODE_:win_clustering:378825:
 	
+		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
+			 println("button_heatmapVis - GButton >> GEvent." + event + " @ " + millis());
+		} //_CODE_:button_heatmapVis:452216:
 	/**************************************
 	* 			Custom Methods
 	**************************************/				
 	public void updateStatusWindow(Session session){
 		label_sessionNameDisplay.setText(session.name);
-	}				
+	}
+	
 				
 	/**************************************
 	 * 	  		Instance Variables
@@ -380,22 +459,28 @@ public class MainWindow extends PApplet{
 	String s;
 	
 	//G4P Variables
+	GPanel panel_file; 
 	GButton button_newSession; 
 	GButton button_loadSession; 
-	GWindow statusWindow;
-	GLabel label_statusWindow; 
-	GLabel label_sessionName; 
+	GButton button_saveSession; 
+	GPanel panel_status; 
 	GLabel label_maType; 
-	GLabel label_organism; 
-	GLabel label_numOfSamples; 
-	GLabel label_deg; 
-	GLabel label_go; 
+	GLabel label_sessionName; 
 	GLabel label_sessionNameDisplay; 
 	GLabel label_maTypeDisplay; 
+	GLabel label_organism; 
+	GLabel label_numOfSamples; 
 	GLabel label_organismDisplay; 
 	GLabel label_numOfSamplesDisplay; 
-	GLabel label_degDisplay; 
-	GLabel label_goDisplay; 
+	GLabel label_degInfo; 
+	GLabel label_degInfoDisplay; 
+	GLabel label_degValue; 
+	GLabel label_goInfo; 
+	GPanel panel_clustering; 
+	GButton button_degFinding; 
+	GButton button_goFinding; 
+	GPanel panel_visualization; 
+	GButton button_heatmapVis; 
 	GWindow win_newSession;
 	GLabel label_createSession; 
 	GLabel label_sessionNameType; 
@@ -408,7 +493,7 @@ public class MainWindow extends PApplet{
 	GButton button_loadSamplerInfo; 
 	GButton button_createSession; 
 	GWindow win_clustering;
-	GLabel label_clusteringTool; 
+	GLabel label_degFinding; 
 	GButton button_findDEG; 
 	GLabel label_pVaue; 
 	GLabel label_foldChange; 
