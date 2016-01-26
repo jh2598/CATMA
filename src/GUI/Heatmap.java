@@ -1,6 +1,8 @@
 package GUI;
 
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.*;
 
 import javax.swing.JFileChooser;
@@ -12,6 +14,8 @@ import g4p_controls.*;
 import processing.core.*;
 import processing.event.*;
 import processing.opengl.*;
+import gluegen.*;
+import jogl.*;
 
 
 
@@ -35,13 +39,13 @@ public class Heatmap extends PApplet{
 		background(0);
 
 		//Init. variables
-		xMargin = 20;
-		yMargin = 20;
+		margin = new Point(20,20);
+		buffer = new Point(0,0);
+		temp = new Point(0,0);
+		axis = new Point(0,0);
+		localP = new Point(0,0);
+		worldP = new Point(0,0);
 		scaleLevel = 1;
-		xScaleAxis = 0;
-		yScaleAxis = 0;
-		worldPx = 0;
-		worldPy = 0;
 		
 		//maxValue = input (FOR FILL COLOR)
 		
@@ -52,8 +56,8 @@ public class Heatmap extends PApplet{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		cLength = (width-2*xMargin)/table[1].length;
-		rLength = (height-2*yMargin)/table.length;
+		cLength = (width-2*margin.x)/table[1].length;
+		rLength = (height-2*margin.y)/table.length;
 		
 		frameCount = 0;
 		
@@ -67,30 +71,44 @@ public class Heatmap extends PApplet{
 		
 		//Drawing Heatmap
 		
-		//translate(xMargin,yMargin);
+		//translate(margin.x,margin.y);
 		pushMatrix();
-		scaleTable();
+		transform();
 		drawHeatmap(this.table);
+		
+			
 		popMatrix();
 		
+		pushMatrix();
+		drawGeneInfo();
+		popMatrix();
+		pushMatrix();
+		drawCurrentCursor();
+		popMatrix();
+		
+		
 		//Update frameCount
+		buffer.x = 0;
+		buffer.y = 0;
 		frameCount ++;
 		frameCount = frameCount%256;
+		
+		System.out.println("Drawing in... [axis:"+axis.x+","+axis.y+"] [scale level:"+scaleLevel+"]");
 	}
 	
 	public void mouseWheel(MouseEvent event) {
 		
 		//Saving old axis for new point calculation
-		int oldxScaleAxis = xScaleAxis;
-		int oldyScaleAxis = yScaleAxis;
+		int oldaxis = axis.x;
+		int oldyAxis = axis.y;
 		
 		//Update Scale Axis
-		xScaleAxis = mouseX;
-		yScaleAxis = mouseY;
+		axis.x = mouseX;
+		axis.y = mouseY;
 		
 		//Calculate new Point's wolrd coordinate point
-		worldPx = (int)((xScaleAxis-oldxScaleAxis)/scaleLevel + oldxScaleAxis);
-		worldPy = (int)((yScaleAxis-oldxScaleAxis)/scaleLevel + oldyScaleAxis);
+//		worldPx = (int)((axis.x-oldaxis.x)/scaleLevel + oldaxis.x);
+//		worldPy = (int)((yAxis-oldaxis.x)/scaleLevel + oldyAxis);
 		
 		//This method controls scaleLevel variable
 		if(event.getCount()==WHEEL_UP)
@@ -102,6 +120,18 @@ public class Heatmap extends PApplet{
 				scaleLevel = 1;
 				
 		System.out.println("Heatmap>> Scale Level: "+scaleLevel);
+	}
+
+	
+	public void mouseDragged(MouseEvent event){
+		
+		buffer.x = mouseX - pmouseX;
+		buffer.y = mouseY - pmouseY;
+		
+		axis.x += buffer.x;	
+		axis.y += buffer.y;
+		
+		System.out.println("Heatmap>> x-buffer:"+buffer.x+" / y-buffer:"+buffer.y);
 	}
 
 	
@@ -151,33 +181,70 @@ public class Heatmap extends PApplet{
 		}
 	}
 	
+	private void drawGeneInfo(){
+		
+		translate(mouseX+5,mouseY-35);
+		
+		fill(0,60);
+		rect(0,0,90,40);
+		fill(255);
+		textSize(9);
+		text("probe ID: ",10,10);
+		text("Value: ",10,20);
+	}
+	
+	private void drawCurrentCursor(){
+		if(updateLocalP()){
+			int x = (int)localP.x/cLength;
+			int y = (int)localP.y/rLength;
+			
+			stroke(255);
+			strokeWeight(2);
+			rect(x,y,x+cLength,y+rLength);
+			noStroke();
+			
+			System.out.println(x+","+y);
+		}
+	}
+	
+	private boolean updateLocalP(){
+		
+		localP.x = (int)((worldP.x-axis.x)/scaleLevel+axis.x);
+		localP.y = (int)((worldP.y-axis.y)/scaleLevel+axis.y);
+		
+		if((localP.x<width-margin.x)&&(localP.x>margin.x)&&(localP.y>margin.y)&&(localP.y<height-margin.y));
+			return true;
+	}
 
-	private void scaleTable(){
-		translate(-1*xScaleAxis,-1*yScaleAxis);
+	private void transform(){
+		
+		//Scale method
+		translate(-1*axis.x*scaleLevel,-1*axis.y*scaleLevel);
 		scale(scaleLevel);
-		//translate(xScaleAxis,yScaleAxis);	
+		translate(axis.x*scaleLevel,axis.y*scaleLevel);
+		
+		//Translate method
+		//translate(axis.x,yAxis);
 	}
 	
 	/*******************************
 	 * 		Instance Variables
 	 *******************************/
-	int xMargin;
-	int yMargin;
+	Point margin;
+	Point buffer;
+	Point temp;
+	Point axis;
+	Point localP;
+	Point worldP;
 	int cLength;
 	int rLength;
 	int maxValue;
-	int xScaleAxis;
-	int yScaleAxis;
-	int worldPx;
-	int worldPy;
 	
 	float scaleLevel;
 	
 	//Static Constants
 	static final float WHEEL_UP = -1.f;
 	static final float WHEEL_DOWN = 1.f;
-	static final int XAXIS = 1;
-	static final int YAXIS = 1;
 	
 
 	String[][] table;
