@@ -28,7 +28,6 @@ public class GOdb {
 			e.printStackTrace();
 			System.exit(0);
 		}
-
 	}
 	public void selectOntology() throws SQLException{
 		//go_ontology print

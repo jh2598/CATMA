@@ -392,6 +392,7 @@ public class MainWindow extends PApplet{
 			System.out.println("Clustering Window>> Start finding DEG at - [P-Value:"+pValue+"] [Fold Change:"+foldChange+"] [Ranking:"+ranking+"]");
 			
 			process.findDEG();
+			process.mapId();
 			label_degInfoDisplay.setText("Data Generated");
 			label_degValue.setText("P-Value: "+pValue+" / Fold Change: "+foldChange);
 			
