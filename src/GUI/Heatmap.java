@@ -7,20 +7,14 @@ import java.io.*;
 
 import javax.swing.JFileChooser;
 
-import org.rosuda.REngine.Rserve.RserveException;
-
-import Data.*;
 import g4p_controls.*;
 import processing.core.*;
 import processing.event.*;
 import processing.opengl.*;
-import gluegen.*;
-import jogl.*;
 
 
 
 public class Heatmap extends PApplet{
-
 
 	/****************************************
 	 * 
@@ -75,13 +69,8 @@ public class Heatmap extends PApplet{
 		pushMatrix();
 		transform();
 		drawHeatmap(this.table);
-		
-			
 		popMatrix();
 		
-		pushMatrix();
-		drawGeneInfo();
-		popMatrix();
 		pushMatrix();
 		drawCurrentCursor();
 		popMatrix();
@@ -92,23 +81,12 @@ public class Heatmap extends PApplet{
 		buffer.y = 0;
 		frameCount ++;
 		frameCount = frameCount%256;
-		
-		System.out.println("Drawing in... [axis:"+axis.x+","+axis.y+"] [scale level:"+scaleLevel+"]");
+
 	}
 	
 	public void mouseWheel(MouseEvent event) {
 		
-		//Saving old axis for new point calculation
-		int oldaxis = axis.x;
-		int oldyAxis = axis.y;
-		
-		//Update Scale Axis
-		axis.x = mouseX;
 		axis.y = mouseY;
-		
-		//Calculate new Point's wolrd coordinate point
-//		worldPx = (int)((axis.x-oldaxis.x)/scaleLevel + oldaxis.x);
-//		worldPy = (int)((yAxis-oldaxis.x)/scaleLevel + oldyAxis);
 		
 		//This method controls scaleLevel variable
 		if(event.getCount()==WHEEL_UP)
@@ -125,10 +103,10 @@ public class Heatmap extends PApplet{
 	
 	public void mouseDragged(MouseEvent event){
 		
-		buffer.x = mouseX - pmouseX;
+		//buffer.x = mouseX - pmouseX;
 		buffer.y = mouseY - pmouseY;
 		
-		axis.x += buffer.x;	
+		//axis.x += buffer.x;	
 		axis.y += buffer.y;
 		
 		System.out.println("Heatmap>> x-buffer:"+buffer.x+" / y-buffer:"+buffer.y);
@@ -171,7 +149,7 @@ public class Heatmap extends PApplet{
 			for(int j=0; j<table[i].length;j++){
 				if(j==0){
 					fill(255);
-					text(table[i][0],cLength*4,rLength*(i+1));
+					text(table[i][0],cLength*4,rLength*(i+1)+scaleLevel/2);
 				}
 				else{
 					fill(Float.parseFloat(table[i][j])/13*255,Float.parseFloat(table[i][j])/13*255/2,255-Float.parseFloat(table[i][j])/13*255);
@@ -185,46 +163,63 @@ public class Heatmap extends PApplet{
 		
 		translate(mouseX+5,mouseY-35);
 		
-		fill(0,60);
-		rect(0,0,90,40);
-		fill(255);
+		fill(0,90);
+		rect(0,0,150,40);
 		textSize(9);
-		text("probe ID: ",10,10);
-		text("Value: ",10,20);
+		//Organism
+		fill(255);
+		text("Organ. : ",2,10);
+		String org = table[0][(int)(localP.x/(float)cLength)+1].substring(0, 15) + "...";		//Limit String length to 15
+		fill(255,255,0);
+		text(org,45,10);
+		//Probe ID
+		fill(255);
+		text("Probe ID: ",2,20);
+		fill(255,255,0);
+		text(table[(int)(localP.y/(float)rLength)][0],50,20);
+		//Value
+		fill(255);
+		text("Value: ",2,30);
+		fill(255,255,0);
+		text(table[(int)(localP.y/(float)rLength)][(int)(localP.x/(float)cLength)+1],35,30);
 	}
 	
 	private void drawCurrentCursor(){
 		if(updateLocalP()){
-			int x = (int)localP.x/cLength;
-			int y = (int)localP.y/rLength;
+			int x = (int)(localP.x/(float)cLength);
+			int y = (int)(localP.y/(float)rLength);
 			
 			stroke(255);
 			strokeWeight(2);
-			rect(x,y,x+cLength,y+rLength);
+			fill(0,0);
+			rect(x*cLength,y*rLength*scaleLevel,cLength,rLength*scaleLevel);
 			noStroke();
 			
-			System.out.println(x+","+y);
+			drawGeneInfo();
 		}
 	}
 	
 	private boolean updateLocalP(){
 		
-		localP.x = (int)((worldP.x-axis.x)/scaleLevel+axis.x);
-		localP.y = (int)((worldP.y-axis.y)/scaleLevel+axis.y);
+		localP.x = (int)((mouseX-axis.x)/scaleLevel+axis.x);
+		localP.y = (int)((mouseY-axis.y)/scaleLevel+axis.y);
 		
-		if((localP.x<width-margin.x)&&(localP.x>margin.x)&&(localP.y>margin.y)&&(localP.y<height-margin.y));
+		if((localP.x<cLength*(table[0].length-1))&&(localP.y<rLength*table.length))
 			return true;
+		return false;
+				
 	}
 
 	private void transform(){
 		
 		//Scale method
-		translate(-1*axis.x*scaleLevel,-1*axis.y*scaleLevel);
-		scale(scaleLevel);
-		translate(axis.x*scaleLevel,axis.y*scaleLevel);
+		translate(0,-axis.y);
+		scale(1,scaleLevel);
+		//translate(0,axis.y);
+		
 		
 		//Translate method
-		//translate(axis.x,yAxis);
+		//translate(axis.x,axis.y);
 	}
 	
 	/*******************************
