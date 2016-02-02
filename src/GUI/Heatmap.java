@@ -1,6 +1,5 @@
 package GUI;
 
-
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.io.*;
@@ -11,7 +10,6 @@ import g4p_controls.*;
 import processing.core.*;
 import processing.event.*;
 import processing.opengl.*;
-
 
 
 public class Heatmap extends PApplet{
@@ -35,13 +33,10 @@ public class Heatmap extends PApplet{
 		//Init. variables
 		margin = new Point(20,20);
 		buffer = new Point(0,0);
-		temp = new Point(0,0);
 		axis = new Point(0,0);
 		localP = new Point(0,0);
 		worldP = new Point(0,0);
 		scaleLevel = 1;
-		
-		//maxValue = input (FOR FILL COLOR)
 		
 		table = new String[114][5];		//LATER, DO NOT DO LIKE THIS, read the database, input it.
 		try {
@@ -54,8 +49,6 @@ public class Heatmap extends PApplet{
 		rLength = (height-2*margin.y)/table.length;
 		
 		frameCount = 0;
-		
-
 	}
 	
 	public void draw(){
@@ -65,7 +58,6 @@ public class Heatmap extends PApplet{
 		
 		//Drawing Heatmap
 		
-		//translate(margin.x,margin.y);
 		pushMatrix();
 		transform();
 		drawHeatmap(this.table);
@@ -85,9 +77,7 @@ public class Heatmap extends PApplet{
 	}
 	
 	public void mouseWheel(MouseEvent event) {
-		
-		axis.y = mouseY;
-		
+
 		//This method controls scaleLevel variable
 		if(event.getCount()==WHEEL_UP)
 			scaleLevel += 0.2;
@@ -141,6 +131,11 @@ public class Heatmap extends PApplet{
 		fill(255,255,0);
 		textSize(9);
 		
+		if(scaleLevel>2.5){
+			stroke(0);
+			textSize(11);
+		}
+		
 		//First Line : CEL Information.
 		for(int i=0; i<table[0].length; i++)
 			text(table[0][i],cLength*(i-1),0);
@@ -149,14 +144,15 @@ public class Heatmap extends PApplet{
 			for(int j=0; j<table[i].length;j++){
 				if(j==0){
 					fill(255);
-					text(table[i][0],cLength*4,rLength*(i+1)+scaleLevel/2);
+					text(table[i][0],cLength*4,rLength*((i+1)*scaleLevel-scaleLevel/2));
 				}
 				else{
 					fill(Float.parseFloat(table[i][j])/13*255,Float.parseFloat(table[i][j])/13*255/2,255-Float.parseFloat(table[i][j])/13*255);
-					rect(cLength*(j-1),rLength*i,cLength,rLength);
+					rect(cLength*(j-1),rLength*i*scaleLevel,cLength,rLength*scaleLevel);
 				}
 			}
 		}
+		noStroke();
 	}
 	
 	private void drawGeneInfo(){
@@ -188,38 +184,25 @@ public class Heatmap extends PApplet{
 		if(updateLocalP()){
 			int x = (int)(localP.x/(float)cLength);
 			int y = (int)(localP.y/(float)rLength);
-			
-			stroke(255);
-			strokeWeight(2);
-			fill(0,0);
-			rect(x*cLength,y*rLength*scaleLevel,cLength,rLength*scaleLevel);
-			noStroke();
+
+			fill(255,100);
+			rect(x*cLength+margin.x,y*rLength*scaleLevel+margin.y,cLength,rLength*scaleLevel);
 			
 			drawGeneInfo();
 		}
 	}
 	
 	private boolean updateLocalP(){
-		
-		localP.x = (int)((mouseX-axis.x)/scaleLevel+axis.x);
-		localP.y = (int)((mouseY-axis.y)/scaleLevel+axis.y);
-		
+		localP.x = mouseX-margin.x;
+		localP.y = (int)((mouseY-axis.y)/scaleLevel);
+
 		if((localP.x<cLength*(table[0].length-1))&&(localP.y<rLength*table.length))
 			return true;
 		return false;
-				
 	}
 
 	private void transform(){
-		
-		//Scale method
-		translate(0,-axis.y);
-		scale(1,scaleLevel);
-		//translate(0,axis.y);
-		
-		
-		//Translate method
-		//translate(axis.x,axis.y);
+		translate(margin.x,margin.y);
 	}
 	
 	/*******************************
@@ -227,10 +210,9 @@ public class Heatmap extends PApplet{
 	 *******************************/
 	Point margin;
 	Point buffer;
-	Point temp;
-	Point axis;
-	Point localP;
-	Point worldP;
+	Point axis;		//x-axis : margin, y-axis : custom
+	Point localP;	//Local map position (axis : 0,0)
+	Point worldP;	//World map position (custom y-axis)
 	int cLength;
 	int rLength;
 	int maxValue;
@@ -240,7 +222,10 @@ public class Heatmap extends PApplet{
 	//Static Constants
 	static final float WHEEL_UP = -1.f;
 	static final float WHEEL_DOWN = 1.f;
-	
+	static final int INDEX = 0;
+	static final int PROBE_ID = 1;
+	static final int ENTIZ_ID = 2;
+	static final int NAME =3;
 
 	String[][] table;
 	
