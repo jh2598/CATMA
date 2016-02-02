@@ -1,7 +1,11 @@
 package Data;
 
 import java.io.Serializable;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 public class Database implements Serializable{
 	private static final long serialVersionUID = -8151450629209385190L;
 	Connection conn = null;
@@ -12,7 +16,7 @@ public class Database implements Serializable{
 	public Database(DataProcess dataProcess){
 		try {
 			Class.forName("org.sqlite.JDBC");
-			conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+			conn = DriverManager.getConnection("jdbc:sqlite:"+dataProcess.session.name+".db");
 		} catch ( Exception e ) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 			System.exit(0);
@@ -60,14 +64,14 @@ public class Database implements Serializable{
 		String[][] exp = dataProcess.getSampleExp();
 		String str;
 
-		Connection c = null;
+		//Connection conn = null;
 		Statement stmt = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
+			conn = DriverManager.getConnection("jdbc:sqlite:"+dataProcess.session.name+".db");
+			conn.setAutoCommit(false);
 			System.out.println("SQLite :: Opened database successfully");
-			stmt = c.createStatement();
+			stmt = conn.createStatement();
 			
 			for(int i=0;i<idx;i++){
 				str = i+1 + ", "+ "'" + id[0][i] + "', '"+ id[1][i] + "', '"+ id[2][i]+"'";
@@ -76,19 +80,56 @@ public class Database implements Serializable{
 				}
 
 				sql = "INSERT INTO "+SAMPLE+" VALUES ("+str+")";
-				//System.out.println(sql);
+				System.out.println(sql);
 				stmt.executeUpdate(sql);
 			}
 			stmt.close();
-			c.commit();
-			c.close();
+			conn.commit();
+			conn.close();
 		} catch ( Exception e ) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 			System.exit(0);
 		}
 		System.out.println("SQLite :: Records created successfully");
 	}
+	public String[][] retrieveSampleTable(){
+		//Sample table array[Row][Column]
+		stmt = null;
+		String[][] sampleArray = null;
+	    try {
+	      Class.forName("org.sqlite.JDBC");
+	      conn = DriverManager.getConnection("jdbc:sqlite:"+dataProcess.session.name+".db");
+	      conn.setAutoCommit(false);
+	      System.out.println("Opened database successfully");
+	      stmt = conn.createStatement();
+	      ResultSet rs = stmt.executeQuery( "SELECT * FROM SAMPLE;" );
+		  ResultSetMetaData meta = rs.getMetaData();
+		  int colCount = meta.getColumnCount();
+		  int rowCount = 0;
+		  sampleArray = new String[dataProcess.getSampleLength()][colCount];
+	      while ( rs.next() ) {
+	    	  try{
+	    		  for(int i =0 ;i<colCount;i++){
+	    			  sampleArray[rowCount][i] = rs.getString(i+1);
+//	    			  System.out.print(rs.getString(i+1));
+//	    			  System.out.print(",");
+	    		  }
+	    		  rowCount++;
+//	    		  System.out.println();
+	    	  }catch(Exception e){
+	    		  e.printStackTrace();
+	    	  }
+	      }
+	      rs.close();
+	      stmt.close();
+	      conn.close();
+	    } catch ( Exception e ) {
+	      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+	      System.exit(0);
+	    }
+	    System.out.println("Retrieving Sample table Operation done successfully");
+		return sampleArray;
+	}
 	public void saveDEG(DataProcess data){
-
 	}
 }

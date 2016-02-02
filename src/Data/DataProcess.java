@@ -10,6 +10,7 @@ public class DataProcess {
 	private RConnection c;
 	public Session session;
 	public String GOdbPath;
+	public Database db;
 	REXP x;
 
 	public DataProcess(Session session) {
@@ -124,8 +125,9 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 		
-		Database database = new Database(this);
-		database.saveSample();
+		db = new Database(this);
+		session.setDB(db);
+		db.saveSample();
 	}
 	public String[][] getSampleId(){ // Mapped ID 0:PROBES, 1:ENTREZ, 2:SYMBOL
 		String[][] str = new String[3][getSampleLength()];

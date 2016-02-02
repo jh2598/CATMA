@@ -19,8 +19,7 @@ public class Session implements Serializable {
 		System.out.println("Session Created. :: "+this);
 		this.name = name;
 		this.celFilePath = celPath;
-		this.sampleInfoPath = samplePath;
-//		db = new Database();	
+		this.sampleInfoPath = samplePath;	
 	}
 	public void save(){
 		//자신을 직렬화해서 filePath에 저장
@@ -45,5 +44,11 @@ public class Session implements Serializable {
 		// TODO Auto-generated method stub
 		System.out.println("::"+name);
 		return "Successfully opened.";
+	}
+	public void setDB(Database db){
+		this.db = db;
+	}
+	public Database getDB(){
+		return db;
 	}
 }
