@@ -93,11 +93,15 @@ public class Heatmap extends PApplet{
 	
 	public void mouseDragged(MouseEvent event){
 		
-		//buffer.x = mouseX - pmouseX;
 		buffer.y = mouseY - pmouseY;
 		
-		//axis.x += buffer.x;	
-		axis.y += buffer.y;
+		//Limits axis value
+		if(axis.y<=0)
+			axis.y += buffer.y;
+		else if(axis.y > (-1)*(int)(table.length*scaleLevel+height)+margin.y)
+			axis.y += 0;
+		else
+			axis.y = 0;
 		
 		System.out.println("Heatmap>> x-buffer:"+buffer.x+" / y-buffer:"+buffer.y);
 	}
@@ -186,15 +190,20 @@ public class Heatmap extends PApplet{
 			int y = (int)(localP.y/(float)rLength);
 
 			fill(255,100);
-			rect(x*cLength+margin.x,y*rLength*scaleLevel+margin.y,cLength,rLength*scaleLevel);
+			rect(x*cLength+margin.x,y*rLength*scaleLevel+axis.y+margin.y,cLength,rLength*scaleLevel);
 			
 			drawGeneInfo();
 		}
 	}
 	
 	private boolean updateLocalP(){
-		localP.x = mouseX-margin.x;
-		localP.y = (int)((mouseY-axis.y)/scaleLevel);
+		
+		if(mouseX>margin.x && mouseY>margin.y+axis.y){
+			localP.x = mouseX-margin.x;
+			localP.y = (int)((mouseY-axis.y)/scaleLevel)-(int)(margin.y/scaleLevel);
+		}
+		else
+			return false;
 
 		if((localP.x<cLength*(table[0].length-1))&&(localP.y<rLength*table.length))
 			return true;
@@ -203,6 +212,7 @@ public class Heatmap extends PApplet{
 
 	private void transform(){
 		translate(margin.x,margin.y);
+		translate(0,axis.y);
 	}
 	
 	/*******************************
