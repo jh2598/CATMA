@@ -39,15 +39,15 @@ public class Heatmap extends PApplet{
 		localP = new Point(0,0);
 		worldP = new Point(0,0);
 		scaleLevel = 1;
-		
-		table = new String[114][5];		//LATER, DO NOT DO LIKE THIS, read the database, input it.
+
+		//Reading DEG data
 		try {
-			readDEGData(table);
+			readDEGData();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		cLength = (width-2*margin.x)/table[1].length;
+		cLength = (width-2*margin.x)/table[0].length-3;
 		rLength = (height-2*margin.y)/table.length;
 		
 		frameCount = 0;
@@ -113,21 +113,20 @@ public class Heatmap extends PApplet{
 	 * @throws IOException 
 	 *******************************/
 	
-	private void readDEGData(String[][] table) throws IOException{
+	private void readDEGData() throws IOException{
 		
-		InputStream inputStream;
-		Reader streamReader;
-		BufferedReader br = null;
-		
-		inputStream = new FileInputStream("c:/Data/testDEGData.txt");
-		streamReader = new InputStreamReader(inputStream);
-		br = new BufferedReader(new InputStreamReader(inputStream));
-		
-		String line;
-		for (int i=0; (line = br.readLine()) != null; i++) {
-			table[i][0]=line; 
-			table[i] = table[i][0].split(",");
+		String s = null;
+		try {
+			BufferedReader in = new BufferedReader(new FileReader("temp.txt"));
+			s = in.readLine();
+			in.close();
+		} catch (IOException e) {
+			System.err.println(e); 
+			System.exit(1);
 		}
+		
+		Database db = new Database(s);
+		table = db.retrieveSampleTable();
 		
 	}	//Saves DEG Data into table[][]
 	
@@ -142,16 +141,16 @@ public class Heatmap extends PApplet{
 		}
 		
 		//First Line : CEL Information.
-		for(int i=0; i<table[0].length; i++)
-			text(table[0][i],cLength*(i-1),0);
+		//for(int i=0; i<table[0].length; i++)
+		//	text(table[0][i],cLength*(i-1),0);
 		
-		for(int i=1; i<table.length; i++){
-			for(int j=0; j<table[i].length;j++){
-				if(j==0){
+		for(int i=0; i<table.length; i++){
+			for(int j=1; j<table[i].length;j++){
+				if(j==PROBE_ID){
 					fill(255);
-					text(table[i][0],cLength*4,rLength*((i+1)*scaleLevel-scaleLevel/2));
+					text(table[i][PROBE_ID],cLength*4,rLength*((i+1)*scaleLevel-scaleLevel/2));
 				}
-				else{
+				else if(j>=SAMPLE){
 					fill(Float.parseFloat(table[i][j])/13*255,Float.parseFloat(table[i][j])/13*255/2,255-Float.parseFloat(table[i][j])/13*255);
 					rect(cLength*(j-1),rLength*i*scaleLevel,cLength,rLength*scaleLevel);
 				}
@@ -177,7 +176,7 @@ public class Heatmap extends PApplet{
 		fill(255);
 		text("Probe ID: ",2,20);
 		fill(255,255,0);
-		text(table[(int)(localP.y/(float)rLength)][0],50,20);
+		text(table[(int)(localP.y/(float)rLength)][PROBE_ID],50,20);
 		//Value
 		fill(255);
 		text("Value: ",2,30);
@@ -215,6 +214,7 @@ public class Heatmap extends PApplet{
 		translate(margin.x,margin.y);
 		translate(0,axis.y);
 	}
+	
 	private void retrieve(){
 		String s = null;
 		try {
@@ -228,6 +228,7 @@ public class Heatmap extends PApplet{
 		Database db = new Database(s);
 		db.retrieveSampleTable();
 	}
+	
 	/*******************************
 	 * 		Instance Variables
 	 *******************************/
@@ -249,11 +250,12 @@ public class Heatmap extends PApplet{
 	static final int PROBE_ID = 1;
 	static final int ENTIZ_ID = 2;
 	static final int NAME =3;
+	static final int SAMPLE =4;
 
-	String[][] table;
+	String[][] table;	//[Index][ProbeID][Entrez][Symbol][SAMPLE....]
 	
 	//Running Method
-	public static void main(String[] args) {
+	public static void run() {
         PApplet.main(new String[] { GUI.Heatmap.class.getName() });
     }
 	

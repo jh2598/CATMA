@@ -442,7 +442,7 @@ public class MainWindow extends PApplet{
 		} //_CODE_:win_clustering:378825:
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
-			 println("button_heatmapVis - GButton >> GEvent." + event + " @ " + millis());
+			 Heatmap.run();
 		} //_CODE_:button_heatmapVis:452216:
 	/**************************************
 	* 			Custom Methods
