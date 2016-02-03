@@ -98,12 +98,11 @@ public class Heatmap extends PApplet{
 		//Limits axis value
 		if(axis.y<=0)
 			axis.y += buffer.y;
-		else if(axis.y > (-1)*(int)(table.length*scaleLevel+height)+margin.y)
-			axis.y += 0;
 		else
 			axis.y = 0;
 		
-		System.out.println("Heatmap>> x-buffer:"+buffer.x+" / y-buffer:"+buffer.y);
+		System.out.println("axis.y ="+axis.y+" / Limit value: "+(-1)*(int)(table.length*scaleLevel+height));
+		//System.out.println("Heatmap>> x-buffer:"+buffer.x+" / y-buffer:"+buffer.y);
 	}
 
 	
