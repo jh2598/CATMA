@@ -1,15 +1,17 @@
 package GUI;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
-import javax.swing.JFileChooser;
-
-import g4p_controls.*;
-import processing.core.*;
-import processing.event.*;
-import processing.opengl.*;
+import Data.Database;
+import processing.core.PApplet;
+import processing.event.MouseEvent;
 
 
 public class Heatmap extends PApplet{
@@ -213,7 +215,19 @@ public class Heatmap extends PApplet{
 		translate(margin.x,margin.y);
 		translate(0,axis.y);
 	}
-	
+	private void retrieve(){
+		String s = null;
+		try {
+			BufferedReader in = new BufferedReader(new FileReader("temp.txt"));
+			s = in.readLine();
+			in.close();
+		} catch (IOException e) {
+			System.err.println(e); 
+			System.exit(1);
+		}
+		Database db = new Database(s);
+		db.retrieveSampleTable();
+	}
 	/*******************************
 	 * 		Instance Variables
 	 *******************************/

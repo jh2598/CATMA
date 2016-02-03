@@ -10,19 +10,32 @@ public class Database implements Serializable{
 	private static final long serialVersionUID = -8151450629209385190L;
 	Connection conn = null;
 	Statement stmt = null;
+	String dbName;
 	String SAMPLE = "SAMPLE";
 	String sql;
 	DataProcess dataProcess;
 	public Database(DataProcess dataProcess){
+		this.dbName = dataProcess.session.name;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			conn = DriverManager.getConnection("jdbc:sqlite:"+dataProcess.session.name+".db");
+			conn = DriverManager.getConnection("jdbc:sqlite:"+dbName+".db");
 		} catch ( Exception e ) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 			System.exit(0);
 		}
 		System.out.println("SQLite :: Opened database successfully");
 		this.dataProcess = dataProcess;
+	}
+	public Database(String dbname){
+		this.dbName = dbname;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			conn = DriverManager.getConnection("jdbc:sqlite:"+dbname+".db");
+		} catch ( Exception e ) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			System.exit(0);
+		}
+		System.out.println("SQLite :: Opened database successfully");
 	}
 	public void saveSample(){
 		createSampleTable();
@@ -80,7 +93,7 @@ public class Database implements Serializable{
 				}
 
 				sql = "INSERT INTO "+SAMPLE+" VALUES ("+str+")";
-				System.out.println(sql);
+				//System.out.println(sql);
 				stmt.executeUpdate(sql);
 			}
 			stmt.close();
@@ -98,15 +111,24 @@ public class Database implements Serializable{
 		String[][] sampleArray = null;
 	    try {
 	      Class.forName("org.sqlite.JDBC");
-	      conn = DriverManager.getConnection("jdbc:sqlite:"+dataProcess.session.name+".db");
+	      conn = DriverManager.getConnection("jdbc:sqlite:"+dbName+".db");
 	      conn.setAutoCommit(false);
 	      System.out.println("Opened database successfully");
 	      stmt = conn.createStatement();
 	      ResultSet rs = stmt.executeQuery( "SELECT * FROM SAMPLE;" );
+		  //몇개의 행이 있는지 알아냄
+		  int idx = 0;
+		  while(rs.next()){
+			  idx++;
+		  }
+		  rs = null;
+		  rs = stmt.executeQuery( "SELECT * FROM SAMPLE;" );
+		  //metaData를 이용해 몇 개의 열이 있는지 알아냄
 		  ResultSetMetaData meta = rs.getMetaData();
 		  int colCount = meta.getColumnCount();
 		  int rowCount = 0;
-		  sampleArray = new String[dataProcess.getSampleLength()][colCount];
+		  //반환할 문자열 배열
+		  sampleArray = new String[idx][colCount];
 	      while ( rs.next() ) {
 	    	  try{
 	    		  for(int i =0 ;i<colCount;i++){
