@@ -1,6 +1,8 @@
 package Data;
 
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -39,6 +41,22 @@ public class MenuBar {
 	}
 	public Session loadSession(Session s){
 		currentSession = s;
+		//Session Name을 경로에 텍스트로 저장.
+		try
+        {
+            FileWriter fw = new FileWriter("temp.txt"); // 절대주소 경로 가능
+            BufferedWriter bw = new BufferedWriter(fw);
+            String str = s.name;
+            bw.write(str);
+            bw.newLine(); // 줄바꿈
+            bw.close();
+        }
+        catch (IOException e)
+        {
+            System.err.println(e); // 에러가 있다면 메시지 출력
+            System.exit(1);
+        }
+
 		return currentSession;//로드한 세션 반환
 	}
 	public void saveSession(){

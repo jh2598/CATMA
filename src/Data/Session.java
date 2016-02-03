@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 public class Session implements Serializable {
 	private static final long serialVersionUID = -4961998355515742346L;
+	//Singleton instance
 	public String name;
 	public String filePath;
 	public String celFilePath;
