@@ -27,6 +27,7 @@ public class Database implements Serializable{
 		this.dataProcess = dataProcess;
 	}
 	public Database(String dbname){
+		//이 생성자를 쓰면 Retrieve 이외의 메소드는 DataProcess가 없어서 NullPointerException
 		this.dbName = dbname;
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -107,6 +108,7 @@ public class Database implements Serializable{
 	}
 	public String[][] retrieveSampleTable(){
 		//Sample table array[Row][Column]
+		//Table : ID, PROBE, ENTREZ, SYMBOL, SAMPLE...
 		stmt = null;
 		String[][] sampleArray = null;
 	    try {
@@ -151,6 +153,32 @@ public class Database implements Serializable{
 	    }
 	    System.out.println("Retrieving Sample table Operation done successfully");
 		return sampleArray;
+	}
+	public String[] getSampleNames(){
+		//Sample Column Names
+		//.Cel 포맷 파일의 이름들...
+		String name;
+		String[] names = null;
+		try{
+	      Class.forName("org.sqlite.JDBC");
+	      conn = DriverManager.getConnection("jdbc:sqlite:"+dbName+".db");
+	      conn.setAutoCommit(false);
+	      System.out.println("Opened database successfully");
+	      stmt = conn.createStatement();
+	      ResultSet rs = stmt.executeQuery( "SELECT * FROM SAMPLE;" );
+	      names = new String[rs.getMetaData().getColumnCount()];
+	      for(int i=0;i<rs.getMetaData().getColumnCount();i++){
+	    	  name = rs.getMetaData().getColumnLabel(i);
+	    	  names[i] = name;
+	      }
+	      rs.close();
+	      stmt.close();
+	      conn.close();
+	      System.out.println("Get Sample names...");
+		}catch(Exception e){
+  		  e.printStackTrace();
+		}
+		return names;
 	}
 	public void saveDEG(DataProcess data){
 	}

@@ -128,7 +128,6 @@ public class DataProcess {
 		db = new Database(this);
 		session.setDB(db);
 		db.saveSample();
-		db.retrieveSampleTable();
 	}
 	public String[][] getSampleId(){ // Mapped ID 0:PROBES, 1:ENTREZ, 2:SYMBOL
 		String[][] str = new String[3][getSampleLength()];
