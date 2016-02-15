@@ -47,7 +47,7 @@ public class Heatmap extends PApplet{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		cLength = (width-2*margin.x)/table[0].length-3;
+		cLength = (width-2*margin.x)/(table[0].length-3);
 		rLength = (height-2*margin.y)/table.length;
 		
 		frameCount = 0;
@@ -145,14 +145,14 @@ public class Heatmap extends PApplet{
 		//	text(table[0][i],cLength*(i-1),0);
 		
 		for(int i=0; i<table.length; i++){
-			for(int j=1; j<table[i].length;j++){
+			for(int j=PROBE_ID; j<table[i].length;j++){
 				if(j==PROBE_ID){
 					fill(255);
 					text(table[i][PROBE_ID],cLength*4,rLength*((i+1)*scaleLevel-scaleLevel/2));
 				}
 				else if(j>=SAMPLE){
 					fill(Float.parseFloat(table[i][j])/13*255,Float.parseFloat(table[i][j])/13*255/2,255-Float.parseFloat(table[i][j])/13*255);
-					rect(cLength*(j-1),rLength*i*scaleLevel,cLength,rLength*scaleLevel);
+					rect(cLength*(j-4),rLength*i*scaleLevel,cLength,rLength*scaleLevel);
 				}
 			}
 		}
@@ -169,7 +169,7 @@ public class Heatmap extends PApplet{
 		//Organism
 		fill(255);
 		text("Organ. : ",2,10);
-		String org = table[0][(int)(localP.x/(float)cLength)+1].substring(0, 15) + "...";		//Limit String length to 15
+		String org = table[0][(int)(localP.x/(float)cLength)+1];//.substring(0, 15) + "...";		//Limit String length to 15
 		fill(255,255,0);
 		text(org,45,10);
 		//Probe ID
@@ -181,7 +181,7 @@ public class Heatmap extends PApplet{
 		fill(255);
 		text("Value: ",2,30);
 		fill(255,255,0);
-		text(table[(int)(localP.y/(float)rLength)][(int)(localP.x/(float)cLength)+1],35,30);
+		text(table[(int)(localP.y/(float)rLength)][(int)(localP.x/(float)cLength)+SAMPLE],35,30);
 	}
 	
 	private void drawCurrentCursor(){
@@ -205,7 +205,7 @@ public class Heatmap extends PApplet{
 		else
 			return false;
 
-		if((localP.x<cLength*(table[0].length-1))&&(localP.y<rLength*table.length))
+		if((localP.x<cLength*(table[0].length-4))&&(localP.y<rLength*table.length))
 			return true;
 		return false;
 	}
@@ -227,6 +227,7 @@ public class Heatmap extends PApplet{
 		}
 		Database db = new Database(s);
 		db.retrieveSampleTable();
+		db.getSampleNames();
 	}
 	
 	/*******************************
