@@ -263,9 +263,9 @@ public class Database implements Serializable{
 			}
 			eg = new String[egList.size()];
 			eg = egList.toArray(eg);
-			for(int i=0;i<eg.length;i++){
-				System.out.println(eg[i]);
-			}
+//			for(int i=0;i<eg.length;i++){
+//				System.out.println(eg[i]);
+//			}
 			rs.close();
 			stmt.close();
 			conn.close();
@@ -296,9 +296,9 @@ public class Database implements Serializable{
 			}
 			ge = new String[geList.size()];
 			ge = geList.toArray(ge);
-			for(int i=0;i<ge.length;i++){
-				System.out.println(ge[i]);
-			}
+//			for(int i=0;i<ge.length;i++){
+//				System.out.println(ge[i]);
+//			}
 			rs.close();
 			stmt.close();
 			conn.close();
