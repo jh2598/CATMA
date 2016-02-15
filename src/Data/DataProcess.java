@@ -128,6 +128,37 @@ public class DataProcess {
 		db = new Database(this);
 		session.setDB(db);
 		db.saveSample();
+		
+		//Mapping Entrez id to GO id
+		try {
+			db.createEntrezToGoTable();
+			db.insertEntrezToGoTable(entrezToGoMapping());
+//			db.GoToEntrez("GO:0000122");
+//			db.entrezToGo("7490");
+		} catch (RserveException | REXPMismatchException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public String[][] entrezToGoMapping() throws RserveException, REXPMismatchException{
+		c.eval("eg = bitr(genes.total, fromType=\"ENTREZID\", toType=\"GO\", annoDb=\"org.Hs.eg.db\")");
+		x = c.eval("nrow(eg)");
+		String[][] eg = new String[4][x.asInteger()];
+		x = c.eval("eg[,1]");
+		eg[0] = x.asStrings(); //ENTREZ
+		x = c.eval("eg[,2]");
+		eg[1] = x.asStrings(); //GO
+		x = c.eval("eg[,3]");
+		eg[2] = x.asStrings(); //EVIDENCE
+		x = c.eval("eg[,4]");
+		eg[3] = x.asStrings(); //ONTOLOGY
+//		for(int i=0;i<4;i++){
+//			for(int j=0;j<10;j++){
+//				System.out.print(eg[i][j]+" / ");
+//			}
+//			System.out.println();
+//		}
+		return eg;
 	}
 	public String[][] getSampleId(){ // Mapped ID 0:PROBES, 1:ENTREZ, 2:SYMBOL
 		String[][] str = new String[3][getSampleLength()];
