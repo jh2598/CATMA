@@ -49,14 +49,16 @@ final class Server{
 			is = new DataInputStream(mainWindowSocket.getInputStream());
 	        os = new PrintStream(mainWindowSocket.getOutputStream());
 	        
-	     // As long as we receive data, echo that data back to the client.
+	     //Receiving message from client
 	        while (true) {
 	          message = is.readInt();
 
 	          switch(message){
 	          case CALL_HEATMAP_WINDOW:
+	        	  System.out.println("Server>> Message received - Open Heatmap");
 	        	  WinController.runHeatmap();
-	        	  runHeatmapServer();
+	        	  //runHeatmapServer();
+	        	  
 	        	  break;
 	          case CALL_GO_WINDOW:
 	        	  break;

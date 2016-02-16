@@ -56,6 +56,8 @@ public class MainWindow extends PApplet{
         //server connection
         try {
 			client = new Socket(InetAddress.getLocalHost(),Server.MAINWINDOW_PORT);
+			is = new DataInputStream(client.getInputStream());
+			os = new DataOutputStream(client.getOutputStream());
 			System.out.println("MainWindow>> Client Connected");
 			} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -454,7 +456,14 @@ public class MainWindow extends PApplet{
 		} //_CODE_:win_clustering:378825:
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
-			 Heatmap.run();
+			 try {
+				os.writeByte(Server.CALL_HEATMAP_WINDOW);
+				System.out.println("MainWindow>> Call Heatmap");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 //Heatmap.run();
 		} //_CODE_:button_heatmapVis:452216:
 	/**************************************
 	* 			Custom Methods
@@ -473,8 +482,8 @@ public class MainWindow extends PApplet{
 	
 	//Client Variables
 	static Socket client;
-	DataInputStream is;
-	DataOutputStream os;
+	static DataInputStream is;
+	static DataOutputStream os;
 	
 	//G4P Variables
 	GPanel panel_file; 
