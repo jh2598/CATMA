@@ -7,6 +7,8 @@ import org.rosuda.REngine.Rserve.RserveException;
 import Data.*;
 import g4p_controls.*;
 import processing.core.*;
+import java.io.*;
+import java.net.*;
 
 public class MainWindow extends PApplet{
 	
@@ -44,14 +46,24 @@ public class MainWindow extends PApplet{
 		frameCount ++;
 		frameCount = frameCount%256;
 	}
-
-	public void customGUI(){
-		
-	}
 	
 	//Running Method
 	public static void run() {
+		
+		//running PApplet
         PApplet.main(new String[] { GUI.MainWindow.class.getName() });
+        
+        //server connection
+        try {
+			client = new Socket(InetAddress.getLocalHost(),Server.MAINWINDOW_PORT);
+			System.out.println("MainWindow>> Client Connected");
+			} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 	/**************************************
@@ -458,6 +470,11 @@ public class MainWindow extends PApplet{
 	//Processing Variables
 	int frameCount;
 	String s;
+	
+	//Client Variables
+	static Socket client;
+	DataInputStream is;
+	DataOutputStream os;
 	
 	//G4P Variables
 	GPanel panel_file; 

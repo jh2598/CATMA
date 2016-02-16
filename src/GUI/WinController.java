@@ -6,14 +6,15 @@ import java.net.*;
 public class WinController {
 
 	//window running methods
+	public static void runMainWindow(){
+		MainWindow.run();
+	}
+	
 	public static void runHeatmap(){
 		Heatmap.run();
 	}
 	
 	public static void main(String[] args) {
-		
-		//Running main window
-		MainWindow.run();
 		//Starting server
 		Server server = new Server();
 		server.runWindowServer();
@@ -27,11 +28,12 @@ final class Server{
 		
 		//Opening server	
 		try {
-			mainWindowServer = new ServerSocket(9999);	//port number must be over 1023
-			heatmapServer = new ServerSocket(8888);
-			goServer = new ServerSocket(7777);
+			mainWindowServer = new ServerSocket(Server.MAINWINDOW_PORT);	//port number must be over 1023
+			heatmapServer = new ServerSocket(Server.HEATMAP_PORT);
+			goServer = new ServerSocket(Server.GO_PORT);
 			System.out.println("Server>> Opening Port...");
 			System.out.println("Server>> Port Number - Main Window:9999 | Heatmap:8888 | GO:7777");
+			WinController.runMainWindow();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -43,7 +45,7 @@ final class Server{
 		try {
 			//Linked with main window!
 			mainWindowSocket = mainWindowServer.accept();
-			System.out.println("Server>> server connected with MainWindow");
+			System.out.println("Server>> Sever Connected : MainWindow");
 			is = new DataInputStream(mainWindowSocket.getInputStream());
 	        os = new PrintStream(mainWindowSocket.getOutputStream());
 	        
@@ -89,7 +91,6 @@ final class Server{
 		}
 	}
 	
-	
 	//server instance variables
 	ServerSocket mainWindowServer;
 	ServerSocket heatmapServer;
@@ -101,6 +102,9 @@ final class Server{
 	PrintStream os;
 	int message;
 	//Server message rules
+	public static final int MAINWINDOW_PORT = 9999;
+	public static final int HEATMAP_PORT = 8888;
+	public static final int GO_PORT = 7777;
 	public static final int CALL_HEATMAP_WINDOW = 0;
 	public static final int CALL_GO_WINDOW = 1;
 	
