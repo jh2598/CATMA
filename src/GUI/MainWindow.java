@@ -443,7 +443,12 @@ public class MainWindow extends PApplet{
 
 		public void button_goFindingClicked(GButton source, GEvent event) { //_CODE_:button_goFinding:481867:
 		  println("button_goFinding - GButton >> GEvent." + event + " @ " + millis());
-		  GOdb godb = new GOdb("C:/Users/hajh0/Documents/R/win-library/3.2/GO.db/extdata/GO.sqlite");
+		  GOdb godb = null;
+		  try{
+			  godb = new GOdb(process.getDBPath());
+		  }catch(NullPointerException e){
+			  e.printStackTrace();
+		  }
 		  GOGraph g = new GOGraph(godb);
 		  
 		} //_CODE_:button_goFinding:481867:

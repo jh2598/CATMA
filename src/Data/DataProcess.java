@@ -72,6 +72,23 @@ public class DataProcess {
 		System.out.println("R :: GO db file : "+GOdbPath);
 		System.out.println("R :: Sample info path is setted.");
 	}
+	public String getDBPath(){
+		try {
+			x = c.eval("GO_dbfile()");
+		} catch (RserveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			GOdbPath = x.asString();
+		} catch (REXPMismatchException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("R :: GO db file : "+GOdbPath);
+		System.out.println("R :: Sample info path is setted.");
+		return GOdbPath;
+	}
 	//3
 	public void setSearchValue(double pValue, double foldChange) throws RserveException{
 		double[] value = new double[2];
