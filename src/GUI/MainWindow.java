@@ -450,7 +450,6 @@ public class MainWindow extends PApplet{
 			  e.printStackTrace();
 		  }
 		  GOGraph g = new GOGraph(godb);
-		  
 		} //_CODE_:button_goFinding:481867:
 
 		public void panel_visClicked(GPanel source, GEvent event) { //_CODE_:panel_visualization:685902:

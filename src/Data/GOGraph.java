@@ -16,6 +16,7 @@ public class GOGraph {
 	HashMap<Integer, GO> bpMap;
 	HashMap<Integer, GO> ccMap;
 	HashMap<Integer, GO> mfMap;
+	HashMap<String, GO> go_map;
 	private DirectedAcyclicGraph<GO, DefaultEdge> bp;
 	private DirectedAcyclicGraph<GO, DefaultEdge> cc;
 	private DirectedAcyclicGraph<GO, DefaultEdge> mf;
@@ -57,12 +58,15 @@ public class GOGraph {
 			if(allTerm[i].getOntology().compareTo("BP")==0){
 				bp.addVertex(allTerm[i]);
 				bpMap.put(allTerm[i].getId(), allTerm[i]);
+				go_map.put(allTerm[i].getGo_id(), allTerm[i]);
 			}else if(allTerm[i].getOntology().compareTo("CC")==0){
 				cc.addVertex(allTerm[i]);
 				ccMap.put(allTerm[i].getId(), allTerm[i]);
+				go_map.put(allTerm[i].getGo_id(), allTerm[i]);
 			}else if(allTerm[i].getOntology().compareTo("MF")==0){
 				mf.addVertex(allTerm[i]);
 				mfMap.put(allTerm[i].getId(), allTerm[i]);
+				go_map.put(allTerm[i].getGo_id(), allTerm[i]);
 			}
 		}
 		System.out.println("Classfication done.");
@@ -118,5 +122,8 @@ public class GOGraph {
 	}
 	public DirectedAcyclicGraph<GO, DefaultEdge> getMf() {
 		return mf;
+	}
+	public HashMap<String, GO> getGoMap() {
+		return go_map;
 	}
 }
