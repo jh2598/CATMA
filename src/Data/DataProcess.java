@@ -1,5 +1,7 @@
 package Data;
 
+import java.sql.SQLException;
+
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -20,7 +22,7 @@ public class DataProcess {
 			x = c.eval("R.version.string");
 			System.out.println("R Connected successfully :: " + x.asString());
 		} catch (RserveException | REXPMismatchException e) {
-			System.out.println("RConnection not Constructed.");
+			System.out.println("RConnection not Constructed. Please check Rserve running.");
 			e.printStackTrace();
 		}
 	}
@@ -64,10 +66,10 @@ public class DataProcess {
 		//Sample.csv 불러오기
 		c.eval("pheno = read.csv(\""+ session.sampleInfoPath +"\", sep=\",\", header=TRUE)");
 		
+		//GO db 경로 체크
 		x = c.eval("GO_dbfile()");
 		GOdbPath = x.asString();
 		System.out.println("R :: GO db file : "+GOdbPath);
-		
 		System.out.println("R :: Sample info path is setted.");
 	}
 	//3

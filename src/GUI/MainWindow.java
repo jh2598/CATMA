@@ -1,5 +1,7 @@
 package GUI;
 
+import java.sql.SQLException;
+
 import javax.swing.JFileChooser;
 
 import org.rosuda.REngine.Rserve.RserveException;
@@ -441,6 +443,9 @@ public class MainWindow extends PApplet{
 
 		public void button_goFindingClicked(GButton source, GEvent event) { //_CODE_:button_goFinding:481867:
 		  println("button_goFinding - GButton >> GEvent." + event + " @ " + millis());
+		  GOdb godb = new GOdb("C:/Users/hajh0/Documents/R/win-library/3.2/GO.db/extdata/GO.sqlite");
+		  GOGraph g = new GOGraph(godb);
+		  
 		} //_CODE_:button_goFinding:481867:
 
 		public void panel_visClicked(GPanel source, GEvent event) { //_CODE_:panel_visualization:685902:

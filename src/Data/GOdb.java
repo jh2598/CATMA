@@ -1,5 +1,10 @@
 package Data;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 public class GOdb {
 	Connection conn = null;
@@ -50,7 +55,7 @@ public class GOdb {
 		while ( rs.next() ) {
 			int id = rs.getInt("_id");
 			String go_id = rs.getString("go_id");
-			String  term = rs.getString("term");
+			String term = rs.getString("term");
 			String ontology = rs.getString("ontology");
 			String definition = rs.getString("definition");
 			System.out.println( "id = " + id );
@@ -58,8 +63,80 @@ public class GOdb {
 			System.out.println( "term = " + term);
 			System.out.println( "ontology = " + ontology);
 			System.out.println( "definition = " + definition);
-			System.out.println();
 		}
 		rs.close();
+	}
+	public GO[] getAllTerm() throws SQLException{
+		ResultSet rs = stmt.executeQuery( "SELECT * FROM go_term;" );
+		ArrayList<GO> goList = new ArrayList<GO>();	
+		while ( rs.next() ) {
+			int id = rs.getInt("_id");
+			String go_id = rs.getString("go_id");
+			String term = rs.getString("term");
+			String ontology = rs.getString("ontology");
+			String definition = rs.getString("definition");
+			goList.add(new GO(id,go_id,term,ontology,definition));
+		}
+		GO[] go = new GO[goList.size()];
+		go = goList.toArray(go);
+		rs.close();
+		return go;
+	}
+	public void selectBpOffspring() throws SQLException{
+		//go_term print
+				ResultSet rs = stmt.executeQuery( "SELECT * FROM go_bp_offspring;" );
+				while ( rs.next() ) {
+					int id = rs.getInt("_id");
+					String _offspring_id = rs.getString("_offspring_id");
+					System.out.println( "id = " + id );
+					System.out.println( "offspring_id = " + _offspring_id );
+					System.out.println();
+				}
+				rs.close();
+	}
+	public int[] getBpOffspring(int id) throws SQLException{
+		//id에 해당하는 GO term의 offspring의 id들을 반환
+		ArrayList<Integer> offspringList = new ArrayList<Integer>();
+		ResultSet rs = stmt.executeQuery( "SELECT _offspring_id FROM go_bp_offspring WHERE _id = "+id+";" );
+		while ( rs.next() ) {
+			int _offspring_id = rs.getInt("_offspring_id");
+			offspringList.add(_offspring_id);
+		}
+		int[] offsprings = new int[offspringList.size()];
+		for(int i=0;i<offspringList.size();i++){
+			offsprings[i] = offspringList.get(i).intValue();
+		}
+		rs.close();
+		return offsprings;
+	}
+	public int[] getCcOffspring(int id) throws SQLException{
+		//id에 해당하는 GO term의 offspring의 id들을 반환
+		ArrayList<Integer> offspringList = new ArrayList<Integer>();
+		ResultSet rs = stmt.executeQuery( "SELECT _offspring_id FROM go_cc_offspring WHERE _id = "+id+";" );
+		while ( rs.next() ) {
+			int _offspring_id = rs.getInt("_offspring_id");
+			offspringList.add(_offspring_id);
+		}
+		int[] offsprings = new int[offspringList.size()];
+		for(int i=0;i<offspringList.size();i++){
+			offsprings[i] = offspringList.get(i).intValue();
+		}
+		rs.close();
+		return offsprings;
+	}
+	public int[] getMfOffspring(int id) throws SQLException{
+		//id에 해당하는 GO term의 offspring의 id들을 반환
+		ArrayList<Integer> offspringList = new ArrayList<Integer>();
+		ResultSet rs = stmt.executeQuery( "SELECT _offspring_id FROM go_mf_offspring WHERE _id = "+id+";" );
+		while ( rs.next() ) {
+			int _offspring_id = rs.getInt("_offspring_id");
+			offspringList.add(_offspring_id);
+		}
+		int[] offsprings = new int[offspringList.size()];
+		for(int i=0;i<offspringList.size();i++){
+			offsprings[i] = offspringList.get(i).intValue();
+		}
+		rs.close();
+		return offsprings;
 	}
 }
