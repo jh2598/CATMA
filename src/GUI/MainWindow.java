@@ -7,6 +7,8 @@ import org.rosuda.REngine.Rserve.RserveException;
 import Data.*;
 import g4p_controls.*;
 import processing.core.*;
+import java.io.*;
+import java.net.*;
 
 public class MainWindow extends PApplet{
 	
@@ -44,14 +46,26 @@ public class MainWindow extends PApplet{
 		frameCount ++;
 		frameCount = frameCount%256;
 	}
-
-	public void customGUI(){
-		
-	}
 	
 	//Running Method
 	public static void run() {
+		
+		//running PApplet
         PApplet.main(new String[] { GUI.MainWindow.class.getName() });
+        
+        //server connection
+        try {
+			client = new Socket(InetAddress.getLocalHost(),Server.MAINWINDOW_PORT);
+			is = new DataInputStream(client.getInputStream());
+			os = new DataOutputStream(client.getOutputStream());
+			System.out.println("MainWindow>> Client Connected");
+			} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 	/**************************************
@@ -442,7 +456,14 @@ public class MainWindow extends PApplet{
 		} //_CODE_:win_clustering:378825:
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
-			 Heatmap.run();
+			 try {
+				os.writeByte(Server.CALL_HEATMAP_WINDOW);
+				System.out.println("MainWindow>> Call Heatmap");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 //Heatmap.run();
 		} //_CODE_:button_heatmapVis:452216:
 	/**************************************
 	* 			Custom Methods
@@ -458,6 +479,11 @@ public class MainWindow extends PApplet{
 	//Processing Variables
 	int frameCount;
 	String s;
+	
+	//Client Variables
+	static Socket client;
+	static DataInputStream is;
+	static DataOutputStream os;
 	
 	//G4P Variables
 	GPanel panel_file; 
