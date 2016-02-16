@@ -14,7 +14,7 @@ public class DataProcess {
 	public String GOdbPath;
 	public Database db;
 	REXP x;
-
+	
 	public DataProcess(Session session) {
 		try {
 			this.session = session;
