@@ -14,7 +14,7 @@ public class DataProcess {
 	public String GOdbPath;
 	public Database db;
 	REXP x;
-
+	
 	public DataProcess(Session session) {
 		try {
 			this.session = session;
@@ -74,6 +74,7 @@ public class DataProcess {
 	}
 	public String getDBPath(){
 		try {
+			x = c.eval("library(GO.db)");
 			x = c.eval("GO_dbfile()");
 		} catch (RserveException e) {
 			// TODO Auto-generated catch block
