@@ -32,7 +32,7 @@ public class GOGraph {
 		bp = new DirectedAcyclicGraph<GO, DefaultEdge>(DefaultEdge.class);
 		cc = new DirectedAcyclicGraph<GO, DefaultEdge>(DefaultEdge.class);
 		mf = new DirectedAcyclicGraph<GO, DefaultEdge>(DefaultEdge.class);
-
+		go_map = new HashMap<String, GO>();
 		this.db = db;
 		try {
 			allTerm = db.getAllTerm();

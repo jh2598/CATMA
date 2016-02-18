@@ -74,6 +74,7 @@ public class DataProcess {
 	}
 	public String getDBPath(){
 		try {
+			x = c.eval("library(GO.db)");
 			x = c.eval("GO_dbfile()");
 		} catch (RserveException e) {
 			// TODO Auto-generated catch block
