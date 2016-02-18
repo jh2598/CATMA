@@ -37,6 +37,18 @@ public class MainWindow extends PApplet{
 		frameCount = 0;
 		menu = new MenuBar();
 			
+		try {
+			client = new Socket(InetAddress.getLocalHost(),GUIServer.MAINWINDOW_PORT);
+			dis = new DataInputStream(client.getInputStream());
+			dos = new DataOutputStream(client.getOutputStream());
+			ois = new ObjectInputStream(client.getInputStream());
+			oos = new ObjectOutputStream(client.getOutputStream());
+			System.out.println("MainWindow>> Object Stream Created");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		//Using G4P Library
 		createMainGUI();
 	}
@@ -56,18 +68,8 @@ public class MainWindow extends PApplet{
         PApplet.main(new String[] { GUI.MainWindow.class.getName() });
         
         //server connection
-        try {
-			client = new Socket(InetAddress.getLocalHost(),Server.MAINWINDOW_PORT);
-			is = new DataInputStream(client.getInputStream());
-			os = new DataOutputStream(client.getOutputStream());
-			System.out.println("MainWindow>> Client Connected");
-			} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+
     }
 
 	/**************************************
@@ -202,8 +204,12 @@ public class MainWindow extends PApplet{
 		  button_heatmapVis.setText("Heatmap");
 		  button_heatmapVis.setLocalColorScheme(GCScheme.GREEN_SCHEME);
 		  button_heatmapVis.addEventHandler(this, "button_heatmapVisClicked");
+		  button_goVis = new GButton(this, 164, 136, 80, 30);
+		  button_goVis.setText("Gene Ontology");
+		  button_goVis.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+		  button_goVis.addEventHandler(this, "button_goVisClicked");
 		  panel_visualization.addControl(button_heatmapVis);
-		  
+		  panel_visualization.addControl(button_goVis);
 	}
 	
 	public void createGUI_newSession(){
@@ -442,14 +448,12 @@ public class MainWindow extends PApplet{
 		} //_CODE_:button_degFinding:435031:
 
 		public void button_goFindingClicked(GButton source, GEvent event) { //_CODE_:button_goFinding:481867:
-		  println("button_goFinding - GButton >> GEvent." + event + " @ " + millis());
-		  GOdb godb = null;
 		  try{
 			  godb = new GOdb(process.getDBPath());
 		  }catch(NullPointerException e){
 			  e.printStackTrace();
 		  }
-		  GOGraph g = new GOGraph(godb);
+		  goGraph = new GOGraph(godb);
 		} //_CODE_:button_goFinding:481867:
 
 		public void panel_visClicked(GPanel source, GEvent event) { //_CODE_:panel_visualization:685902:
@@ -466,14 +470,31 @@ public class MainWindow extends PApplet{
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
 			 try {
-				os.writeByte(Server.CALL_HEATMAP_WINDOW);
+				dos.writeByte(GUIServer.OPEN_HEATMAP_WINDOW);
 				System.out.println("MainWindow>> Call Heatmap");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			 //Heatmap.run();
 		} //_CODE_:button_heatmapVis:452216:
+		
+		public void button_goVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
+				
+			//If goGraph Object is not Null, send it to GO Visualzation Window
+			if(goGraph!=null){
+				try {
+					System.out.println("Here?");
+					dos.writeByte(GUIServer.OPEN_GO_WINDOW);
+					oos.writeObject("Hello!");
+					System.out.println("MainWindow>> Call goVisualization");
+				}catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else
+				System.err.println("MainWindow>> Error : Please run GeneOntology clustering");
+		}
 	/**************************************
 	* 			Custom Methods
 	**************************************/				
@@ -490,9 +511,14 @@ public class MainWindow extends PApplet{
 	String s;
 	
 	//Client Variables
-	static Socket client;
-	static DataInputStream is;
-	static DataOutputStream os;
+	Socket client;
+	DataInputStream dis;
+	DataOutputStream dos;
+	ObjectInputStream ois;
+	ObjectOutputStream oos;
+	
+	GOdb godb;
+	GOGraph goGraph;
 	
 	//G4P Variables
 	GPanel panel_file; 
@@ -537,6 +563,7 @@ public class MainWindow extends PApplet{
 	GTextField textfield_pValue; 
 	GTextField textfield_foldChange; 
 	GTextField textfield_ranking; 
+	GButton button_goVis;
 	
 	MenuBar menu;
 	DataProcess process;

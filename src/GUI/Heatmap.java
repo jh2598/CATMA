@@ -13,7 +13,6 @@ import Data.Database;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
-
 public class Heatmap extends PApplet{
 
 	/****************************************
