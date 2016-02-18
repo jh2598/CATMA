@@ -52,7 +52,7 @@ final class Server{
 	     //Receiving message from client
 	        while (true) {
 	          message = is.readInt();
-
+	          System.out.println(message);
 	          switch(message){
 	          case CALL_HEATMAP_WINDOW:
 	        	  System.out.println("Server>> Message received - Open Heatmap");
