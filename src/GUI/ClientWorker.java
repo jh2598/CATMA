@@ -13,12 +13,12 @@ public class ClientWorker implements Runnable {
 
 	//Constructor, Receive Socket from main server
 	public ClientWorker(Socket socket) {
+		System.out.println("Client Worker>> New Client Opened");
 		clientSocket = socket;
+		
 		try {
-			dos = (DataOutputStream) clientSocket.getOutputStream();
-			dis = (DataInputStream) clientSocket.getInputStream();
-			ois = (ObjectInputStream) clientSocket.getInputStream();
-			oos = (ObjectOutputStream) clientSocket.getOutputStream();
+			oos = new ObjectOutputStream(clientSocket.getOutputStream());
+			ois = new ObjectInputStream(clientSocket.getInputStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -26,13 +26,12 @@ public class ClientWorker implements Runnable {
 	}
 	
 	public void run() {
-		
 		try {
-			int message = dis.readInt();
+			System.out.println("Client Worker>> Waiting for message....");
+			int message = ois.readInt();
+			System.out.println("Client Worker>> Message Received : "+ message);
 			
 			switch(message){
-			case GUIServer.OPEN_WINDOWCONTROLLER:
-				break;
 			case GUIServer.OPEN_HEATMAP_WINDOW:
 				break;
 			case GUIServer.OPEN_GO_WINDOW:
@@ -50,9 +49,7 @@ public class ClientWorker implements Runnable {
 	}
 
 	protected Socket clientSocket;
-	private DataOutputStream dos;
-	private DataInputStream dis;
-	private ObjectInputStream ois;
-	private ObjectOutputStream oos;
+	protected ObjectInputStream ois;
+	protected ObjectOutputStream oos;
 	
 }

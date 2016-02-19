@@ -36,20 +36,24 @@ public class MainWindow extends PApplet{
 		//Init. variables
 		frameCount = 0;
 		menu = new MenuBar();
-			
+
+		//Connecting Server
 		try {
-			client = new Socket(InetAddress.getLocalHost(),GUIServer.MAINWINDOW_PORT);
-			dis = new DataInputStream(client.getInputStream());
-			dos = new DataOutputStream(client.getOutputStream());
-			ois = new ObjectInputStream(client.getInputStream());
+			client = new Socket(InetAddress.getLocalHost(),GUIServer.PORT_NUMBER);
+			System.out.println("Client Worker>> New Client connected : Main Window");
+			
+			//Create Object I/O Stream
 			oos = new ObjectOutputStream(client.getOutputStream());
-			System.out.println("MainWindow>> Object Stream Created");
+			ois = new ObjectInputStream(client.getInputStream());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		//Using G4P Library
+		
+		//Start drawing main window
 		createMainGUI();
 	}
 	
@@ -470,7 +474,7 @@ public class MainWindow extends PApplet{
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
 			 try {
-				dos.writeByte(GUIServer.OPEN_HEATMAP_WINDOW);
+				oos.writeInt(GUIServer.OPEN_HEATMAP_WINDOW);
 				System.out.println("MainWindow>> Call Heatmap");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -484,8 +488,7 @@ public class MainWindow extends PApplet{
 			if(goGraph!=null){
 				try {
 					System.out.println("Here?");
-					dos.writeByte(GUIServer.OPEN_GO_WINDOW);
-					oos.writeObject("Hello!");
+					oos.writeInt(GUIServer.OPEN_GO_WINDOW);
 					System.out.println("MainWindow>> Call goVisualization");
 				}catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -512,8 +515,6 @@ public class MainWindow extends PApplet{
 	
 	//Client Variables
 	Socket client;
-	DataInputStream dis;
-	DataOutputStream dos;
 	ObjectInputStream ois;
 	ObjectOutputStream oos;
 	

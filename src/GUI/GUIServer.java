@@ -17,7 +17,7 @@ import java.net.Socket;
 
 public class GUIServer implements Runnable{
 
-	
+	//Server Constructor
 	public GUIServer() {
 		running = true;
 	}
@@ -39,7 +39,6 @@ public class GUIServer implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	//Main method
@@ -60,13 +59,6 @@ public class GUIServer implements Runnable{
 			new Thread(new ClientWorker(clientSocket)).start();
 		}
 	}
-	
-	public static GUIServer getServer(){
-		if(instance != null)
-			instance = new GUIServer();
-		
-		return instance;
-	}
 		
 	public synchronized void stopServer(){
 		this.running = false;
@@ -84,7 +76,6 @@ public class GUIServer implements Runnable{
 	
 	//Instance Variables
 	
-	private static GUIServer instance;
 	private boolean running;
 	protected Thread runningThread;
 	
@@ -99,8 +90,6 @@ public class GUIServer implements Runnable{
 	//Message rule constants
 	//Server message rules
 	public static final int PORT_NUMBER = 9999;
-	public static final int GO_PORT = 6666;
-	public static final int OPEN_WINDOWCONTROLLER = 0;
 	public static final int OPEN_HEATMAP_WINDOW = 1;
 	public static final int OPEN_GO_WINDOW = 2;
 
