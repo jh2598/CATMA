@@ -474,8 +474,8 @@ public class MainWindow extends PApplet{
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
 			 try {
+				//Client message : Open Heatmap
 				oos.writeInt(GUIServer.OPEN_HEATMAP_WINDOW);
-				System.out.println("MainWindow>> Call Heatmap");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -487,9 +487,8 @@ public class MainWindow extends PApplet{
 			//If goGraph Object is not Null, send it to GO Visualzation Window
 			if(goGraph!=null){
 				try {
-					System.out.println("Here?");
+					//Client message : Open Go Window
 					oos.writeInt(GUIServer.OPEN_GO_WINDOW);
-					System.out.println("MainWindow>> Call goVisualization");
 				}catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

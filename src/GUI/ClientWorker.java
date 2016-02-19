@@ -27,14 +27,16 @@ public class ClientWorker implements Runnable {
 	
 	public void run() {
 		try {
-			System.out.println("Client Worker>> Waiting for message....");
 			int message = ois.readInt();
-			System.out.println("Client Worker>> Message Received : "+ message);
 			
 			switch(message){
 			case GUIServer.OPEN_HEATMAP_WINDOW:
+				System.out.println("Client Worker>> Message Received : Open Heatmap Window");
+				Heatmap.run();
 				break;
 			case GUIServer.OPEN_GO_WINDOW:
+				System.out.println("Client Worker>> Message Received : Open GOVisualize Window");
+				GOVisualize.run();
 				break;
 			}
 			
