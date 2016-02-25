@@ -15,7 +15,7 @@ public class WinController {
 	}
 	
 	public static void runGOVisualize(){
-		GOVisualize.run();
+		//GOVisualize.run();
 	}
 	//server instance variables
 }

@@ -10,23 +10,19 @@ import java.net.Socket;
 public class ClientWorker implements Runnable {
 	
 
-
 	//Constructor, Receive Socket from main server
 	public ClientWorker(Socket socket) {
 		System.out.println("Client Worker>> New Client Opened");
 		clientSocket = socket;
-		
-		try {
-			oos = new ObjectOutputStream(clientSocket.getOutputStream());
-			ois = new ObjectInputStream(clientSocket.getInputStream());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
 	}
 	
 	public void run() {
+		
 		try {
+			ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
+			ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+			System.out.println("Client Worker>> Waiting Response....");
 			int message = ois.readInt();
 			
 			switch(message){
@@ -36,22 +32,16 @@ public class ClientWorker implements Runnable {
 				break;
 			case GUIServer.OPEN_GO_WINDOW:
 				System.out.println("Client Worker>> Message Received : Open GOVisualize Window");
-				GOVisualize.run();
+				//GOVisualize.run();
 				break;
 			}
-			
 		} catch (IOException e) {
-			System.out.println("Client Worker>> Wrong Message Communication Rule!");
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-
 		// TODO Auto-generated method stub
-
 	}
 
 	protected Socket clientSocket;
-	protected ObjectInputStream ois;
-	protected ObjectOutputStream oos;
 	
 }

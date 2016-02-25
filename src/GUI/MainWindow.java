@@ -66,7 +66,7 @@ public class MainWindow extends PApplet{
 	}
 	
 	//Running Method
-	public static void run() {
+	public static void run(){
 		
 		//running PApplet
         PApplet.main(new String[] { GUI.MainWindow.class.getName() });
@@ -476,6 +476,7 @@ public class MainWindow extends PApplet{
 			 try {
 				//Client message : Open Heatmap
 				oos.writeInt(GUIServer.OPEN_HEATMAP_WINDOW);
+				System.out.println("MainWindow>> Message Sent: Open Heatmap Window");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -489,6 +490,7 @@ public class MainWindow extends PApplet{
 				try {
 					//Client message : Open Go Window
 					oos.writeInt(GUIServer.OPEN_GO_WINDOW);
+					GOVisualize.run(goGraph);
 				}catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
