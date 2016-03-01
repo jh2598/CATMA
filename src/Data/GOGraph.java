@@ -83,10 +83,11 @@ public class GOGraph {
 			int[] offsprings = db.getBpOffspring(tmp);
 //			System.out.println("Parent:"+bpMap.get(tmp));
 			for(int j=0;j<offsprings.length;j++){
-				DefaultEdge edge = bp.addEdge(bpMap.get(tmp), bpMap.get(offsprings[j]));
+				bp.addEdge(bpMap.get(tmp), bpMap.get(offsprings[j]));
 			}
 		}
 		System.out.println("BP done.");
+		
 		iter = ccMap.keySet().iterator();
 		System.out.println("Linking CC offspring relation...");
 		while(iter.hasNext()){
@@ -94,10 +95,11 @@ public class GOGraph {
 			int[] offsprings = db.getCcOffspring(tmp);
 //			System.out.println("Parent:"+ccMap.get(tmp));
 			for(int j=0;j<offsprings.length;j++){
-				DefaultEdge edge = cc.addEdge(ccMap.get(tmp), ccMap.get(offsprings[j]));
+				cc.addEdge(ccMap.get(tmp), ccMap.get(offsprings[j]));
 			}
 		}
 		System.out.println("CC done.");
+		
 		iter = mfMap.keySet().iterator();
 		System.out.println("Linking MF offspring relation...");
 		while(iter.hasNext()){
@@ -105,7 +107,7 @@ public class GOGraph {
 			int[] offsprings = db.getMfOffspring(tmp);
 //			System.out.println("Parent:"+mfMap.get(tmp));
 			for(int j=0;j<offsprings.length;j++){
-				DefaultEdge edge = mf.addEdge(mfMap.get(tmp), mfMap.get(offsprings[j]));
+				mf.addEdge(mfMap.get(tmp), mfMap.get(offsprings[j]));
 			}
 		}
 		System.out.println("MF done.");

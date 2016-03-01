@@ -48,6 +48,11 @@ public class GOVisualize extends PApplet{
 		physics.update();
 		cluster.display(GOCluster.MF,true);	// Display flag(Go Term Name)
 	}
+	
+	//Mouse Event Handlers
+	public void mousePressed(){
+
+	}
 
 	//Running method
 	public static void run(GOGraph g) {
@@ -62,5 +67,6 @@ public class GOVisualize extends PApplet{
 	private VerletParticle2D selectedParticle;
 	GOCluster cluster;
 	float diameter;		//length of edge
+
 
 }
