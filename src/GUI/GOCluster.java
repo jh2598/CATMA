@@ -62,13 +62,12 @@ public class GOCluster {
 		int parentIndex = -1;
 		int currentNodeIndex = 0;
 		
-		
 		Set<DefaultEdge> offspringTemp = term.edgesOf(rootNode);
 		Object[] offspring = offspringTemp.toArray();
 		for(int i=0; i<offspring.length; i++){
 			DefaultEdge e = (DefaultEdge)offspring[i];
 			GO child = graph.getMf().getEdgeSource(e);
-			System.out.println(child.getGo_id());
+			System.out.println(child.getGo_id()+",index:"+i);
 		}
 /*		while(bfs.hasNext()){
 			
