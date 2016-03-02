@@ -110,6 +110,10 @@ public class GOGraph {
 				mf.addEdge(mfMap.get(tmp), mfMap.get(offsprings[j]));
 			}
 		}
+		
+		int[] offsprings = db.getMfOffspring(db.getMfRootId());
+		System.out.println("Length of root child list :: "+offsprings.length);
+		
 		System.out.println("MF done.");
 		System.out.println("BP Offspring size:"+bp.edgeSet().size());
 		System.out.println("CC Offspring size:"+cc.edgeSet().size());

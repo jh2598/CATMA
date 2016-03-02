@@ -139,4 +139,13 @@ public class GOdb {
 		rs.close();
 		return offsprings;
 	}
+	public int getMfRootId() throws SQLException{
+		ResultSet rs = stmt.executeQuery( "SELECT _id FROM go_term WHERE go_id = "+"'GO:0003674'"+";" );
+		ArrayList<Integer> arr = new ArrayList<Integer>();
+		int _id = -1;
+		while ( rs.next() ) {
+			_id = rs.getInt("_id");
+		}
+		return _id;
+	}
 }
