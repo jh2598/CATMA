@@ -64,7 +64,7 @@ public class GOCluster {
 		
 		Set<DefaultEdge> offspringTemp = term.edgesOf(rootNode);
 		Object[] offspring = offspringTemp.toArray();
-		for(int i=0; i<offspring.length; i++){
+		for(int i=0; i<10; i++){
 			DefaultEdge e = (DefaultEdge)offspring[i];
 			GO child = graph.getMf().getEdgeSource(e);
 			System.out.println(child.getGo_id()+",index:"+i);
