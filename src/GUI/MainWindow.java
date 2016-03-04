@@ -473,14 +473,16 @@ public class MainWindow extends PApplet{
 		} //_CODE_:win_clustering:378825:
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
-			 try {
+			
+			Heatmap.run();
+/*			 try {
 				//Client message : Open Heatmap
 				oos.writeInt(GUIServer.OPEN_HEATMAP_WINDOW);
 				System.out.println("MainWindow>> Message Sent: Open Heatmap Window");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		} //_CODE_:button_heatmapVis:452216:
 		
 		public void button_goVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
