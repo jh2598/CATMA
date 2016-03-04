@@ -42,7 +42,7 @@ public class GOGraph {
 		}
 		termClassification();
 		try {
-			makeEdge();
+			makeAllEdge();
 		} catch (SQLException | CycleFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -74,46 +74,39 @@ public class GOGraph {
 		System.out.println("CC Map Size : "+ccMap.size());
 		System.out.println("MF Map Size : "+mfMap.size());
 	}
-	public void makeEdge() throws SQLException, CycleFoundException{
-		//GO Term끼리의 Offspring 관계를 확인해서 Graph의 Edge를 만들어서 연결 
-		Iterator<Integer> iter = bpMap.keySet().iterator();
-		System.out.println("Linking BP offspring relation...");
+	public void makeEdge(DirectedAcyclicGraph<GO, DefaultEdge> go_graph, HashMap<Integer,GO> ontologyMap) throws SQLException{
+		Iterator<Integer> iter = ontologyMap.keySet().iterator();
+		System.out.println("Linking "+ go_graph.hashCode() +" children relation...");
 		while(iter.hasNext()){
-			int tmp = iter.next();
-			int[] offsprings = db.getBpOffspring(tmp);
+			int parent = iter.next();
+			if(currentOntology == -1){
+				System.err.println("Current ontology is not setted.");;
+			}
+			int[] children = db.retrieveChildrenOf(currentOntology, parent);
 //			System.out.println("Parent:"+bpMap.get(tmp));
-			for(int j=0;j<offsprings.length;j++){
-				bp.addEdge(bpMap.get(tmp), bpMap.get(offsprings[j]));
+			for(int j=0;j<children.length;j++){
+				go_graph.addEdge(ontologyMap.get(parent), ontologyMap.get(children[j]));
 			}
-		}
-		System.out.println("BP done.");
-		
-		iter = ccMap.keySet().iterator();
-		System.out.println("Linking CC offspring relation...");
-		while(iter.hasNext()){
-			int tmp = iter.next();
-			int[] offsprings = db.getCcOffspring(tmp);
-//			System.out.println("Parent:"+ccMap.get(tmp));
-			for(int j=0;j<offsprings.length;j++){
-				cc.addEdge(ccMap.get(tmp), ccMap.get(offsprings[j]));
-			}
-		}
-		System.out.println("CC done.");
-		
-		iter = mfMap.keySet().iterator();
-		System.out.println("Linking MF offspring relation...");
-		while(iter.hasNext()){
-			int tmp = iter.next();
-			int[] offsprings = db.getMfOffspring(tmp);
-//			System.out.println("Parent:"+mfMap.get(tmp));
-			for(int j=0;j<offsprings.length;j++){
-				mf.addEdge(mfMap.get(tmp), mfMap.get(offsprings[j]));
-			}
-		}
+		}		
 		System.out.println("MF done.");
 		System.out.println("BP Offspring size:"+bp.edgeSet().size());
 		System.out.println("CC Offspring size:"+cc.edgeSet().size());
 		System.out.println("MF Offspring size:"+mf.edgeSet().size());
+		System.out.println("Linking children of "+go_graph.hashCode()+" done.");
+	}
+	
+	private static int currentOntology=-1; // 현재 어떤 ontology가 작업중인지 makeEdge에 알려주는 용도의 변수
+	public void makeAllEdge() throws SQLException, CycleFoundException{
+		//GO Term끼리의 children 관계를 확인해서 Graph의 Edge를 만들어서 연결 
+		currentOntology = GOdb.BP;
+		makeEdge(bp,bpMap);
+		currentOntology = GOdb.CC;
+		makeEdge(cc,ccMap);
+		currentOntology = GOdb.MF;
+		makeEdge(mf,mfMap);
+		System.out.println("BP children size:"+bp.edgeSet().size());
+		System.out.println("CC children size:"+cc.edgeSet().size());
+		System.out.println("MF children size:"+mf.edgeSet().size());
 	}
 	
 	public DirectedAcyclicGraph<GO, DefaultEdge> getBp() {

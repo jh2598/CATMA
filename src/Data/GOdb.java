@@ -82,61 +82,48 @@ public class GOdb {
 		rs.close();
 		return go;
 	}
-	public void selectBpOffspring() throws SQLException{
-		//go_term print
-				ResultSet rs = stmt.executeQuery( "SELECT * FROM go_bp_offspring;" );
-				while ( rs.next() ) {
-					int id = rs.getInt("_id");
-					String _offspring_id = rs.getString("_offspring_id");
-					System.out.println( "id = " + id );
-					System.out.println( "offspring_id = " + _offspring_id );
-					System.out.println();
-				}
-				rs.close();
-	}
-	public int[] getBpOffspring(int id) throws SQLException{
-		//id에 해당하는 GO term의 offspring의 id들을 반환
-		ArrayList<Integer> offspringList = new ArrayList<Integer>();
-		ResultSet rs = stmt.executeQuery( "SELECT _offspring_id FROM go_bp_offspring WHERE _id = "+id+";" );
-		while ( rs.next() ) {
-			int _offspring_id = rs.getInt("_offspring_id");
-			offspringList.add(_offspring_id);
+	//Ontology 구분을 위해 아무 값이나 할당, retrieveParentsOf에서 사용됨.
+	static final int BP = 1;
+	static final int CC = 2;
+	static final int MF = 3;
+	//bpChildren, ccChildren, mfChildren에서 자신의 Ontology를 인자로 삼아 호출
+	//각 Ontology에 맞게 DB의 go_XX_parents에서 인자로 전달받은 id를 부모로 가지는 term을 찾아서 그 term들의 id 전체를 배열로 반환
+	public int[] retrieveChildrenOf(int ontologyType, int parentId) throws SQLException{
+		String ontology = null;//Ontology Type에 따른 임시변수
+		if(ontologyType == BP){
+			ontology = "go_bp_parents";
+		}else if(ontologyType == CC){
+			ontology = "go_cc_parents";
+		}else if(ontologyType == MF){
+			ontology = "go_mf_parents";
+		}else{
+			System.err.println("retrieveChildrenOf ONTOLOGY TYPE:"+ontologyType+"? <- Ontology type is invalid.");
 		}
-		int[] offsprings = new int[offspringList.size()];
-		for(int i=0;i<offspringList.size();i++){
-			offsprings[i] = offspringList.get(i).intValue();
+		
+		ArrayList<Integer> childrenList = new ArrayList<>();//정수 배열 반환을 위한 임시 리스트
+		String query = "SELECT _id FROM "+ontology+" WHERE _parent_id = "+parentId+";";
+		ResultSet rs = stmt.executeQuery(query);
+		while(rs.next()){//Add child into childrenList(Temporary)
+			int _children_id = rs.getInt("_id");
+			childrenList.add(_children_id);
 		}
-		rs.close();
-		return offsprings;
-	}
-	public int[] getCcOffspring(int id) throws SQLException{
-		//id에 해당하는 GO term의 offspring의 id들을 반환
-		ArrayList<Integer> offspringList = new ArrayList<Integer>();
-		ResultSet rs = stmt.executeQuery( "SELECT _offspring_id FROM go_cc_offspring WHERE _id = "+id+";" );
-		while ( rs.next() ) {
-			int _offspring_id = rs.getInt("_offspring_id");
-			offspringList.add(_offspring_id);
-		}
-		int[] offsprings = new int[offspringList.size()];
-		for(int i=0;i<offspringList.size();i++){
-			offsprings[i] = offspringList.get(i).intValue();
+		int[] children = new int[childrenList.size()];
+		for(int i=0;i<childrenList.size();i++){
+			children[i] = childrenList.get(i).intValue();
 		}
 		rs.close();
-		return offsprings;
+		if(children.length == 0){
+			//System.err.println("term(_id:"+parentId+") of go_term has no child.");
+		}
+		return children;		
 	}
-	public int[] getMfOffspring(int id) throws SQLException{
-		//id에 해당하는 GO term의 offspring의 id들을 반환
-		ArrayList<Integer> offspringList = new ArrayList<Integer>();
-		ResultSet rs = stmt.executeQuery( "SELECT _offspring_id FROM go_mf_offspring WHERE _id = "+id+";" );
+	public int getMfRootId() throws SQLException{
+		ResultSet rs = stmt.executeQuery( "SELECT _id FROM go_term WHERE go_id = "+"'GO:0003674'"+";" );
+		ArrayList<Integer> arr = new ArrayList<Integer>();
+		int _id = -1;
 		while ( rs.next() ) {
-			int _offspring_id = rs.getInt("_offspring_id");
-			offspringList.add(_offspring_id);
+			_id = rs.getInt("_id");
 		}
-		int[] offsprings = new int[offspringList.size()];
-		for(int i=0;i<offspringList.size();i++){
-			offsprings[i] = offspringList.get(i).intValue();
-		}
-		rs.close();
-		return offsprings;
+		return _id;
 	}
 }
