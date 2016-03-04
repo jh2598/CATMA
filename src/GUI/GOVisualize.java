@@ -46,7 +46,7 @@ public class GOVisualize extends PApplet{
 		
 		//Loop method
 		physics.update();
-		cluster.display(GOCluster.MF,true);	// Display flag(Go Term Name)
+		cluster.display(GOCluster.CC,false);	// Display flag(Go Term Name)
 	}
 	
 	//Mouse Event Handlers

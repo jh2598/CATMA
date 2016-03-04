@@ -64,9 +64,9 @@ public class Heatmap extends PApplet{
 		drawHeatmap(this.table);
 		popMatrix();
 		
-		pushMatrix();
-		drawCurrentCursor();
-		popMatrix();
+		//pushMatrix();
+		//drawCurrentCursor();
+		//popMatrix();
 		
 		
 		//Update frameCount
@@ -138,10 +138,6 @@ public class Heatmap extends PApplet{
 			stroke(0);
 			textSize(11);
 		}
-		
-		//First Line : CEL Information.
-		//for(int i=0; i<table[0].length; i++)
-		//	text(table[0][i],cLength*(i-1),0);
 		
 		for(int i=0; i<table.length; i++){
 			for(int j=PROBE_ID; j<table[i].length;j++){
