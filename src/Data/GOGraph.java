@@ -94,7 +94,7 @@ public class GOGraph {
 		System.out.println("MF Offspring size:"+mf.edgeSet().size());
 		System.out.println("Linking children of "+go_graph.hashCode()+" done.");
 	}
-	
+	//TODO : GO.db에서 Relationship To 부분을 읽어와야 할 것 같다.
 	private static int currentOntology=-1; // 현재 어떤 ontology가 작업중인지 makeEdge에 알려주는 용도의 변수
 	public void makeAllEdge() throws SQLException, CycleFoundException{
 		//GO Term끼리의 children 관계를 확인해서 Graph의 Edge를 만들어서 연결 
