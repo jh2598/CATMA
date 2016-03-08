@@ -243,6 +243,7 @@ public class Database implements Serializable{
 		}
 		System.out.println("SQLite :: Records created successfully");
 	}
+	//Entrez id를 받아 그에 해당하는 GO로 반환
 	public String[] entrezToGo(String entrez){
 		String[] eg = null;
 		try {
@@ -276,6 +277,7 @@ public class Database implements Serializable{
 		}
 		return eg;
 	}
+	//GO를 받아 해당하는 Entrez ID를 반환
 	public String[] GoToEntrez(String go){
 		String[] ge = null;
 		try {

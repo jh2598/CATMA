@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import Data.UserDefinedType.GeneOntology;
+
 public class GOdb {
 	Connection conn = null;
 	Statement stmt = null;
@@ -66,18 +68,18 @@ public class GOdb {
 		}
 		rs.close();
 	}
-	public GO[] getAllTerm() throws SQLException{
+	public GeneOntology[] getAllTerm() throws SQLException{
 		ResultSet rs = stmt.executeQuery( "SELECT * FROM go_term;" );
-		ArrayList<GO> goList = new ArrayList<GO>();	
+		ArrayList<GeneOntology> goList = new ArrayList<GeneOntology>();	
 		while ( rs.next() ) {
 			int id = rs.getInt("_id");
 			String go_id = rs.getString("go_id");
 			String term = rs.getString("term");
 			String ontology = rs.getString("ontology");
 			String definition = rs.getString("definition");
-			goList.add(new GO(id,go_id,term,ontology,definition));
+			goList.add(new GeneOntology(id,go_id,term,ontology,definition));
 		}
-		GO[] go = new GO[goList.size()];
+		GeneOntology[] go = new GeneOntology[goList.size()];
 		go = goList.toArray(go);
 		rs.close();
 		return go;

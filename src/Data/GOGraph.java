@@ -9,30 +9,31 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException;
 import org.jgrapht.graph.DefaultEdge;
 
+import Data.UserDefinedType.GeneOntology;
 import sun.font.CreatedFontTracker;
 public class GOGraph {
-	private GO[] allTerm;
+	private GeneOntology[] allTerm;
 	GOdb db;
-	HashMap<Integer, GO> bpMap;
-	HashMap<Integer, GO> ccMap;
-	HashMap<Integer, GO> mfMap;
-	HashMap<String, GO> go_map;
-	private DirectedAcyclicGraph<GO, DefaultEdge> bp;
-	private DirectedAcyclicGraph<GO, DefaultEdge> cc;
-	private DirectedAcyclicGraph<GO, DefaultEdge> mf;
+	HashMap<Integer, GeneOntology> bpMap;
+	HashMap<Integer, GeneOntology> ccMap;
+	HashMap<Integer, GeneOntology> mfMap;
+	HashMap<String, GeneOntology> go_map;
+	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> bp;
+	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> cc;
+	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> mf;
 	public GOGraph(GOdb db) {
 		// TODO Auto-generated constructor stub
-		EdgeFactory<GO, DefaultEdge> ef = new EdgeFactory<GO, DefaultEdge>() {
+		EdgeFactory<GeneOntology, DefaultEdge> ef = new EdgeFactory<GeneOntology, DefaultEdge>() {
 			@Override
-			public DefaultEdge createEdge(GO arg0, GO arg1) {
+			public DefaultEdge createEdge(GeneOntology arg0, GeneOntology arg1) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 		};
-		bp = new DirectedAcyclicGraph<GO, DefaultEdge>(DefaultEdge.class);
-		cc = new DirectedAcyclicGraph<GO, DefaultEdge>(DefaultEdge.class);
-		mf = new DirectedAcyclicGraph<GO, DefaultEdge>(DefaultEdge.class);
-		go_map = new HashMap<String, GO>();
+		bp = new DirectedAcyclicGraph<GeneOntology, DefaultEdge>(DefaultEdge.class);
+		cc = new DirectedAcyclicGraph<GeneOntology, DefaultEdge>(DefaultEdge.class);
+		mf = new DirectedAcyclicGraph<GeneOntology, DefaultEdge>(DefaultEdge.class);
+		go_map = new HashMap<String, GeneOntology>();
 		this.db = db;
 		try {
 			allTerm = db.getAllTerm();
@@ -50,9 +51,9 @@ public class GOGraph {
 	}
 	public void termClassification(){
 		//GO Term을 확인해서 해당하는 Ontology의 Graph에 집어넣음
-		bpMap = new HashMap<Integer,GO>();
-		ccMap = new HashMap<Integer,GO>();
-		mfMap = new HashMap<Integer,GO>();
+		bpMap = new HashMap<Integer,GeneOntology>();
+		ccMap = new HashMap<Integer,GeneOntology>();
+		mfMap = new HashMap<Integer,GeneOntology>();
 		System.out.println("GO Term Classficating...");
 		for(int i=0;i<allTerm.length;i++){
 			if(allTerm[i].getOntology().compareTo("BP")==0){
@@ -74,7 +75,7 @@ public class GOGraph {
 		System.out.println("CC Map Size : "+ccMap.size());
 		System.out.println("MF Map Size : "+mfMap.size());
 	}
-	public void makeEdge(DirectedAcyclicGraph<GO, DefaultEdge> go_graph, HashMap<Integer,GO> ontologyMap) throws SQLException{
+	public void makeEdge(DirectedAcyclicGraph<GeneOntology, DefaultEdge> go_graph, HashMap<Integer,GeneOntology> ontologyMap) throws SQLException{
 		Iterator<Integer> iter = ontologyMap.keySet().iterator();
 		System.out.println("Linking "+ go_graph.hashCode() +" children relation...");
 		while(iter.hasNext()){
@@ -109,16 +110,16 @@ public class GOGraph {
 		System.out.println("MF children size:"+mf.edgeSet().size());
 	}
 	
-	public DirectedAcyclicGraph<GO, DefaultEdge> getBp() {
+	public DirectedAcyclicGraph<GeneOntology, DefaultEdge> getBp() {
 		return bp;
 	}
-	public DirectedAcyclicGraph<GO, DefaultEdge> getCc() {
+	public DirectedAcyclicGraph<GeneOntology, DefaultEdge> getCc() {
 		return cc;
 	}
-	public DirectedAcyclicGraph<GO, DefaultEdge> getMf() {
+	public DirectedAcyclicGraph<GeneOntology, DefaultEdge> getMf() {
 		return mf;
 	}
-	public HashMap<String, GO> getGoMap() {
+	public HashMap<String, GeneOntology> getGoMap() {
 		return go_map;
 	}
 }

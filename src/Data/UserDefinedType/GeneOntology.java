@@ -1,13 +1,14 @@
-package Data;
+package Data.UserDefinedType;
 
-public class GO {
+public class GeneOntology {
+	//GO db의 GO term 스키마를 바탕으로 함
 	private int id;
 	private String go_id;
 	private String term;
 	private String ontology;
 	private String definition;
 	public boolean visited;
-	public GO(int id, String go_id, String term, String ontology, String definition){
+	public GeneOntology(int id, String go_id, String term, String ontology, String definition){
 		this.id = id;
 		this.go_id = go_id;
 		this.term = term;
