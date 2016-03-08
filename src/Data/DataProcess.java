@@ -107,9 +107,7 @@ public class DataProcess {
 	//4
 	public void findDEG(){
 		System.out.println("Find DEG from cel files. and Save it as table.");
-		String userDir = System.getProperty("user.dir");
-		userDir = userDir.replaceAll("\\\\", "/");
-		userDir += "/R_Finding_DEG.R";
+		String userDir = getUserDir("/R_Finding_DEG.R");
 		System.out.println("R code is at :: "+ userDir);
 		System.out.println("R :: Source code is executing...");
 		try {
@@ -122,6 +120,13 @@ public class DataProcess {
 	public Database findDEG(double pValue, double foldChange, int ranking) {
 		return null;
 	}
+	//UserDirectory를 R에서 사용가능하도록 \를 치환 후 R코드 파일을 받은 경로를 덧붙임
+	public String getUserDir(String postfix){
+		String userDir = System.getProperty("user.dir");
+		userDir = userDir.replaceAll("\\\\", "/");
+		userDir += "/"+postfix;
+		return userDir;
+	}
 	public String getGOdb(){
 		return GOdbPath;
 	}
@@ -133,9 +138,7 @@ public class DataProcess {
 	//5
 	public void mapId(){
 		System.out.println("Mapping Probe ID to ENTREZ, SYMBOL ID.");
-		String userDir = System.getProperty("user.dir");
-		userDir = userDir.replaceAll("\\\\", "/");
-		userDir += "/R_Mapping_ID.R";
+		String userDir = getUserDir("/R_Mapping_ID.R");
 		System.out.println("R code is at :: "+ userDir);
 		System.out.println("R :: Source code is executing...");
 		try {
