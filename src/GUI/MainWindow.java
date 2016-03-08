@@ -36,22 +36,6 @@ public class MainWindow extends PApplet{
 		//Init. variables
 		frameCount = 0;
 		menu = new MenuBar();
-
-		//Connecting Server
-		try {
-			client = new Socket(InetAddress.getLocalHost(),GUIServer.PORT_NUMBER);
-			System.out.println("Client Worker>> New Client connected : Main Window");
-			
-			//Create Object I/O Stream
-			oos = new ObjectOutputStream(client.getOutputStream());
-			ois = new ObjectInputStream(client.getInputStream());
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		//Start drawing main window
 		createMainGUI();
@@ -474,7 +458,7 @@ public class MainWindow extends PApplet{
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
 			
-			Heatmap.run();
+			Heatmap.run(communicator);
 /*			 try {
 				//Client message : Open Heatmap
 				oos.writeInt(GUIServer.OPEN_HEATMAP_WINDOW);
@@ -489,14 +473,7 @@ public class MainWindow extends PApplet{
 				
 			//If goGraph Object is not Null, send it to GO Visualzation Window
 			if(goGraph!=null){
-				try {
-					//Client message : Open Go Window
-					oos.writeInt(GUIServer.OPEN_GO_WINDOW);
-					GOVisualize.run(goGraph);
-				}catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				GOVisualize.run(goGraph,communicator);
 			}
 			else
 				System.err.println("MainWindow>> Error : Please run GeneOntology clustering");
@@ -523,6 +500,7 @@ public class MainWindow extends PApplet{
 	
 	GOdb godb;
 	GOGraph goGraph;
+	static Communicator communicator;
 	
 	//G4P Variables
 	GPanel panel_file; 

@@ -94,10 +94,14 @@ public class GOCluster {
 							nodes.add(new Node(center.add(Vec2D.randomVector()),p,child));
 							currentNodeIndex++;
 						}
-						if(physics.getSpring(nodes.get(parentIndex),nodes.get(currentNodeIndex))==null){
-							physics.addSpring(new VerletConstrainedSpring2D(nodes.get(parentIndex),nodes.get(currentNodeIndex),diameter,0.9f,800));
+						
+						VerletSpring2D spring = physics.getSpring(nodes.get(parentIndex),nodes.get(currentNodeIndex));
+						if(spring==null){
+							physics.addSpring(new VerletConstrainedSpring2D(nodes.get(parentIndex),nodes.get(currentNodeIndex),diameter,0.99f,diameter));
 							edgeNumber++;
 						}
+						//else
+							//spring.setRestLength((float)(spring.getRestLength()*1.5));
 						
 						System.out.println("GOCluster>> Adding node ["+currentNodeIndex+","+child.getGo_id()+"]"+", Connecting with parent ["+parentIndex+","+parent.getGo_id()+"]");
 						

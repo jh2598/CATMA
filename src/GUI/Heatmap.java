@@ -23,7 +23,7 @@ public class Heatmap extends PApplet{
 	
 	public void settings(){
 		//From Processing 3.x, method size()&smooth() must be inside settings 
-		size(700,800,JAVA2D);
+		size(550,800,JAVA2D);
 		noSmooth();
 	}
 	
@@ -32,7 +32,7 @@ public class Heatmap extends PApplet{
 		background(0);
 
 		//Init. variables
-		margin = new Point(20,20);
+		margin = new Point(30,30);
 		buffer = new Point(0,0);
 		axis = new Point(0,0);
 		localP = new Point(0,0);
@@ -47,9 +47,11 @@ public class Heatmap extends PApplet{
 			e.printStackTrace();
 		}
 		cLength = (width-2*margin.x)/(table[0].length-3);
-		rLength = (height-2*margin.y)/table.length;
+		rLength = (int)((height-2*margin.y)/table.length);
 		
 		frameCount = 0;
+		
+		System.out.println("Window Height:"+height+"/ rLength:"+rLength+"/ tableLength:"+table.length);
 	}
 	
 	public void draw(){
@@ -58,15 +60,14 @@ public class Heatmap extends PApplet{
 		noStroke();
 		
 		//Drawing Heatmap
-		
 		pushMatrix();
 		transform();
 		drawHeatmap(this.table);
 		popMatrix();
 		
-		//pushMatrix();
-		//drawCurrentCursor();
-		//popMatrix();
+		pushMatrix();
+		drawCurrentCursor();
+		popMatrix();
 		
 		
 		//Update frameCount
@@ -80,17 +81,21 @@ public class Heatmap extends PApplet{
 	public void mouseWheel(MouseEvent event) {
 
 		//This method controls scaleLevel variable
-		if(event.getCount()==WHEEL_UP)
-			scaleLevel += 0.2;
-		else if(event.getCount()==WHEEL_DOWN)
-			if(scaleLevel>=1.2)
+		if(event.getCount()==WHEEL_UP){
+			if(scaleLevel<2)
+				scaleLevel += 0.2;
+			else
+				scaleLevel = 2;
+		}
+		else if(event.getCount()==WHEEL_DOWN){
+			if(scaleLevel>1.2)
 				scaleLevel -= 0.2;
 			else
 				scaleLevel = 1;
+		}
 				
 		System.out.println("Heatmap>> Scale Level: "+scaleLevel);
 	}
-
 	
 	public void mouseDragged(MouseEvent event){
 		
@@ -106,6 +111,7 @@ public class Heatmap extends PApplet{
 		//System.out.println("Heatmap>> x-buffer:"+buffer.x+" / y-buffer:"+buffer.y);
 	}
 
+	
 	
 	/*******************************
 	 * 		Custom Methods
@@ -146,7 +152,7 @@ public class Heatmap extends PApplet{
 					text(table[i][PROBE_ID],cLength*4,rLength*((i+1)*scaleLevel-scaleLevel/2));
 				}
 				else if(j>=SAMPLE){
-					fill(Float.parseFloat(table[i][j])/13*255,Float.parseFloat(table[i][j])/13*255/2,255-Float.parseFloat(table[i][j])/13*255);
+					fill(Float.parseFloat(table[i][j])/13*255,255-Float.parseFloat(table[i][j])/13*255,0);
 					rect(cLength*(j-4),rLength*i*scaleLevel,cLength,rLength*scaleLevel);
 				}
 			}
@@ -160,21 +166,13 @@ public class Heatmap extends PApplet{
 		
 		fill(0,90);
 		rect(0,0,150,40);
-		textSize(9);
-		//Organism
-		fill(255);
-		text("Organ. : ",2,10);
-		String org = table[0][(int)(localP.x/(float)cLength)+1];//.substring(0, 15) + "...";		//Limit String length to 15
-		fill(255,255,0);
-		text(org,45,10);
+		textSize(11);
 		//Probe ID
 		fill(255);
-		text("Probe ID: ",2,20);
-		fill(255,255,0);
-		text(table[(int)(localP.y/(float)rLength)][PROBE_ID],50,20);
+		text(table[(int)(localP.y/(float)rLength)][PROBE_ID],3,15);
 		//Value
 		fill(255);
-		text("Value: ",2,30);
+		text("Value: ",3,30);
 		fill(255,255,0);
 		text(table[(int)(localP.y/(float)rLength)][(int)(localP.x/(float)cLength)+SAMPLE],35,30);
 	}
@@ -184,8 +182,13 @@ public class Heatmap extends PApplet{
 			int x = (int)(localP.x/(float)cLength);
 			int y = (int)(localP.y/(float)rLength);
 
-			fill(255,100);
+			pushMatrix();
+			fill(255,255,0,125);
+			rect(margin.x,y*rLength*scaleLevel+axis.y+margin.y,cLength*(table[0].length-3),rLength*scaleLevel);
+	
+			fill(255);
 			rect(x*cLength+margin.x,y*rLength*scaleLevel+axis.y+margin.y,cLength,rLength*scaleLevel);
+			popMatrix();
 			
 			drawGeneInfo();
 		}
@@ -225,9 +228,17 @@ public class Heatmap extends PApplet{
 		db.getSampleNames();
 	}
 	
+	//Running Method
+	public static void run(Communicator c) {
+		communicator = c;
+        PApplet.main(new String[] { GUI.Heatmap.class.getName() });
+    }
+	
+	
 	/*******************************
 	 * 		Instance Variables
 	 *******************************/
+	static Communicator communicator;
 	Point margin;
 	Point buffer;
 	Point axis;		//x-axis : margin, y-axis : custom
@@ -249,11 +260,6 @@ public class Heatmap extends PApplet{
 	static final int SAMPLE =4;
 
 	String[][] table;	//[Index][ProbeID][Entrez][Symbol][SAMPLE....]
-	
-	//Running Method
-	public static void run() {
-        PApplet.main(new String[] { GUI.Heatmap.class.getName() });
-    }
 	
 }
 

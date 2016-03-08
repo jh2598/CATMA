@@ -1,9 +1,11 @@
 package GUI;
 
 import processing.core.*;
+import processing.event.KeyEvent;
 import toxi.geom.Vec2D;
 import toxi.physics2d.VerletParticle2D;
 import toxi.physics2d.VerletPhysics2D;
+import toxi.physics2d.VerletSpring2D;
 import Data.GOGraph;
 import gluegen.*;
 import jogl.util.*;
@@ -18,7 +20,7 @@ public class GOVisualize extends PApplet{
 	
 	public void settings(){
 		size(1280,800,P2D);
-		noSmooth();
+		smooth();
 	}
 	
 	public void setup(){
@@ -28,11 +30,11 @@ public class GOVisualize extends PApplet{
 		
 		//init. variables
 		loop = 0;
-		diameter = 300;
+		edgeLength = 300;
 		physics = new VerletPhysics2D();
-		
+		scaleLevel = 0;
 		//Begin Clustering
-		cluster = new GOCluster(goGraph,diameter,new Vec2D(width/2,height/2),physics,this);
+		cluster = new GOCluster(goGraph,edgeLength,new Vec2D(width/2,height/2),physics,this);
 		
 	}
 	
@@ -42,31 +44,40 @@ public class GOVisualize extends PApplet{
 		background(0);
 		stroke(255);
 		noFill();
-
-		
 		//Loop method
 		physics.update();
-		cluster.display(GOCluster.CC,false);	// Display flag(Go Term Name)
+		cluster.display(GOCluster.MF,false);	// Display flag(Go Term Name)
 	}
 	
 	//Mouse Event Handlers
 	public void mousePressed(){
 
 	}
-
+	
+	public void keyPressed(KeyEvent event){
+		
+		if(event.getKey() == 's')
+			scaleLevel += 0.1;
+		if(event.getKey() == 'a')
+			scaleLevel -= 0.1;
+	}
+	
 	//Running method
-	public static void run(GOGraph g) {
+	public static void run(GOGraph g, Communicator c) {
         PApplet.main(new String[] { GUI.GOVisualize.class.getName() });
         goGraph =g;
+        communicator = c;
     }
 	
 	//Instance Variables
 	private int loop;
+	float scaleLevel;
 	static GOGraph goGraph;
+	static Communicator communicator;
 	private VerletPhysics2D physics;
 	private VerletParticle2D selectedParticle;
 	GOCluster cluster;
-	float diameter;		//length of edge
-
+	float edgeLength;		//length of edge
+	float edgeLimit;
 
 }
