@@ -15,6 +15,7 @@ public class DataProcess {
 	public Session session;
 	public String GOdbPath;
 	public Database db;
+	public ExpressedGeneOntology[] ego = null;
 	REXP x;
 	
 	public DataProcess(Session session) {
@@ -182,13 +183,14 @@ public class DataProcess {
 		return eg;
 	}
 	//6
+	//assign ego
 	public void overRepresentation(){
 		String userDir = getUserDir("GO_OverRepresentation.R");
 		try {		
 			System.out.println("R :: Source code(GO OverRepresentation) is executing...");
 			c.eval("source(\"" + userDir + "\")");
 			System.out.println("R Source code(GO OverRepresentation) is executed successfully.");
-			selectExpressedGeneOntolgy();
+			this.ego = selectExpressedGeneOntolgy();
 		} catch (RserveException | REXPMismatchException e) {
 			e.printStackTrace();
 		}
