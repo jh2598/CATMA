@@ -13,6 +13,7 @@ import org.jgrapht.traverse.BreadthFirstIterator;
 import org.jgrapht.traverse.DepthFirstIterator;
 
 import Data.*;
+import Data.UserDefinedType.GeneOntology;
 import processing.core.PApplet;
 import toxi.geom.Vec2D;
 import toxi.physics2d.VerletConstrainedSpring2D;
@@ -36,8 +37,8 @@ public class GOCluster {
 	private void cluster(int goTerm){
 		
 		nodes = new ArrayList<Node>();
-		DirectedAcyclicGraph<GO, DefaultEdge> term = null;
-		GO rootNode = null;
+		DirectedAcyclicGraph<GeneOntology, DefaultEdge> term = null;
+		GeneOntology rootNode = null;
 		
 		//Receiving graph
 		switch(goTerm){
@@ -56,7 +57,7 @@ public class GOCluster {
 		}
 		
 		//Cluster Using breadth-first-search
-		BreadthFirstIterator<GO, DefaultEdge> bfs = new BreadthFirstIterator<GO,DefaultEdge>(term,rootNode);
+		BreadthFirstIterator<GeneOntology, DefaultEdge> bfs = new BreadthFirstIterator<GeneOntology,DefaultEdge>(term,rootNode);
 		
 		int edgeNumber = 0;
 		int parentIndex = -1;
@@ -65,7 +66,7 @@ public class GOCluster {
 		while(bfs.hasNext()){
 			
 			//Adding Parent Node
-			GO parent = bfs.next();
+			GeneOntology parent = bfs.next();
 			parentIndex++;
 			
 			//Adding Root Node
@@ -85,7 +86,7 @@ public class GOCluster {
 					
 					DefaultEdge e = (DefaultEdge)offspring[i];
 					//Connecting child with parent
-					GO child = term.getEdgeTarget(e);
+					GeneOntology child = term.getEdgeTarget(e);
 					
 					if(!parent.equals(child)){
 						
@@ -142,7 +143,7 @@ public class GOCluster {
 		}
 	}
 	
-	public void drawGOInfo(GO go){
+	public void drawGOInfo(GeneOntology go){
 				
 		int lineSpace = 20;
 		int xMargin=20;		//Left Upper Margin space-x

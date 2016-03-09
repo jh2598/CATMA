@@ -1,18 +1,20 @@
 package Data;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
+import Data.UserDefinedType.*;
 
 public class DataProcess {
 	private RConnection c;
 	public Session session;
 	public String GOdbPath;
-	public Database db;
+	public DatabaseHelper db;
+	public EnrichedGeneOntology[] ego = null;
 	REXP x;
 	
 	public DataProcess(Session session) {
@@ -107,9 +109,7 @@ public class DataProcess {
 	//4
 	public void findDEG(){
 		System.out.println("Find DEG from cel files. and Save it as table.");
-		String userDir = System.getProperty("user.dir");
-		userDir = userDir.replaceAll("\\\\", "/");
-		userDir += "/R_Finding_DEG.R";
+		String userDir = getUserDir("/R_Finding_DEG.R");
 		System.out.println("R code is at :: "+ userDir);
 		System.out.println("R :: Source code is executing...");
 		try {
@@ -119,33 +119,33 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 	}
-	public Database findDEG(double pValue, double foldChange, int ranking) {
+	public DatabaseHelper findDEG(double pValue, double foldChange, int ranking) {
 		return null;
+	}
+	//UserDirectory를 R에서 사용가능하도록 \를 치환 후 R코드 파일을 받은 경로를 덧붙임
+	public String getUserDir(String fileName){
+		String userDir = System.getProperty("user.dir");
+		userDir = userDir.replaceAll("\\\\", "/");
+		userDir += "/"+fileName;
+		return userDir;
 	}
 	public String getGOdb(){
 		return GOdbPath;
 	}
-//	public void saveData() throws RserveException {
-//		//Save data to .csv file
-//		c.eval("write.csv(tab,\""+session.filePath+"/"+session.name+".csv\")");
-//		System.out.println("DEG information is saved at "+session.filePath+"/"+session.name+".csv");
-//	}
 	//5
 	public void mapId(){
 		System.out.println("Mapping Probe ID to ENTREZ, SYMBOL ID.");
-		String userDir = System.getProperty("user.dir");
-		userDir = userDir.replaceAll("\\\\", "/");
-		userDir += "/R_Mapping_ID.R";
+		String userDir = getUserDir("/R_Mapping_ID.R");
 		System.out.println("R code is at :: "+ userDir);
-		System.out.println("R :: Source code is executing...");
+		System.out.println("R :: Source code(Mapping ID) is executing...");
 		try {
 			c.eval("source(\"" + userDir + "\")");
-			System.out.println("R Source code is executed successfully.");
+			System.out.println("R Source code(Mapping ID) is executed successfully.");
 		} catch (RserveException e) {
 			e.printStackTrace();
 		}
 		
-		db = new Database(this);
+		db = new DatabaseHelper(this);
 		session.setDB(db);
 		db.saveSample();
 		
@@ -160,6 +160,7 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 	}
+	//Entrez id를 GO로 변환한다.
 	public String[][] entrezToGoMapping() throws RserveException, REXPMismatchException{
 		c.eval("eg = bitr(genes.total, fromType=\"ENTREZID\", toType=\"GO\", annoDb=\"org.Hs.eg.db\")");
 		x = c.eval("nrow(eg)");
@@ -179,6 +180,55 @@ public class DataProcess {
 //			System.out.println();
 //		}
 		return eg;
+	}
+	//6
+	//assign ego
+	public void overRepresentation(){
+		String userDir = getUserDir("GO_OverRepresentation.R");
+		try {		
+			System.out.println("R :: Source code(GO OverRepresentation) is executing...");
+			c.eval("source(\"" + userDir + "\")");
+			System.out.println("R Source code(GO OverRepresentation) is executed successfully.");
+			this.ego = selectEnrichedGeneOntolgy();
+		} catch (RserveException | REXPMismatchException e) {
+			e.printStackTrace();
+		}
+	}
+	//R에서 생성된 ego를 ExpressedGeneOntology 배열로 정리해서 반환
+	public EnrichedGeneOntology[] selectEnrichedGeneOntolgy() throws REXPMismatchException, RserveException{
+		x = c.eval("nrow(summary(ego.up.bp))");
+		int egoLength = x.asInteger();
+		EnrichedGeneOntology ego[] = new EnrichedGeneOntology[egoLength];
+		
+		String[] egoAttr = new String[9];
+		for(int row = 1; row <= egoLength;row++){
+			for(int col = 1; col <= 9; col++){
+				x = c.eval("summary(ego.up.bp)["+ row + ","+ col +"]");
+				egoAttr[col-1] = x.asString(); 
+			}
+			ego[row-1] = new EnrichedGeneOntology(egoAttr[0], egoAttr[1], egoAttr[2], egoAttr[3], egoAttr[4], egoAttr[5], egoAttr[6], egoAttr[7], egoAttr[8]);
+			System.out.println(ego[row-1].toString());
+		}
+		return ego;
+	}
+	//ego list에서 인자로 받은 go를 찾아서 그에 해당하는 gene list를 반환
+	public String[] getGeneListOf(GeneOntology go){
+		for(int i=0;i<ego.length;i++){
+			if(ego[i].getGoId() == go.getGo_id()){
+				return ego[i].getGeneList();
+			}
+		}
+		System.err.println("There is no such Gene Ontology");
+		return null;
+	}
+	public String[] getGeneListOf(String GoID){
+		for(int i=0;i<ego.length;i++){
+			if(ego[i].getGoId() == GoID){
+				return ego[i].getGeneList();
+			}
+		}
+		System.err.println("There is no such Gene Ontology");
+		return null;
 	}
 	public String[][] getSampleId(){ // Mapped ID 0:PROBES, 1:ENTREZ, 2:SYMBOL
 		String[][] str = new String[3][getSampleLength()];

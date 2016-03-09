@@ -2,7 +2,7 @@ package GUI;
 
 import toxi.geom.Vec2D;
 import toxi.physics2d.VerletParticle2D;
-import Data.GO;
+import Data.UserDefinedType.GeneOntology;
 import processing.core.*;
 
 public class Node extends VerletParticle2D{
@@ -11,7 +11,7 @@ public class Node extends VerletParticle2D{
 		this(pos, parent, null);
 	}
 	
-	public Node(Vec2D pos, PApplet parent, GO g) {
+	public Node(Vec2D pos, PApplet parent, GeneOntology g) {
 		super(pos);
 		p = parent;
 		go = g;
@@ -28,11 +28,11 @@ public class Node extends VerletParticle2D{
 		
 	}
 
-	public GO getGO(){
+	public GeneOntology getGO(){
 		return go;
 	}
 	
 	//Instance Variables
 	private PApplet p;
-	private GO go;
+	private GeneOntology go;
 }

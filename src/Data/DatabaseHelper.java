@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
-public class Database implements Serializable{
+public class DatabaseHelper implements Serializable{
 	private static final long serialVersionUID = -8151450629209385190L;
 	static final String SAMPLE = "SAMPLE";
 	static final String ENTREZ_GO = "ENTREZ_GO";
@@ -16,7 +16,7 @@ public class Database implements Serializable{
 	String dbName;
 	String sql;
 	DataProcess dataProcess;
-	public Database(DataProcess dataProcess){
+	public DatabaseHelper(DataProcess dataProcess){
 		this.dbName = dataProcess.session.name;
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -28,7 +28,7 @@ public class Database implements Serializable{
 		System.out.println("SQLite :: Opened database successfully");
 		this.dataProcess = dataProcess;
 	}
-	public Database(String dbname){
+	public DatabaseHelper(String dbname){
 		//이 생성자를 쓰면 Retrieve 이외의 메소드는 DataProcess가 없어서 NullPointerException
 		this.dbName = dbname;
 		try {
@@ -243,6 +243,7 @@ public class Database implements Serializable{
 		}
 		System.out.println("SQLite :: Records created successfully");
 	}
+	//Entrez id를 받아 그에 해당하는 GO로 반환
 	public String[] entrezToGo(String entrez){
 		String[] eg = null;
 		try {
@@ -276,6 +277,7 @@ public class Database implements Serializable{
 		}
 		return eg;
 	}
+	//GO를 받아 해당하는 Entrez ID를 반환
 	public String[] GoToEntrez(String go){
 		String[] ge = null;
 		try {

@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import Data.Database;
+import Data.DatabaseHelper;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
@@ -130,7 +130,7 @@ public class Heatmap extends PApplet{
 			System.exit(1);
 		}
 		
-		Database db = new Database(s);
+		DatabaseHelper db = new DatabaseHelper(s);
 		table = db.retrieveSampleTable();
 		
 	}	//Saves DEG Data into table[][]
@@ -223,7 +223,7 @@ public class Heatmap extends PApplet{
 			System.err.println(e); 
 			System.exit(1);
 		}
-		Database db = new Database(s);
+		DatabaseHelper db = new DatabaseHelper(s);
 		db.retrieveSampleTable();
 		db.getSampleNames();
 	}

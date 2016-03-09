@@ -403,6 +403,7 @@ public class MainWindow extends PApplet{
 			
 			process.findDEG();
 			process.mapId();
+			process.overRepresentation();
 			label_degInfoDisplay.setText("Data Generated");
 			label_degValue.setText("P-Value: "+pValue+" / Fold Change: "+foldChange);
 			
