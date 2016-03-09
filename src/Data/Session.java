@@ -14,7 +14,7 @@ public class Session implements Serializable {
 	public String filePath;
 	public String celFilePath;
 	public String sampleInfoPath;
-	Database db;
+	DatabaseHelper db;
 
 	public Session(String name, String celPath, String samplePath){
 		System.out.println("Session Created. :: "+this);
@@ -46,10 +46,10 @@ public class Session implements Serializable {
 		System.out.println("::"+name);
 		return "Successfully opened.";
 	}
-	public void setDB(Database db){
+	public void setDB(DatabaseHelper db){
 		this.db = db;
 	}
-	public Database getDB(){
+	public DatabaseHelper getDB(){
 		return db;
 	}
 }

@@ -1,6 +1,6 @@
 package Data.UserDefinedType;
 
-public class ExpressedGeneOntology {
+public class EnrichedGeneOntology {
 	private String goId;
 	private String description;
 	private String geneRatio;
@@ -13,7 +13,7 @@ public class ExpressedGeneOntology {
 	
 	private String[] geneList;
 	
-	public ExpressedGeneOntology(String goId, String description, String geneRatio, String bgRatio, String pValue, String pAdjust, String qValue, String geneId, String count){
+	public EnrichedGeneOntology(String goId, String description, String geneRatio, String bgRatio, String pValue, String pAdjust, String qValue, String geneId, String count){
 		this.goId = goId;
 		this.description = description;
 		this.geneRatio = geneRatio;
@@ -44,7 +44,6 @@ public class ExpressedGeneOntology {
 	public String toString(){
 		String str = "GO ID:" + goId;
 		str += ", Gene Ratio:"+ geneRatio;
-		str += ", GeneList Count : "+geneList.length;
 		return str;
 	}
 }

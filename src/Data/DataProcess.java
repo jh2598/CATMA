@@ -1,21 +1,20 @@
 package Data;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
-
-import Data.UserDefinedType.ExpressedGeneOntology;
+import Data.UserDefinedType.*;
 
 public class DataProcess {
 	private RConnection c;
 	public Session session;
 	public String GOdbPath;
-	public Database db;
-	public ExpressedGeneOntology[] ego = null;
+	public DatabaseHelper db;
+	public EnrichedGeneOntology[] ego = null;
 	REXP x;
 	
 	public DataProcess(Session session) {
@@ -120,7 +119,7 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 	}
-	public Database findDEG(double pValue, double foldChange, int ranking) {
+	public DatabaseHelper findDEG(double pValue, double foldChange, int ranking) {
 		return null;
 	}
 	//UserDirectory를 R에서 사용가능하도록 \를 치환 후 R코드 파일을 받은 경로를 덧붙임
@@ -146,7 +145,7 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 		
-		db = new Database(this);
+		db = new DatabaseHelper(this);
 		session.setDB(db);
 		db.saveSample();
 		
@@ -190,16 +189,16 @@ public class DataProcess {
 			System.out.println("R :: Source code(GO OverRepresentation) is executing...");
 			c.eval("source(\"" + userDir + "\")");
 			System.out.println("R Source code(GO OverRepresentation) is executed successfully.");
-			this.ego = selectExpressedGeneOntolgy();
+			this.ego = selectEnrichedGeneOntolgy();
 		} catch (RserveException | REXPMismatchException e) {
 			e.printStackTrace();
 		}
 	}
 	//R에서 생성된 ego를 ExpressedGeneOntology 배열로 정리해서 반환
-	public ExpressedGeneOntology[] selectExpressedGeneOntolgy() throws REXPMismatchException, RserveException{
+	public EnrichedGeneOntology[] selectEnrichedGeneOntolgy() throws REXPMismatchException, RserveException{
 		x = c.eval("nrow(summary(ego.up.bp))");
 		int egoLength = x.asInteger();
-		ExpressedGeneOntology ego[] = new ExpressedGeneOntology[egoLength];
+		EnrichedGeneOntology ego[] = new EnrichedGeneOntology[egoLength];
 		
 		String[] egoAttr = new String[9];
 		for(int row = 1; row <= egoLength;row++){
@@ -207,10 +206,29 @@ public class DataProcess {
 				x = c.eval("summary(ego.up.bp)["+ row + ","+ col +"]");
 				egoAttr[col-1] = x.asString(); 
 			}
-			ego[row-1] = new ExpressedGeneOntology(egoAttr[0], egoAttr[1], egoAttr[2], egoAttr[3], egoAttr[4], egoAttr[5], egoAttr[6], egoAttr[7], egoAttr[8]);
+			ego[row-1] = new EnrichedGeneOntology(egoAttr[0], egoAttr[1], egoAttr[2], egoAttr[3], egoAttr[4], egoAttr[5], egoAttr[6], egoAttr[7], egoAttr[8]);
 			System.out.println(ego[row-1].toString());
 		}
 		return ego;
+	}
+	//ego list에서 인자로 받은 go를 찾아서 그에 해당하는 gene list를 반환
+	public String[] getGeneListOf(GeneOntology go){
+		for(int i=0;i<ego.length;i++){
+			if(ego[i].getGoId() == go.getGo_id()){
+				return ego[i].getGeneList();
+			}
+		}
+		System.err.println("There is no such Gene Ontology");
+		return null;
+	}
+	public String[] getGeneListOf(String GoID){
+		for(int i=0;i<ego.length;i++){
+			if(ego[i].getGoId() == GoID){
+				return ego[i].getGeneList();
+			}
+		}
+		System.err.println("There is no such Gene Ontology");
+		return null;
 	}
 	public String[][] getSampleId(){ // Mapped ID 0:PROBES, 1:ENTREZ, 2:SYMBOL
 		String[][] str = new String[3][getSampleLength()];
