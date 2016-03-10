@@ -8,10 +8,10 @@ import processing.core.*;
 public class Node extends VerletParticle2D{
 
 	public Node(Vec2D pos, PApplet parent){
-		this(pos, parent, null);
+		this(pos, null, parent);
 	}
 	
-	public Node(Vec2D pos, PApplet parent, GeneOntology g) {
+	public Node(Vec2D pos, GeneOntology g, PApplet parent) {
 		super(pos);
 		p = parent;
 		go = g;

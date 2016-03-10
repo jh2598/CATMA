@@ -1,5 +1,7 @@
 package Data;
 
+import java.io.Serializable;
+
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -7,13 +9,18 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import Data.UserDefinedType.*;
 
-public class DataProcess {
-	private RConnection c;
+public class DataProcess implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5763457894404886383L;
+	
+	static private RConnection c;
 	public Session session;
 	public String GOdbPath;
 	public DatabaseHelper db;
 	public EnrichedGeneOntology[] ego = null;
-	REXP x;
+	static REXP x;
 
 	
 	public DataProcess(Session session) {
@@ -196,6 +203,7 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 	}
+	
 	//R에서 생성된 ego를 ExpressedGeneOntology 배열로 정리해서 반환
 	public EnrichedGeneOntology[] selectEnrichedGeneOntolgy() throws REXPMismatchException, RserveException{
 		x = c.eval("nrow(summary(ego.up.bp))");
@@ -209,10 +217,10 @@ public class DataProcess {
 				egoAttr[col-1] = x.asString(); 
 			}
 			ego[row-1] = new EnrichedGeneOntology(egoAttr[0], egoAttr[1], egoAttr[2], egoAttr[3], egoAttr[4], egoAttr[5], egoAttr[6], egoAttr[7], egoAttr[8]);
-			System.out.println(ego[row-1].toString());
 		}
 		return ego;
 	}
+	
 	//ego list에서 인자로 받은 go를 찾아서 그에 해당하는 gene list를 반환
 	public String[] getGeneListOf(GeneOntology go){
 		for(int i=0;i<ego.length;i++){

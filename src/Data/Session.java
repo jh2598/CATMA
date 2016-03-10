@@ -15,17 +15,17 @@ public class Session implements Serializable {
 	public String filePath;
 	public String celFilePath;
 	public String sampleInfoPath;
-	
+
 	public DataProcess dataProcess;
-	
+
 	public GOGraph allGo;
 	private boolean existGoData = false;
-	public static final String GoGraphFileName = "ALL_GO_GRAPH.dat";
-	
+	public static final String GoGraphFileName = GOGraph.allGoDataFileName;
+
 	public DatabaseHelper db;
-	
+
 	public EnrichedGeneOntology[] ego = null;
-	
+
 	public Session(String name, String celPath, String samplePath){
 		System.out.println("Session Created. :: "+this);
 		this.name = name;
@@ -41,13 +41,19 @@ public class Session implements Serializable {
 			oos.flush(); 
 			fos.close();
 			oos.close();
+			System.out.println("All GO ::::"+allGo);
+			if(allGo != null && !checkGoGraphDataExist()){
+				allGo.save();
+			}
 		}catch(IOException e){
 			System.err.println(e);
+			e.printStackTrace();
 		}
 	}
 	public boolean checkGoGraphDataExist(){
 		String dir = DataProcess.getUserDir(GoGraphFileName);
 		File goData = new File(dir);
+		System.out.println("ALL_GO_GRAPH PATH ::::"+dir);
 		if(goData.exists()){
 			existGoData = true;
 		}else{
@@ -58,7 +64,7 @@ public class Session implements Serializable {
 	public void setName(String name) {this.name = name;}
 	public void setFilePath(String filePath) {this.filePath = filePath;}
 	public String loaded() {
-		// TODO Auto-generated method stub
+
 		System.out.println("::"+name);
 		return "Successfully opened.";
 	}
@@ -68,6 +74,12 @@ public class Session implements Serializable {
 	public void setDataProcess(DataProcess process){
 		this.dataProcess = process;
 	}
-	public DatabaseHelper getDB(){return db;}
+	public DatabaseHelper getDB(){
+		if(db != null){
+			return db;
+		}
+		System.err.println("Session->db is null");
+		return null;
+	}
 	public void setAllGo(GOGraph allGo){this.allGo = allGo;}
 }

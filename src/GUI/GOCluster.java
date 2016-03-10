@@ -13,6 +13,7 @@ import org.jgrapht.traverse.BreadthFirstIterator;
 import org.jgrapht.traverse.DepthFirstIterator;
 
 import Data.*;
+import Data.UserDefinedType.EnrichedGeneOntology;
 import Data.UserDefinedType.GeneOntology;
 import processing.core.PApplet;
 import toxi.geom.Vec2D;
@@ -23,18 +24,95 @@ import toxi.physics2d.VerletSpring2D;
 
 public class GOCluster {
 
-	public GOCluster(GOGraph graph, float diameter, Vec2D center, VerletPhysics2D physics, PApplet pApplet) {
+	public GOCluster(GOGraph graph, EnrichedGeneOntology[] gl, float diameter, Vec2D center, VerletPhysics2D physics, PApplet pApplet) {
 		
 		//init. variables
 		p = pApplet;
 		this.diameter = diameter;
 		this.center = center;
 		this.graph = graph;
+		this.goList = gl;
 		this.physics = physics;
-		clustered = false;
 	}
 	
-	private void cluster(int goTerm){
+	private void clusterBp(){
+		
+		System.out.println("\nGOCluster>> Processing : linking nodes...");
+		
+		nodes = new ArrayList<Node>();
+		
+		//Adding Root Node-[GO:0008150] and its children
+		GeneOntology rootGO = graph.getGoMap().get("GO:0008150");
+		Node rootNode = new Node(new Vec2D(p.width/2,p.height/2),rootGO,p);
+		nodes.add(rootNode);
+		nodes.get(0).lock();
+		//Getting children of root node
+		Set<DefaultEdge> childrenSet = graph.getBp().outgoingEdgesOf(rootGO);
+		Object[] childrenEdges = childrenSet.toArray();
+		//Adding children
+		for(Object e : childrenEdges){
+			GeneOntology child = graph.getBp().getEdgeSource((DefaultEdge) e);
+			
+			Node childNode = new Node(center.add(Vec2D.randomVector()),child,p);
+			VerletConstrainedSpring2D spring = new VerletConstrainedSpring2D(rootNode,childNode,diameter,0.9f,diameter);
+			spring.lockB(true);
+			physics.addSpring(spring);			
+		}
+		
+		for(EnrichedGeneOntology ego : goList){
+			
+			GeneOntology go = graph.getGoMap().get(ego.getGoId());
+			Node nodeEGO = new Node(center.add(Vec2D.randomVector()),go,p);
+					
+			//Create node graph by recursive function
+			nodes = linkParent(nodeEGO,nodes);
+		}
+		
+		System.out.println("GOCluster>> Clustering Finished. Number of node: "+nodes.size()+" | Number of edges: "+physics.springs.size());
+	}
+	
+	//Recursive-Function linking nodes to parent
+	private ArrayList<Node> linkParent(Node child, ArrayList<Node> n){
+		
+		//Add child to node[]
+		n.add(child);
+		
+		//Finding Parents of child
+		Set<DefaultEdge> parentEdgesSet = graph.getBp().incomingEdgesOf(child.getGO());
+		Object[] parentEdges = parentEdgesSet.toArray();
+		
+		//if root, return
+		if(parentEdges == null)
+			return n;
+
+		//For every parent
+		for(Object e : parentEdges){
+			GeneOntology parent = graph.getBp().getEdgeSource((DefaultEdge) e);
+			
+			//Link(spring) with child
+			Node parentNode = new Node(center.add(Vec2D.randomVector()),parent,p);
+			physics.addSpring(new VerletConstrainedSpring2D(parentNode,child,diameter,0.9f,diameter));
+			
+			System.out.println("GOCluster>> Linking ["+parentNode.getGO().getGo_id()+" - "+child.getGO().getGo_id()+"]");
+			
+			//If parent doesn't exist in node[]
+			if(!isGOExist(parent.getGo_id(), n)){
+				//***Recall Function*****
+				linkParent(parentNode,n);
+			}
+		}
+		return n;
+	}
+	
+	private boolean isGOExist(String goID, ArrayList<Node> n){
+			for(int i=0; i<n.size(); i++){
+				if(n.get(i).getGO().getGo_id().matches(goID))
+					return true;
+			}
+		return false;
+	}
+	
+	private void clusterGraph(int goTerm){
 		
 		nodes = new ArrayList<Node>();
 		DirectedAcyclicGraph<GeneOntology, DefaultEdge> term = null;
@@ -71,7 +149,7 @@ public class GOCluster {
 			
 			//Adding Root Node
 			if(nodes.isEmpty()){
-				nodes.add(new Node(new Vec2D(p.width/2,p.height/2),p,parent));
+				nodes.add(new Node(new Vec2D(p.width/2,p.height/2),parent,p));
 				nodes.get(0).lock();
 			}
 			
@@ -92,13 +170,13 @@ public class GOCluster {
 						
 						if(!child.visited){
 							child.visited = true;
-							nodes.add(new Node(center.add(Vec2D.randomVector()),p,child));
+							nodes.add(new Node(center.add(Vec2D.randomVector()),child,p));
 							currentNodeIndex++;
 						}
 						
 						VerletSpring2D spring = physics.getSpring(nodes.get(parentIndex),nodes.get(currentNodeIndex));
 						if(spring==null){
-							physics.addSpring(new VerletConstrainedSpring2D(nodes.get(parentIndex),nodes.get(currentNodeIndex),diameter,0.99f,diameter));
+							physics.addSpring(new VerletConstrainedSpring2D(nodes.get(parentIndex),nodes.get(currentNodeIndex),diameter,0.0001f,diameter));
 							edgeNumber++;
 						}
 						//else
@@ -115,9 +193,9 @@ public class GOCluster {
 	
 	public void display(int goTerm, boolean goName){
 		
-		if(!clustered){
-			cluster(goTerm);
-			clustered = true;
+		if(nodes == null){
+			//clusterGraph(goTerm);
+			clusterBp();
 		}
 		
 		//Display line
@@ -173,6 +251,7 @@ public class GOCluster {
 	//Instance Variables
 	PApplet p;
 	GOGraph graph;
+	EnrichedGeneOntology[] goList;
 	Vec2D center;
 
 	ArrayList<Node> nodes;

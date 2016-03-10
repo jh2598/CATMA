@@ -15,8 +15,8 @@ public class DatabaseHelper implements Serializable{
 	public Session session;
 	public DataProcess dataProcess;
 	
-	Connection conn = null;
-	Statement stmt = null;
+	static Connection conn = null;
+	static Statement stmt = null;
 	String dbName;
 	String sql;
 	
@@ -43,6 +43,18 @@ public class DatabaseHelper implements Serializable{
 			System.exit(0);
 		}
 		System.out.println("SQLite :: Opened database successfully");
+	}
+	public void load(){
+		if(conn == null){
+			try {
+				Class.forName("org.sqlite.JDBC");
+				conn = DriverManager.getConnection("jdbc:sqlite:"+dbName+".db");
+			} catch ( Exception e ) {
+				System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+				System.exit(0);
+			}
+			System.out.println("SQLite :: Opened database successfully");
+		}
 	}
 	public void saveSample(){
 		createSampleTable();

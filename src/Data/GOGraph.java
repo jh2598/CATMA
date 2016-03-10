@@ -1,4 +1,9 @@
 package Data;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,7 +16,11 @@ import org.jgrapht.graph.DefaultEdge;
 
 import Data.UserDefinedType.GeneOntology;
 import sun.font.CreatedFontTracker;
-public class GOGraph {
+public class GOGraph implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 109972010880313132L;
 	private GeneOntology[] allTerm;
 	private static GOGraph allGo = null;
 	GOdb db;
@@ -23,15 +32,8 @@ public class GOGraph {
 	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> cc;
 	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> mf;
 	
-	public static GOGraph getInstance(GOdb db){
-		if(allGo == null){
-			allGo = new GOGraph(db);
-			return allGo;
-		}
-		return allGo;
-		 
-	}
-	private GOGraph(GOdb db) {
+	public static final String allGoDataFileName = "AllGoData.dat";
+	public GOGraph(GOdb db) {
 		// TODO Auto-generated constructor stub
 		EdgeFactory<GeneOntology, DefaultEdge> ef = new EdgeFactory<GeneOntology, DefaultEdge>() {
 			@Override
@@ -103,7 +105,6 @@ public class GOGraph {
 		System.out.println("BP Offspring size:"+bp.edgeSet().size());
 		System.out.println("CC Offspring size:"+cc.edgeSet().size());
 		System.out.println("MF Offspring size:"+mf.edgeSet().size());
-		System.out.println("Linking children of "+go_graph.hashCode()+" done.");
 	}
 	//TODO : GO.db에서 Relationship To 부분을 읽어와야 할 것 같다.
 	private static int currentOntology=-1; // 현재 어떤 ontology가 작업중인지 makeEdge에 알려주는 용도의 변수
@@ -118,6 +119,12 @@ public class GOGraph {
 		System.out.println("BP children size:"+bp.edgeSet().size());
 		System.out.println("CC children size:"+cc.edgeSet().size());
 		System.out.println("MF children size:"+mf.edgeSet().size());
+		
+		System.out.println("Making graph is done.");
+	}
+	
+	public GeneOntology[] getAllTerm(){
+		return allTerm;
 	}
 	
 	public DirectedAcyclicGraph<GeneOntology, DefaultEdge> getBp() {
@@ -131,5 +138,25 @@ public class GOGraph {
 	}
 	public HashMap<String, GeneOntology> getGoMap() {
 		return go_map;
+	}
+	
+	public void save(){
+		//자신을 직렬화해서 filePath에 저장
+		System.out.println("GO_GRAPH_SAVE!!!!!");
+				try{
+					FileOutputStream fos = new FileOutputStream(getDir());
+					ObjectOutput oos = new ObjectOutputStream(fos);
+					oos.writeObject(this);
+					oos.flush(); 
+					fos.close();
+					oos.close();
+				}catch(IOException e){
+					System.err.println(e);
+					e.printStackTrace();
+				}
+	}
+	public static String getDir(){
+		System.out.println(DataProcess.getUserDir(allGoDataFileName));
+		return DataProcess.getUserDir(allGoDataFileName);
 	}
 }

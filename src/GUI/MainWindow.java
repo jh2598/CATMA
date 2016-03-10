@@ -3,7 +3,9 @@ package GUI;
 import java.sql.SQLException;
 
 import javax.swing.JFileChooser;
+import javax.swing.plaf.synth.SynthSeparatorUI;
 
+import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 import Data.*;
@@ -156,6 +158,47 @@ public class MainWindow extends PApplet{
 		  label_goInfo.setText("GO info.");
 		  label_goInfo.setLocalColorScheme(GCScheme.GREEN_SCHEME);
 		  label_goInfo.setOpaque(false);
+		  
+		  label_degDBExist = new GLabel(this, 20, 230, 110, 20);
+		  label_degDBExist.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_degDBExist.setText("DEG DB Exsist:");
+		  label_degDBExist.setOpaque(false);
+		  label_degDBExistDisplay = new GLabel(this, 135, 230, 200, 20);
+		  label_degDBExistDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_degDBExistDisplay.setText("NONE");
+		  label_degDBExistDisplay.setOpaque(false);
+		  
+		  label_EGOExist = new GLabel(this, 20, 250, 110, 20);
+		  label_EGOExist.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_EGOExist.setText("EGO Exsist:");
+		  label_EGOExist.setOpaque(false);
+		  label_EGOExistDisplay = new GLabel(this, 135, 250, 200, 20);
+		  label_EGOExistDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_EGOExistDisplay.setText("NONE");
+		  label_EGOExistDisplay.setOpaque(false);
+		  
+		  label_GOGraphExist = new GLabel(this, 20, 270, 110, 20);
+		  label_GOGraphExist.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_GOGraphExist.setText("GOGraph Exsist:");
+		  label_GOGraphExist.setOpaque(false);
+		  label_GOGraphExistDisplay = new GLabel(this, 135, 270, 200, 20);
+		  label_GOGraphExistDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+		  label_GOGraphExistDisplay.setText("NONE");
+		  label_GOGraphExistDisplay.setOpaque(false);
+		  
+		  button_test = new GButton(this, 112, 300, 91, 47);
+		  button_test.setText("TEST");
+		  button_test.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
+		  button_test.addEventHandler(this, "button_testClicked");
+		  
+		  panel_status.addControl(button_test);
+		  panel_status.addControl(label_degDBExist);
+		  panel_status.addControl(label_degDBExistDisplay);
+		  panel_status.addControl(label_EGOExist);
+		  panel_status.addControl(label_EGOExistDisplay);
+		  panel_status.addControl(label_GOGraphExist);
+		  panel_status.addControl(label_GOGraphExistDisplay);
+		  
 		  panel_status.addControl(label_maType);
 		  panel_status.addControl(label_sessionName);
 		  panel_status.addControl(label_sessionNameDisplay);
@@ -308,13 +351,15 @@ public class MainWindow extends PApplet{
 			//Update Label
 			System.out.println("Load Session>> Selected session file :" + fc.getSelectedFile().getAbsolutePath());
 			
-			Session session = menu.openSession(fc.getSelectedFile().getAbsolutePath());
+			session = menu.openSession(fc.getSelectedFile().getAbsolutePath());
 			menu.loadSession(session);
-			
-			process = new DataProcess(session);
 			System.out.println(menu.getSession().name);
 			System.out.println(menu.getSession().celFilePath);
 			System.out.println(menu.getSession().sampleInfoPath);
+			
+			label_degDBExistDisplay.setText(session.db.toString());
+			label_EGOExistDisplay.setText(session.ego.toString());
+			label_GOGraphExistDisplay.setText(session.allGo.toString());
 			
 			updateStatusWindow(session);
 			
@@ -322,6 +367,8 @@ public class MainWindow extends PApplet{
 
 		public void button_saveSessionClicked(GButton source, GEvent event) { //_CODE_:button_saveSession:309169:
 			  println("button_saveSession - GButton >> GEvent." + event + " @ " + millis());
+			  menu.saveSession();
+			  System.out.println("Session Saved.");
 			} //_CODE_:button_saveSession:309169:
 		
 		synchronized public void statusWin_draw(PApplet appc, GWinData data) { //_CODE_:statusWindow:699836:
@@ -380,7 +427,7 @@ public class MainWindow extends PApplet{
 			//
 			session.filePath = "C:/Data";
 			menu.saveSession();
-			
+			this.session = session;
 			updateStatusWindow(session);
 			win_newSession.close();
 			
@@ -442,7 +489,8 @@ public class MainWindow extends PApplet{
 		  }catch(NullPointerException e){
 			  e.printStackTrace();
 		  }
-		  goGraph = GOGraph.getInstance(godb);
+		  goGraph = new GOGraph(godb);
+		  session.allGo = goGraph;
 		} //_CODE_:button_goFinding:481867:
 
 		public void panel_visClicked(GPanel source, GEvent event) { //_CODE_:panel_visualization:685902:
@@ -470,15 +518,22 @@ public class MainWindow extends PApplet{
 			}*/
 		} //_CODE_:button_heatmapVis:452216:
 		
-		public void button_goVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
-				
+		public void button_goVisClicked(GButton source, GEvent event) throws RserveException, REXPMismatchException { //_CODE_:button_heatmapVis:452216:
 			//If goGraph Object is not Null, send it to GO Visualzation Window
-			if(goGraph!=null){
-				GOVisualize.run(goGraph,communicator);
+			if(session.allGo!=null){
+				GOVisualize.run(session.allGo,session.ego,communicator);
 			}
 			else
 				System.err.println("MainWindow>> Error : Please run GeneOntology clustering");
 		}
+		
+		public void button_testClicked(GButton source, GEvent event){ //_CODE_:button_heatmapVis:452216:
+			
+			
+			//Test button Event method
+			
+		}
+		
 	/**************************************
 	* 			Custom Methods
 	**************************************/				
@@ -547,8 +602,17 @@ public class MainWindow extends PApplet{
 	GTextField textfield_foldChange; 
 	GTextField textfield_ranking; 
 	GButton button_goVis;
+
+	GLabel label_degDBExist;
+	GLabel label_degDBExistDisplay;
+	GLabel label_EGOExist;
+	GLabel label_EGOExistDisplay;
+	GLabel label_GOGraphExist;
+	GLabel label_GOGraphExistDisplay;
+	GButton button_test;
 	
 	MenuBar menu;
 	DataProcess process;
+	Session session;
 }
 
