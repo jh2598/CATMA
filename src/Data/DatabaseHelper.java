@@ -11,11 +11,15 @@ public class DatabaseHelper implements Serializable{
 	private static final long serialVersionUID = -8151450629209385190L;
 	static final String SAMPLE = "SAMPLE";
 	static final String ENTREZ_GO = "ENTREZ_GO";
-	Connection conn = null;
-	Statement stmt = null;
+	
+	public Session session;
+	public DataProcess dataProcess;
+	
+	static Connection conn = null;
+	static Statement stmt = null;
 	String dbName;
 	String sql;
-	DataProcess dataProcess;
+	
 	public DatabaseHelper(DataProcess dataProcess){
 		this.dbName = dataProcess.session.name;
 		try {
@@ -39,6 +43,18 @@ public class DatabaseHelper implements Serializable{
 			System.exit(0);
 		}
 		System.out.println("SQLite :: Opened database successfully");
+	}
+	public void load(){
+		if(conn == null){
+			try {
+				Class.forName("org.sqlite.JDBC");
+				conn = DriverManager.getConnection("jdbc:sqlite:"+dbName+".db");
+			} catch ( Exception e ) {
+				System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+				System.exit(0);
+			}
+			System.out.println("SQLite :: Opened database successfully");
+		}
 	}
 	public void saveSample(){
 		createSampleTable();

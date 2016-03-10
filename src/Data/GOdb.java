@@ -1,4 +1,5 @@
 package Data;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,9 +9,13 @@ import java.util.ArrayList;
 
 import Data.UserDefinedType.GeneOntology;
 
-public class GOdb {
-	Connection conn = null;
-	Statement stmt = null;
+public class GOdb implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -220889749439050555L;
+	static Connection conn = null;
+	static Statement stmt = null;
 	String sql;
 	public GOdb(String GOdb_Path){
 		try {

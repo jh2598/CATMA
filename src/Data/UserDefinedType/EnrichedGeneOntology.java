@@ -1,6 +1,12 @@
 package Data.UserDefinedType;
 
-public class EnrichedGeneOntology {
+import java.io.Serializable;
+
+public class EnrichedGeneOntology implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 328503157585636240L;
 	private String goId;
 	private String description;
 	private String geneRatio;
