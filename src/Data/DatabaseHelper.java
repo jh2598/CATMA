@@ -11,11 +11,15 @@ public class DatabaseHelper implements Serializable{
 	private static final long serialVersionUID = -8151450629209385190L;
 	static final String SAMPLE = "SAMPLE";
 	static final String ENTREZ_GO = "ENTREZ_GO";
+	
+	public Session session;
+	public DataProcess dataProcess;
+	
 	Connection conn = null;
 	Statement stmt = null;
 	String dbName;
 	String sql;
-	DataProcess dataProcess;
+	
 	public DatabaseHelper(DataProcess dataProcess){
 		this.dbName = dataProcess.session.name;
 		try {

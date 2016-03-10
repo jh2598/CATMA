@@ -13,6 +13,7 @@ import Data.UserDefinedType.GeneOntology;
 import sun.font.CreatedFontTracker;
 public class GOGraph {
 	private GeneOntology[] allTerm;
+	private static GOGraph allGo = null;
 	GOdb db;
 	HashMap<Integer, GeneOntology> bpMap;
 	HashMap<Integer, GeneOntology> ccMap;
@@ -21,7 +22,16 @@ public class GOGraph {
 	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> bp;
 	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> cc;
 	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> mf;
-	public GOGraph(GOdb db) {
+	
+	public static GOGraph getInstance(GOdb db){
+		if(allGo == null){
+			allGo = new GOGraph(db);
+			return allGo;
+		}
+		return allGo;
+		 
+	}
+	private GOGraph(GOdb db) {
 		// TODO Auto-generated constructor stub
 		EdgeFactory<GeneOntology, DefaultEdge> ef = new EdgeFactory<GeneOntology, DefaultEdge>() {
 			@Override

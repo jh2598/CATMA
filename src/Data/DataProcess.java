@@ -1,7 +1,5 @@
 package Data;
 
-import java.util.ArrayList;
-
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -16,10 +14,12 @@ public class DataProcess {
 	public DatabaseHelper db;
 	public EnrichedGeneOntology[] ego = null;
 	REXP x;
+
 	
 	public DataProcess(Session session) {
 		try {
 			this.session = session;
+			session.setDataProcess(this);
 			c = new RConnection();
 			x = c.eval("R.version.string");
 			System.out.println("R Connected successfully :: " + x.asString());
@@ -89,7 +89,6 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 		System.out.println("R :: GO db file : "+GOdbPath);
-		System.out.println("R :: Sample info path is setted.");
 		return GOdbPath;
 	}
 	//3
@@ -119,14 +118,16 @@ public class DataProcess {
 			e.printStackTrace();
 		}
 	}
-	public DatabaseHelper findDEG(double pValue, double foldChange, int ranking) {
-		return null;
-	}
 	//UserDirectory를 R에서 사용가능하도록 \를 치환 후 R코드 파일을 받은 경로를 덧붙임
-	public String getUserDir(String fileName){
+	public static String getUserDir(String fileName){
 		String userDir = System.getProperty("user.dir");
 		userDir = userDir.replaceAll("\\\\", "/");
 		userDir += "/"+fileName;
+		return userDir;
+	}
+	public static String getUserDir(){
+		String userDir = System.getProperty("user.dir");
+		userDir = userDir.replaceAll("\\\\", "/");
 		return userDir;
 	}
 	public String getGOdb(){
@@ -190,6 +191,7 @@ public class DataProcess {
 			c.eval("source(\"" + userDir + "\")");
 			System.out.println("R Source code(GO OverRepresentation) is executed successfully.");
 			this.ego = selectEnrichedGeneOntolgy();
+			session.ego = this.ego;
 		} catch (RserveException | REXPMismatchException e) {
 			e.printStackTrace();
 		}
