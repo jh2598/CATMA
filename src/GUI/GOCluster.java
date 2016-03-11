@@ -21,6 +21,7 @@ import toxi.physics2d.VerletConstrainedSpring2D;
 import toxi.physics2d.VerletParticle2D;
 import toxi.physics2d.VerletPhysics2D;
 import toxi.physics2d.VerletSpring2D;
+import toxi.physics2d.behaviors.AttractionBehavior;
 
 public class GOCluster {
 
@@ -33,6 +34,8 @@ public class GOCluster {
 		this.graph = graph;
 		this.goList = gl;
 		this.physics = physics;
+		this.repulsionRadius = 100;
+		this.repulsionStrength = -0.5f;
 	}
 	
 	private void clusterBp(){
@@ -47,22 +50,30 @@ public class GOCluster {
 		nodes.add(rootNode);
 		nodes.get(0).lock();
 		//Getting children of root node
-		Set<DefaultEdge> childrenSet = graph.getBp().outgoingEdgesOf(rootGO);
-		Object[] childrenEdges = childrenSet.toArray();
-		//Adding children
-		for(Object e : childrenEdges){
-			GeneOntology child = graph.getBp().getEdgeSource((DefaultEdge) e);
+		Set<DefaultEdge> topicSet = graph.getBp().outgoingEdgesOf(rootGO);
+		Object[] topicEdges = topicSet.toArray();
+		//Adding children of root
+		for(Object e : topicEdges){
+			GeneOntology topic = graph.getBp().getEdgeTarget((DefaultEdge) e);
 			
-			Node childNode = new Node(center.add(Vec2D.randomVector()),child,p);
-			VerletConstrainedSpring2D spring = new VerletConstrainedSpring2D(rootNode,childNode,diameter,0.9f,diameter);
-			spring.lockB(true);
+			Node topicNode = new Node(center.add(Vec2D.randomVector()),topic,p);
+			//spacing repulsionStrength
+		    physics.addBehavior(new AttractionBehavior(topicNode,repulsionRadius,repulsionStrength));
+			nodes.add(topicNode);
+			VerletConstrainedSpring2D spring = new VerletConstrainedSpring2D(rootNode,topicNode,diameter,1,diameter);
 			physics.addSpring(spring);			
 		}
+		
+		for(int i=0; i<30; i++)
+			physics.update();
+		
+		for(Node n : nodes)
+			n.lock();
 		
 		for(EnrichedGeneOntology ego : goList){
 			
 			GeneOntology go = graph.getGoMap().get(ego.getGoId());
-			Node nodeEGO = new Node(center.add(Vec2D.randomVector()),go,p);
+			Node nodeEGO = new Node(center.add(Vec2D.randomVector()),go,Node.BLUE,p);
 					
 			//Create node graph by recursive function
 			nodes = linkParent(nodeEGO,nodes);
@@ -77,39 +88,46 @@ public class GOCluster {
 		//Add child to node[]
 		n.add(child);
 		
+		//Set repulse behavior
+		AttractionBehavior repulse = new AttractionBehavior(child,repulsionRadius,repulsionStrength);
+		physics.addBehavior(repulse);
+		
 		//Finding Parents of child
 		Set<DefaultEdge> parentEdgesSet = graph.getBp().incomingEdgesOf(child.getGO());
 		Object[] parentEdges = parentEdgesSet.toArray();
-		
-		//if root, return
-		if(parentEdges == null)
-			return n;
 
 		//For every parent
 		for(Object e : parentEdges){
 			GeneOntology parent = graph.getBp().getEdgeSource((DefaultEdge) e);
-			
-			//Link(spring) with child
-			Node parentNode = new Node(center.add(Vec2D.randomVector()),parent,p);
-			physics.addSpring(new VerletConstrainedSpring2D(parentNode,child,diameter,0.9f,diameter));
-			
-			System.out.println("GOCluster>> Linking ["+parentNode.getGO().getGo_id()+" - "+child.getGO().getGo_id()+"]");
+			Node parentNode = isGOExist(parent.getGo_id(), n);
 			
 			//If parent doesn't exist in node[]
-			if(!isGOExist(parent.getGo_id(), n)){
+			if(parentNode==null){
+				
+				//Link(spring) with child
+				parentNode = new Node(center.add(Vec2D.randomVector()),parent,p);
+				physics.addSpring(new VerletConstrainedSpring2D(parentNode,child,diameter,0.1f,diameter));
+				
+				System.out.println("GOCluster>> Linking ["+parentNode.getGO().getGo_id()+" - "+child.getGO().getGo_id()+"]");
+				
 				//***Recall Function*****
 				linkParent(parentNode,n);
+			}
+			//If parent already exist in Node, just add spring
+			else{
+				physics.addSpring(new VerletConstrainedSpring2D(parentNode,child,diameter,0.9f,diameter));
+				System.out.println("GOCluster>> Linking ["+parentNode.getGO().getGo_id()+" - "+child.getGO().getGo_id()+"]");
 			}
 		}
 		return n;
 	}
 	
-	private boolean isGOExist(String goID, ArrayList<Node> n){
+	private Node isGOExist(String goID, ArrayList<Node> n){
 			for(int i=0; i<n.size(); i++){
 				if(n.get(i).getGO().getGo_id().matches(goID))
-					return true;
+					return n.get(i);
 			}
-		return false;
+		return null;
 	}
 	
 	private void clusterGraph(int goTerm){
@@ -248,15 +266,22 @@ public class GOCluster {
 		p.popMatrix();
 	}
 	
+	//Getter
+	public ArrayList<Node> getNodes(){
+		return nodes;
+	}
+	
 	//Instance Variables
-	PApplet p;
-	GOGraph graph;
-	EnrichedGeneOntology[] goList;
-	Vec2D center;
+	private PApplet p;
+	private GOGraph graph;
+	private EnrichedGeneOntology[] goList;
+	private Vec2D center;
 
-	ArrayList<Node> nodes;
-	VerletPhysics2D physics;
+	private ArrayList<Node> nodes;
+	private VerletPhysics2D physics;
 	float diameter;
+	float repulsionRadius;
+	float repulsionStrength;
 	boolean clustered;
 	
 	public static int BP = 0;

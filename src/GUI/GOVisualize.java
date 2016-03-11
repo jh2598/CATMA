@@ -6,6 +6,8 @@ import toxi.geom.Vec2D;
 import toxi.physics2d.VerletParticle2D;
 import toxi.physics2d.VerletPhysics2D;
 import toxi.physics2d.VerletSpring2D;
+import toxi.physics2d.behaviors.AttractionBehavior;
+import toxi.physics2d.behaviors.ParticleBehavior2D;
 
 import java.util.ArrayList;
 
@@ -79,7 +81,7 @@ public class GOVisualize extends PApplet{
 		//Creating slider group
 		Group graphGroup = cp5.addGroup("Graph Control")
 				.setBackgroundColor(color(0,64))
-				.setBackgroundHeight(150);
+				.setBackgroundHeight(200);
 		
 		cp5.addSlider("Node size")
 	     .setPosition(20,20)
@@ -100,11 +102,27 @@ public class GOVisualize extends PApplet{
 		cp5.addSlider("Edge strength")
 	     .setPosition(20,80)
 	     .setSize(100,20)
-	     .setRange(1,99)
-	     .setValue(99)
+	     .setRange(1,100)
+	     .setValue(10)
 	     .moveTo(graphGroup)
 	     ;
 		
+		cp5.addSlider("Repulse Radius")
+	     .setPosition(20,110)
+	     .setSize(100,20)
+	     .setRange(1,100)
+	     .setValue(50)
+	     .moveTo(graphGroup)
+	     ;
+		
+		cp5.addSlider("Repulse Strength")
+	     .setPosition(20,140)
+	     .setSize(100,20)
+	     .setRange(1,100)
+	     .setValue(50)
+	     .moveTo(graphGroup)
+	     ;
+				
 		//Creating Accordion
 		accordion = cp5.addAccordion("accordion")
 				.setPosition(1000,30)
@@ -118,13 +136,24 @@ public class GOVisualize extends PApplet{
 	
 	private void updateGraphDisplay(){
 		
+		//Receiving controller values
 		int nodeSize = (int) cp5.getController("Node size").getValue();
 		int edgeLength = (int) cp5.getController("Edge length").getValue();
 		float edgeStrength = cp5.getController("Edge strength").getValue()/100;
+		int repulseRadius = (int) cp5.getController("Repulse Radius").getValue();
+		float repulseStrength = cp5.getController("Repulse Strength").getValue()/100*(-1);
 		
-		Object[] nodes = physics.particles.toArray();
+		//Node size
+		for(Node n : cluster.getNodes())
+			n.setNodeSize(nodeSize);
+		
+		//spacing repulsion
+		for(int i=0; i<physics.behaviors.size(); i++){
+			AttractionBehavior b = (AttractionBehavior) physics.behaviors.get(i);	
+			b.setStrength(repulseStrength);
+		}
+			
 		Object[] springs = physics.springs.toArray();
-		
 		for(Object spring : springs){
 			((VerletSpring2D) spring).setRestLength(edgeLength);
 			((VerletSpring2D) spring).setStrength(edgeStrength);
