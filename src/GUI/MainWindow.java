@@ -3,6 +3,7 @@ package GUI;
 import java.sql.SQLException;
 
 import javax.swing.JFileChooser;
+import javax.swing.plaf.synth.SynthSeparatorUI;
 
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -169,7 +170,9 @@ public class MainWindow extends PApplet{
 		  
 		  label_EGOExist = new GLabel(this, 20, 250, 110, 20);
 		  label_EGOExist.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-		  label_EGOExist.setText("DEG DB Exsist:");
+
+		  label_EGOExist.setText("EGO Exsist:");
+
 		  label_EGOExist.setOpaque(false);
 		  label_EGOExistDisplay = new GLabel(this, 135, 250, 200, 20);
 		  label_EGOExistDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
@@ -350,13 +353,15 @@ public class MainWindow extends PApplet{
 			//Update Label
 			System.out.println("Load Session>> Selected session file :" + fc.getSelectedFile().getAbsolutePath());
 			
-			Session session = menu.openSession(fc.getSelectedFile().getAbsolutePath());
+			session = menu.openSession(fc.getSelectedFile().getAbsolutePath());
 			menu.loadSession(session);
-			
-			process = new DataProcess(session);
 			System.out.println(menu.getSession().name);
 			System.out.println(menu.getSession().celFilePath);
 			System.out.println(menu.getSession().sampleInfoPath);
+			
+			label_degDBExistDisplay.setText(session.db.toString());
+			label_EGOExistDisplay.setText(session.ego.toString());
+			label_GOGraphExistDisplay.setText(session.allGo.toString());
 			
 			updateStatusWindow(session);
 			
@@ -364,6 +369,8 @@ public class MainWindow extends PApplet{
 
 		public void button_saveSessionClicked(GButton source, GEvent event) { //_CODE_:button_saveSession:309169:
 			  println("button_saveSession - GButton >> GEvent." + event + " @ " + millis());
+			  menu.saveSession();
+			  System.out.println("Session Saved.");
 			} //_CODE_:button_saveSession:309169:
 		
 		synchronized public void statusWin_draw(PApplet appc, GWinData data) { //_CODE_:statusWindow:699836:
@@ -422,7 +429,7 @@ public class MainWindow extends PApplet{
 			//
 			session.filePath = "C:/Data";
 			menu.saveSession();
-			
+			this.session = session;
 			updateStatusWindow(session);
 			win_newSession.close();
 			
@@ -485,6 +492,7 @@ public class MainWindow extends PApplet{
 			  e.printStackTrace();
 		  }
 		  goGraph = new GOGraph(godb);
+		  session.allGo = goGraph;
 		} //_CODE_:button_goFinding:481867:
 
 		public void panel_visClicked(GPanel source, GEvent event) { //_CODE_:panel_visualization:685902:
@@ -513,10 +521,9 @@ public class MainWindow extends PApplet{
 		} //_CODE_:button_heatmapVis:452216:
 		
 		public void button_goVisClicked(GButton source, GEvent event) throws RserveException, REXPMismatchException { //_CODE_:button_heatmapVis:452216:
-				
 			//If goGraph Object is not Null, send it to GO Visualzation Window
-			if(goGraph!=null){
-				GOVisualize.run(goGraph,process.selectEnrichedGeneOntolgy(),communicator);
+			if(session.allGo!=null){
+				GOVisualize.run(session.allGo,session.ego,communicator);
 			}
 			else
 				System.err.println("MainWindow>> Error : Please run GeneOntology clustering");
@@ -608,5 +615,6 @@ public class MainWindow extends PApplet{
 	
 	MenuBar menu;
 	DataProcess process;
+	Session session;
 }
 

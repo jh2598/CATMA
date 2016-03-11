@@ -1,6 +1,12 @@
 package Data.UserDefinedType;
 
-public class GeneOntology {
+import java.io.Serializable;
+
+public class GeneOntology implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8342199196753374228L;
 	//GO db의 GO term 스키마를 바탕으로 함
 	private int id;
 	private String go_id;
