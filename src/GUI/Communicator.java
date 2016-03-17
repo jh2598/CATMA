@@ -1,20 +1,34 @@
 package GUI;
 
+import java.util.ArrayList;
+
+import Data.UserDefinedType.EnrichedGeneOntology;
+
 public class Communicator {
 
-	private String selectedEntrizID;
-	private String selectedGO;
+	private ArrayList<String> selectedEntrizID;
+	private ArrayList<EnrichedGeneOntology> selectedGO;
+	private static Communicator singletone;
 	
-	public String getSelectedEntrizID() {
+	//Private Constructor : Singletone pattern
+	private Communicator(){
+		selectedEntrizID = new ArrayList<String>();
+		selectedGO = new ArrayList<EnrichedGeneOntology>();
+	}
+
+	public static Communicator getCommunicator(){
+		if(singletone == null)
+			singletone = new Communicator();
+		
+		return singletone;
+	}
+
+	public ArrayList<String> getSelectedEntrizID() {
 		return selectedEntrizID;
 	}
-	public void setSelectedEntrizID(String selectedEntrizID) {
-		this.selectedEntrizID = selectedEntrizID;
-	}
-	public String getSelectedGO() {
+
+	public ArrayList<EnrichedGeneOntology> getSelectedGO() {
 		return selectedGO;
 	}
-	public void setSelectedGO(String selectedGO) {
-		this.selectedGO = selectedGO;
-	}
+		
 }

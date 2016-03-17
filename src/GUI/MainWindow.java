@@ -509,21 +509,14 @@ public class MainWindow extends PApplet{
 	
 		public void button_heatmapVisClicked(GButton source, GEvent event) { //_CODE_:button_heatmapVis:452216:
 			
-			Heatmap.run(communicator);
-/*			 try {
-				//Client message : Open Heatmap
-				oos.writeInt(GUIServer.OPEN_HEATMAP_WINDOW);
-				System.out.println("MainWindow>> Message Sent: Open Heatmap Window");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
+			Heatmap.run();
+
 		} //_CODE_:button_heatmapVis:452216:
 		
 		public void button_goVisClicked(GButton source, GEvent event) throws RserveException, REXPMismatchException { //_CODE_:button_heatmapVis:452216:
 			//If goGraph Object is not Null, send it to GO Visualzation Window
 			if(session.allGo!=null){
-				GOVisualize.run(session.allGo,session.ego,communicator);
+				GOVisualize.run(session.allGo,session.ego);
 			}
 			else
 				System.err.println("MainWindow>> Error : Please run GeneOntology clustering");
@@ -558,7 +551,6 @@ public class MainWindow extends PApplet{
 	
 	GOdb godb;
 	GOGraph goGraph;
-	static Communicator communicator;
 	
 	//G4P Variables
 	GPanel panel_file; 
