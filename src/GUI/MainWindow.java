@@ -170,11 +170,8 @@ public class MainWindow extends PApplet{
 		  
 		  label_EGOExist = new GLabel(this, 20, 250, 110, 20);
 		  label_EGOExist.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-<<<<<<< HEAD
-		  label_EGOExist.setText("DEG DB Exsist:");
-=======
 		  label_EGOExist.setText("EGO Exsist:");
->>>>>>> save
+
 		  label_EGOExist.setOpaque(false);
 		  label_EGOExistDisplay = new GLabel(this, 135, 250, 200, 20);
 		  label_EGOExistDisplay.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
@@ -494,6 +491,7 @@ public class MainWindow extends PApplet{
 			  e.printStackTrace();
 		  }
 		  goGraph = new GOGraph(godb);
+		  goGraph.save();
 		  session.allGo = goGraph;
 		} //_CODE_:button_goFinding:481867:
 
