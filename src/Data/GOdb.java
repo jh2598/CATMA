@@ -95,18 +95,8 @@ public class GOdb implements Serializable{
 	static final int MF = 3;
 	//bpChildren, ccChildren, mfChildren에서 자신의 Ontology를 인자로 삼아 호출
 	//각 Ontology에 맞게 DB의 go_XX_parents에서 인자로 전달받은 id를 부모로 가지는 term을 찾아서 그 term들의 id 전체를 배열로 반환
-	public int[] retrieveChildrenOf(int ontologyType, int parentId) throws SQLException{
-		String ontology = null;//Ontology Type에 따른 임시변수
-		if(ontologyType == BP){
-			ontology = "go_bp_parents";
-		}else if(ontologyType == CC){
-			ontology = "go_cc_parents";
-		}else if(ontologyType == MF){
-			ontology = "go_mf_parents";
-		}else{
-			System.err.println("retrieveChildrenOf ONTOLOGY TYPE:"+ontologyType+"? <- Ontology type is invalid.");
-		}
-		
+	public int[] retrieveChildrenOf(int ontologyType, int parentId) throws SQLException{	
+		String ontology = getOntologyTypeString(ontologyType);
 		ArrayList<Integer> childrenList = new ArrayList<>();//정수 배열 반환을 위한 임시 리스트
 		String query = "SELECT _id FROM "+ontology+" WHERE _parent_id = "+parentId+";";
 		ResultSet rs = stmt.executeQuery(query);
@@ -124,6 +114,37 @@ public class GOdb implements Serializable{
 		}
 		return children;		
 	}
+	//retrieveChildrenOf와 함께 쓰임
+	//같은 순서로 is-a 관계인지 part-of 관계인지 그 외인지를 반환한다.
+	public String[] retrieveRelationshipOf(int ontologyType, int parentId) throws SQLException {
+		String ontology = getOntologyTypeString(ontologyType);
+		ArrayList<String> relationshipList = new ArrayList<>();
+		String query = "SELECT relationship_type FROM "+ontology+" WHERE _parent_id = "+parentId+";";
+		ResultSet rs = stmt.executeQuery(query);
+		while(rs.next()){
+			String relationship = rs.getString("relationship_type");
+			relationshipList.add(relationship);
+		}
+		String[] relationships = new String[relationshipList.size()];
+		for(int i=0;i<relationshipList.size();i++){
+			relationships[i] = relationshipList.get(i).toString();
+		}
+		return relationships;
+	}
+	public String getOntologyTypeString(int ontologyType){
+		String ontology = null;//Ontology Type에 따른 임시변수
+		if(ontologyType == BP){
+			ontology = "go_bp_parents";
+		}else if(ontologyType == CC){
+			ontology = "go_cc_parents";
+		}else if(ontologyType == MF){
+			ontology = "go_mf_parents";
+		}else{
+			System.err.println("retrieveChildrenOf ONTOLOGY TYPE:"+ontologyType+"? <- Ontology type is invalid.");
+		}
+		return ontology;
+	}
+	
 	public int getMfRootId() throws SQLException{
 		ResultSet rs = stmt.executeQuery( "SELECT _id FROM go_term WHERE go_id = "+"'GO:0003674'"+";" );
 		ArrayList<Integer> arr = new ArrayList<Integer>();

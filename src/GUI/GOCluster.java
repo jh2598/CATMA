@@ -19,6 +19,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
 import Data.*;
 import Data.UserDefinedType.EnrichedGeneOntology;
 import Data.UserDefinedType.GeneOntology;
+import Data.UserDefinedType.RelationToEdge;
 import processing.core.PApplet;
 import toxi.geom.Vec2D;
 import toxi.physics.VerletParticle;
@@ -154,7 +155,7 @@ public class GOCluster {
 			g.addVertex(child);
 
 		//Finding Parents of child
-		Set<DefaultEdge> parentEdgesSet = graph.getBp().incomingEdgesOf(child.getGO());
+		Set<RelationToEdge> parentEdgesSet = graph.getBp().incomingEdgesOf(child.getGO());
 		Object[] parentEdges = parentEdgesSet.toArray();
 
 		System.out.println("\nParent of "+child.getGO().getGo_id()+": (size "+parentEdges.length+")");
@@ -166,7 +167,7 @@ public class GOCluster {
 		
 		//For every parent
 		for(Object e : parentEdges){
-			GeneOntology parent = graph.getBp().getEdgeSource((DefaultEdge) e);
+			GeneOntology parent = graph.getBp().getEdgeSource((RelationToEdge) e);
 			Node parentNode = isGOExist(parent.getGo_id(), n);
 			
 			//If parent doesn't exist in node[]
@@ -202,7 +203,7 @@ public class GOCluster {
 	private void clusterGraph(int goTerm){
 		
 		nodes = new ArrayList<Node>();
-		DirectedAcyclicGraph<GeneOntology, DefaultEdge> term = null;
+		DirectedAcyclicGraph<GeneOntology, RelationToEdge> term = null;
 		GeneOntology rootNode = null;
 		
 		//Receiving graph
@@ -222,7 +223,7 @@ public class GOCluster {
 		}
 		
 		//Cluster Using breadth-first-search
-		BreadthFirstIterator<GeneOntology, DefaultEdge> bfs = new BreadthFirstIterator<GeneOntology,DefaultEdge>(term,rootNode);
+		BreadthFirstIterator<GeneOntology, RelationToEdge> bfs = new BreadthFirstIterator<GeneOntology,RelationToEdge>(term,rootNode);
 		
 		int edgeNumber = 0;
 		int parentIndex = -1;
@@ -241,7 +242,7 @@ public class GOCluster {
 			}
 			
 			//Getting offspring of that vertex, Make Connection
-			Set<DefaultEdge> offspringTemp = term.edgesOf(parent);
+			Set<RelationToEdge> offspringTemp = term.edgesOf(parent);
 			Object[] offspring = offspringTemp.toArray();
 			
 			System.out.println("GOCluster>> Parent node:"+parentIndex +"/Number of offspring: "+offspring.length);
@@ -249,7 +250,7 @@ public class GOCluster {
 			if((offspring != null) && (offspring.length!=0)){
 				for(int i=0; i<offspring.length;i++){
 					
-					DefaultEdge e = (DefaultEdge)offspring[i];
+					RelationToEdge e = (RelationToEdge)offspring[i];
 					//Connecting child with parent
 					GeneOntology child = term.getEdgeTarget(e);
 					

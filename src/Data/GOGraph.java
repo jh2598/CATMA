@@ -15,6 +15,7 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException;
 import org.jgrapht.graph.DefaultEdge;
 
 import Data.UserDefinedType.GeneOntology;
+import Data.UserDefinedType.RelationToEdge;
 import sun.font.CreatedFontTracker;
 public class GOGraph implements Serializable{
 	/**
@@ -28,23 +29,23 @@ public class GOGraph implements Serializable{
 	HashMap<Integer, GeneOntology> ccMap;
 	HashMap<Integer, GeneOntology> mfMap;
 	HashMap<String, GeneOntology> go_map;
-	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> bp;
-	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> cc;
-	private DirectedAcyclicGraph<GeneOntology, DefaultEdge> mf;
+	private DirectedAcyclicGraph<GeneOntology, RelationToEdge> bp;
+	private DirectedAcyclicGraph<GeneOntology, RelationToEdge> cc;
+	private DirectedAcyclicGraph<GeneOntology, RelationToEdge> mf;
 	
 	public static final String allGoDataFileName = "AllGoData.dat";
 	public GOGraph(GOdb db) {
 		// TODO Auto-generated constructor stub
-		EdgeFactory<GeneOntology, DefaultEdge> ef = new EdgeFactory<GeneOntology, DefaultEdge>() {
+		EdgeFactory<GeneOntology, RelationToEdge> ef = new EdgeFactory<GeneOntology, RelationToEdge>() {
 			@Override
-			public DefaultEdge createEdge(GeneOntology arg0, GeneOntology arg1) {
+			public RelationToEdge createEdge(GeneOntology arg0, GeneOntology arg1) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 		};
-		bp = new DirectedAcyclicGraph<GeneOntology, DefaultEdge>(DefaultEdge.class);
-		cc = new DirectedAcyclicGraph<GeneOntology, DefaultEdge>(DefaultEdge.class);
-		mf = new DirectedAcyclicGraph<GeneOntology, DefaultEdge>(DefaultEdge.class);
+		bp = new DirectedAcyclicGraph<GeneOntology, RelationToEdge>(RelationToEdge.class);
+		cc = new DirectedAcyclicGraph<GeneOntology, RelationToEdge>(RelationToEdge.class);
+		mf = new DirectedAcyclicGraph<GeneOntology, RelationToEdge>(RelationToEdge.class);
 		go_map = new HashMap<String, GeneOntology>();
 		this.db = db;
 		try {
@@ -87,7 +88,7 @@ public class GOGraph implements Serializable{
 		System.out.println("CC Map Size : "+ccMap.size());
 		System.out.println("MF Map Size : "+mfMap.size());
 	}
-	public void makeEdge(DirectedAcyclicGraph<GeneOntology, DefaultEdge> go_graph, HashMap<Integer,GeneOntology> ontologyMap) throws SQLException{
+	public void makeEdge(DirectedAcyclicGraph<GeneOntology, RelationToEdge> go_graph, HashMap<Integer,GeneOntology> ontologyMap) throws SQLException{
 		Iterator<Integer> iter = ontologyMap.keySet().iterator();
 		System.out.println("Linking "+ go_graph.hashCode() +" children relation...");
 		while(iter.hasNext()){
@@ -95,10 +96,13 @@ public class GOGraph implements Serializable{
 			if(currentOntology == -1){
 				System.err.println("Current ontology is not setted.");;
 			}
+			//currentOntology의 Parent를 전부 조회해서 godb상에서의 id를 배열로 전달.
 			int[] children = db.retrieveChildrenOf(currentOntology, parent);
+			String[] relationships = db.retrieveRelationshipOf(currentOntology, parent);
 //			System.out.println("Parent:"+bpMap.get(tmp));
 			for(int j=0;j<children.length;j++){
-				go_graph.addEdge(ontologyMap.get(parent), ontologyMap.get(children[j]));
+				RelationToEdge edge = go_graph.addEdge(ontologyMap.get(parent), ontologyMap.get(children[j]));
+				edge.setType(relationships[j]);
 			}
 		}		
 		System.out.println("MF done.");
@@ -127,13 +131,13 @@ public class GOGraph implements Serializable{
 		return allTerm;
 	}
 	
-	public DirectedAcyclicGraph<GeneOntology, DefaultEdge> getBp() {
+	public DirectedAcyclicGraph<GeneOntology, RelationToEdge> getBp() {
 		return bp;
 	}
-	public DirectedAcyclicGraph<GeneOntology, DefaultEdge> getCc() {
+	public DirectedAcyclicGraph<GeneOntology, RelationToEdge> getCc() {
 		return cc;
 	}
-	public DirectedAcyclicGraph<GeneOntology, DefaultEdge> getMf() {
+	public DirectedAcyclicGraph<GeneOntology, RelationToEdge> getMf() {
 		return mf;
 	}
 	public HashMap<String, GeneOntology> getGoMap() {
@@ -142,7 +146,7 @@ public class GOGraph implements Serializable{
 	
 	public void save(){
 		//자신을 직렬화해서 filePath에 저장
-		System.out.println("GO_GRAPH_SAVE!!!!!");
+		System.out.println("GO_GRAPH_SAVED");
 				try{
 					FileOutputStream fos = new FileOutputStream(getDir());
 					ObjectOutput oos = new ObjectOutputStream(fos);

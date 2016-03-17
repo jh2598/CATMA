@@ -170,7 +170,6 @@ public class MainWindow extends PApplet{
 		  
 		  label_EGOExist = new GLabel(this, 20, 250, 110, 20);
 		  label_EGOExist.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-
 		  label_EGOExist.setText("EGO Exsist:");
 
 		  label_EGOExist.setOpaque(false);
@@ -492,6 +491,7 @@ public class MainWindow extends PApplet{
 			  e.printStackTrace();
 		  }
 		  goGraph = new GOGraph(godb);
+		  goGraph.save();
 		  session.allGo = goGraph;
 		} //_CODE_:button_goFinding:481867:
 
@@ -523,10 +523,7 @@ public class MainWindow extends PApplet{
 		}
 		
 		public void button_testClicked(GButton source, GEvent event){ //_CODE_:button_heatmapVis:452216:
-			
-			
 			//Test button Event method
-			
 		}
 		
 	/**************************************
