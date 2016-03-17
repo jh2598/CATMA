@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 
 import Data.DatabaseHelper;
+import Data.UserDefinedType.*;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
@@ -37,8 +39,11 @@ public class Heatmap extends PApplet{
 		axis = new Point(0,0);
 		localP = new Point(0,0);
 		worldP = new Point(0,0);
+		mouseInitP = new Point(-10,-10);
+		mouseFinalP = new Point(-10,-10);
 		scaleLevel = 1;
-
+		communicator = Communicator.getCommunicator();
+		
 		//Reading DEG data
 		try {
 			readDEGData();
@@ -50,7 +55,7 @@ public class Heatmap extends PApplet{
 		rLength = (int)((height-2*margin.y)/table.length);
 		
 		frameCount = 0;
-		
+
 		System.out.println("Window Height:"+height+"/ rLength:"+rLength+"/ tableLength:"+table.length);
 	}
 	
@@ -78,7 +83,7 @@ public class Heatmap extends PApplet{
 
 	}
 	
-	public void mouseWheel(MouseEvent event) {
+/*	public void mouseWheel(MouseEvent event) {
 
 		//This method controls scaleLevel variable
 		if(event.getCount()==WHEEL_UP){
@@ -95,11 +100,21 @@ public class Heatmap extends PApplet{
 		}
 				
 		System.out.println("Heatmap>> Scale Level: "+scaleLevel);
-	}
+	}*/
 	
+	public void mousePressed(MouseEvent event){
+		
+		//If mouse pressed, save its position
+		mouseInitP.setLocation(mouseX, mouseY);
+		mouseFinalP.setLocation(mouseX, mouseY);
+		
+	}
+		
 	public void mouseDragged(MouseEvent event){
 		
-		buffer.y = mouseY - pmouseY;
+		mouseFinalP.setLocation(mouseX, mouseY);
+		
+		/*buffer.y = mouseY - pmouseY;
 		
 		//Limits axis value
 		if(axis.y<=0)
@@ -108,11 +123,32 @@ public class Heatmap extends PApplet{
 			axis.y = 0;
 		
 		System.out.println("axis.y ="+axis.y+" / Limit value: "+(-1)*(int)(table.length*scaleLevel+height));
-		//System.out.println("Heatmap>> x-buffer:"+buffer.x+" / y-buffer:"+buffer.y);
+		*/
+	}
+	
+	public void mouseReleased(MouseEvent e){
+		
+		int selectedCol = (int)(((int)(mouseInitP.y-axis.y/scaleLevel)-(int)(margin.y/scaleLevel))/rLength);
+		int selectedColEnd = (int)(((int)(mouseFinalP.y-axis.y/scaleLevel)-(int)(margin.y/scaleLevel))/rLength);
+
+		int start;
+		
+		if(selectedCol>selectedColEnd)
+			start = selectedColEnd;
+		else
+			start = selectedCol;
+	
+		//clear all selected genes before
+		communicator.getSelectedEntrizID().clear();
+		
+		//Add new selected genes
+		System.out.println("Selected ProbeID:");
+		for(int i=start; i<=start+abs(selectedColEnd-selectedCol); i++){
+			communicator.getSelectedEntrizID().add(table[i][ENTRIZ_ID]);
+			System.out.println(table[i][PROBE_ID]);			
+		}
 	}
 
-	
-	
 	/*******************************
 	 * 		Custom Methods
 	 * @throws IOException 
@@ -169,7 +205,9 @@ public class Heatmap extends PApplet{
 		textSize(11);
 		//Probe ID
 		fill(255);
-		text(table[(int)(localP.y/(float)rLength)][PROBE_ID],3,15);
+		if(checkSelected(table[(int)(localP.y/(float)rLength)][ENTRIZ_ID]))
+			fill(255,255,0);
+		text(table[(int)(localP.y/(float)rLength)][NAME],3,15);
 		//Value
 		fill(255);
 		text("Value: ",3,30);
@@ -178,18 +216,31 @@ public class Heatmap extends PApplet{
 	}
 	
 	private void drawCurrentCursor(){
+		
+		int mouseInitY = (int)(((int)(mouseInitP.y-axis.y/scaleLevel)-(int)(margin.y/scaleLevel))/rLength);
+		int mouseFinalY = (int)(((int)(mouseFinalP.y-axis.y/scaleLevel)-(int)(margin.y/scaleLevel))/rLength);
+		
+		//Drawing Selected Area
+		pushMatrix();
+		stroke(255);
+		strokeWeight(2);
+		fill(0,0,255,30);
+		rect(margin.x,mouseInitY*rLength*scaleLevel+axis.y+margin.y,cLength*(table[0].length-3),rLength*(mouseFinalY-mouseInitY+1)*scaleLevel);
+		popMatrix();
+		
 		if(updateLocalP()){
 			int x = (int)(localP.x/(float)cLength);
 			int y = (int)(localP.y/(float)rLength);
 
 			pushMatrix();
+			noStroke();
 			fill(255,255,0,125);
 			rect(margin.x,y*rLength*scaleLevel+axis.y+margin.y,cLength*(table[0].length-3),rLength*scaleLevel);
 	
 			fill(255);
 			rect(x*cLength+margin.x,y*rLength*scaleLevel+axis.y+margin.y,cLength,rLength*scaleLevel);
 			popMatrix();
-			
+
 			drawGeneInfo();
 		}
 	}
@@ -213,6 +264,20 @@ public class Heatmap extends PApplet{
 		translate(0,axis.y);
 	}
 	
+	private boolean checkSelected(String entrizID){
+		
+		ArrayList<String> genes = new ArrayList<String>();
+		for(EnrichedGeneOntology ego : communicator.getSelectedGO()){
+			for(String g : ego.getGeneList())
+				genes.add(g);
+		}
+		for(String s : genes){
+			if(s.matches(entrizID))
+				return true;
+		}
+		return false;
+	}
+	
 	private void retrieve(){
 		String s = null;
 		try {
@@ -229,8 +294,7 @@ public class Heatmap extends PApplet{
 	}
 	
 	//Running Method
-	public static void run(Communicator c) {
-		communicator = c;
+	public static void run() {
         PApplet.main(new String[] { GUI.Heatmap.class.getName() });
     }
 	
@@ -238,12 +302,14 @@ public class Heatmap extends PApplet{
 	/*******************************
 	 * 		Instance Variables
 	 *******************************/
-	static Communicator communicator;
+	private Communicator communicator;
 	Point margin;
 	Point buffer;
 	Point axis;		//x-axis : margin, y-axis : custom
 	Point localP;	//Local map position (axis : 0,0)
 	Point worldP;	//World map position (custom y-axis)
+	Point mouseInitP;	//Initial mouse pressed position
+	Point mouseFinalP;
 	int cLength;
 	int rLength;
 	int maxValue;
@@ -255,7 +321,7 @@ public class Heatmap extends PApplet{
 	static final float WHEEL_DOWN = 1.f;
 	static final int INDEX = 0;
 	static final int PROBE_ID = 1;
-	static final int ENTIZ_ID = 2;
+	static final int ENTRIZ_ID = 2;
 	static final int NAME =3;
 	static final int SAMPLE =4;
 

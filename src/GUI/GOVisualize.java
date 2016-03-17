@@ -1,6 +1,7 @@
 package GUI;
 
 import processing.core.*;
+import processing.data.Table;
 import processing.event.KeyEvent;
 import toxi.geom.Vec2D;
 import toxi.physics2d.VerletParticle2D;
@@ -8,11 +9,16 @@ import toxi.physics2d.VerletPhysics2D;
 import toxi.physics2d.VerletSpring2D;
 import toxi.physics2d.behaviors.AttractionBehavior;
 import toxi.physics2d.behaviors.ParticleBehavior2D;
+import toxi.physics2d.constraints.CircularConstraint;
 
 import java.util.ArrayList;
 
+import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
+import org.jgrapht.graph.DefaultEdge;
+
 import Data.GOGraph;
 import Data.UserDefinedType.EnrichedGeneOntology;
+import Data.UserDefinedType.GeneOntology;
 import gluegen.*;
 import jogl.util.*;
 import controlP5.*;
@@ -36,33 +42,87 @@ public class GOVisualize extends PApplet{
 		noStroke();
 		initControlP5();
 		
+		Table table = loadTable("D:/David/Ajou Undergraduate/2015-2/CATMA/모임자료/DEG_bY-R/GO.list.csv");
+		
+		String[] list = new String[table.getRowCount()];
+		for(int i=0; i<list.length; i++){
+			list[i] = table.getString(i, 0);
+		}
+		EnrichedGeneOntology[] temp = new EnrichedGeneOntology[list.length];
+		int count = 0;
+		for(int i=0; i<goList.length; i++){
+			EnrichedGeneOntology ego = goList[i];
+			for(int j=0; j<list.length; j++){
+				if(ego.getGoId().matches(list[j])){
+					temp[count] = ego;
+					count++;
+					System.out.println(ego.getGoId());
+				}
+			}
+		}
+		
+		goList = temp;
+		
 		//init. variables
 		loop = 0;
 		edgeLength = 100;
 		physics = new VerletPhysics2D();
 		scaleLevel = 0;
+		displayNode = true;
+		displayEdge = true;
+		displayGOID = true;
+		communicator = Communicator.getCommunicator();
 		//Begin Clustering
-		cluster = new GOCluster(goGraph,goList,edgeLength,new Vec2D(width/2,height/2),physics,this);
+		cluster = new GOCluster(goGraph,temp,edgeLength,new Vec2D(width/2,height/2),physics,this);
 		
+		//for(int i=0; i<goList.length; i++)
+			//System.out.println(goList[i].getGoId());
 	}
 	
 	public void draw(){
 		
 		loop++;
 		background(0);
+		drawBackCircle();
 		stroke(255);
 		noFill();
 		//Loop method
-		physics.update();
-		cluster.display(GOCluster.BP,true);	// Display flag(Go Term Name)
 		
+		physics.update();
+		cluster.display(displayNode,displayEdge,displayGOID);
 		updateGraphDisplay();
+		displayGOInfo();
 		
 	}
 	
 	//Mouse Event Handlers
 	public void mousePressed(){
-
+		int nodeSize = (int) cp5.getController("Node size").getValue();
+		
+		Vec2D mousePos=new Vec2D(mouseX,mouseY);
+		for(int i=1; i<physics.particles.size(); i++) {
+		  VerletParticle2D p=physics.particles.get(i);
+		  if (mousePos.distanceToSquared(p)<nodeSize*nodeSize/2) {
+		    selectedParticle=p.lock();
+		    break;
+		  }
+		}
+	}
+	
+	public void mouseClicked(){
+		int nodeSize = (int) cp5.getController("Node size").getValue();
+		
+		Vec2D mousePos=new Vec2D(mouseX,mouseY);
+		for(int i=1; i<cluster.getNodes().size(); i++) {
+			Node n = cluster.getNodes().get(i);
+			if (mousePos.distanceToSquared(n)<nodeSize*nodeSize/2) {
+				EnrichedGeneOntology ego = getEGO(n.getGO().getGo_id());
+				if(ego != null){
+					communicator.getSelectedGO().add(ego);
+					System.out.println("GO Selected:"+ego.getGoId());
+				}
+			}
+		}
 	}
 	
 	public void keyPressed(KeyEvent event){
@@ -73,6 +133,20 @@ public class GOVisualize extends PApplet{
 			scaleLevel -= 0.1;
 	}
 	
+	public void mouseDragged() {
+		if (selectedParticle!=null) {
+		  selectedParticle.set(mouseX,mouseY);
+		}
+	}
+
+	public void mouseReleased() {
+		// unlock the selected particle
+		if (selectedParticle!=null) {
+		    selectedParticle.unlock();
+		    selectedParticle=null;
+		}
+	}
+
 	private void initControlP5(){
 		
 		//Init controller
@@ -94,7 +168,7 @@ public class GOVisualize extends PApplet{
 		cp5.addSlider("Edge length")
 	     .setPosition(20,50)
 	     .setSize(100,20)
-	     .setRange(10,1000)
+	     .setRange(1,500)
 	     .setValue(100)
 	     .moveTo(graphGroup)
 	     ;
@@ -107,7 +181,7 @@ public class GOVisualize extends PApplet{
 	     .moveTo(graphGroup)
 	     ;
 		
-		cp5.addSlider("Repulse Radius")
+		cp5.addSlider("Radius")
 	     .setPosition(20,110)
 	     .setSize(100,20)
 	     .setRange(1,100)
@@ -119,54 +193,230 @@ public class GOVisualize extends PApplet{
 	     .setPosition(20,140)
 	     .setSize(100,20)
 	     .setRange(1,100)
-	     .setValue(50)
+	     .setValue(10)
 	     .moveTo(graphGroup)
 	     ;
-				
+		
+		Group displayGroup = cp5.addGroup("Display Control")
+				.setBackgroundColor(color(0,64))
+				.setBackgroundHeight(150);
+		
+		
+		cp5.addToggle("Node")
+	     .setPosition(20,20)
+	     .setSize(20,20)
+	     .setValue(true)
+	     .moveTo(displayGroup)
+	     ;
+		
+		cp5.addToggle("Edge")
+	     .setPosition(50,20)
+	     .setSize(20,20)
+	     .setValue(true)
+	     .moveTo(displayGroup)
+	     ;
+		
+		cp5.addToggle("GO ID")
+	     .setPosition(80,20)
+	     .setSize(20,20)
+	     .setValue(true)
+	     .moveTo(displayGroup)
+	     ;
+		
+		cp5.addToggle("Lock")
+	     .setPosition(110,20)
+	     .setSize(70,20)
+	     .setValue(false)
+	     .setColorBackground(color(100,0,0))
+	     .setColorActive(color(255,0,0))
+	     .moveTo(displayGroup)
+	     ;
+		
 		//Creating Accordion
 		accordion = cp5.addAccordion("accordion")
-				.setPosition(1000,30)
+				.setPosition(width-220,20)
 				.setWidth(200)
 				.addItem(graphGroup)
+				.addItem(displayGroup)
 				;
-		
 		accordion.open();
 		accordion.setCollapseMode(Accordion.MULTI);
+		
+		//GO info text
+		Textlabel label_goid = cp5.addTextlabel("goID")
+                .setText("GO ID:")
+                .setPosition(width-290+15,height-190+15)
+                .setColorValue(0xffffffff)
+                .setFont(createFont("Georgia",10,false))
+                ;
+		
+		Textlabel label_goidDisplay = cp5.addTextlabel("goIDDisplay")
+                .setText("")
+                .setPosition(width-290+53,height-190+15)
+                .setColorValue(0xffffff00)
+                .setFont(createFont("Georgia",10,false))
+                ;
+		
+		Textlabel label_goName = cp5.addTextlabel("goName")
+                .setText("Name:")
+                .setPosition(width-290+15,height-190+30)
+                .setColorValue(0xffffffff)
+                .setFont(createFont("Georgia",10,false))
+                ;
+		
+		Textlabel label_goNameDisplay = cp5.addTextlabel("goNameDisplay")
+                .setText("")
+                .setPosition(width-290+53,height-190+30)
+                .setColorValue(0xffffff00)
+                .setFont(createFont("Georgia",10,false))
+                ;
+		
+		Textlabel label_def = cp5.addTextlabel("goDef")
+                .setText("Definition:")
+                .setPosition(width-290+15,height-190+45)
+                .setColorValue(0xffffffff)
+                .setFont(createFont("Georgia",10,false))
+                ;
+		textareaGODef = cp5.addTextarea("goDefDisplay")
+                .setPosition(width-290+15,height-190+60)
+                .setSize(240,100)
+                .setFont(createFont("Georgia",10,false))
+                .setLineHeight(12)
+                .setColor(color(255))
+                .setColorBackground(color(0,100))
+                .setColorForeground(color(255,100));
+                ;
+		
 	}
 	
 	private void updateGraphDisplay(){
 		
-		//Receiving controller values
+		//Receiving graph control values
 		int nodeSize = (int) cp5.getController("Node size").getValue();
 		int edgeLength = (int) cp5.getController("Edge length").getValue();
 		float edgeStrength = cp5.getController("Edge strength").getValue()/100;
-		int repulseRadius = (int) cp5.getController("Repulse Radius").getValue();
+		int radius = (int) cp5.getController("Radius").getValue();
 		float repulseStrength = cp5.getController("Repulse Strength").getValue()/100*(-1);
+		//Receiving display control values
+		displayNode = flagCheck((int) cp5.getController("Node").getValue());
+		displayEdge = flagCheck((int) cp5.getController("Edge").getValue());
+		displayGOID = flagCheck((int) cp5.getController("GO ID").getValue());
+		boolean lockNodes = flagCheck((int)cp5.getController("Lock").getValue());
 		
-		//Node size
-		for(Node n : cluster.getNodes())
-			n.setNodeSize(nodeSize);
+		Vec2D center = new Vec2D(width/2,height/2);
 		
-		//spacing repulsion
-		for(int i=0; i<physics.behaviors.size(); i++){
-			AttractionBehavior b = (AttractionBehavior) physics.behaviors.get(i);	
-			b.setStrength(repulseStrength);
-		}
-			
 		Object[] springs = physics.springs.toArray();
+		
+		//Spring modification
 		for(Object spring : springs){
 			((VerletSpring2D) spring).setRestLength(edgeLength);
 			((VerletSpring2D) spring).setStrength(edgeStrength);
 		}
 		
+		//Node modification
+		for(int i=1; i<cluster.getNodes().size(); i++){
+			Node n = cluster.getNodes().get(i);
+			n.setNodeSize(nodeSize);
+			n.normalizeTo(n.getHierarchy()*edgeLength/2);
+			n.addSelf(center);
+		
+			if(lockNodes)
+				n.lock();
+			else
+				n.unlock();
+		}
+		
+		//spacing repulsion
+		for(int i=0; i<physics.behaviors.size(); i++){
+			AttractionBehavior behavior = (AttractionBehavior) physics.behaviors.get(i);
+			if(i==0)
+				behavior.setStrength(repulseStrength*10);
+			else
+				behavior.setStrength(repulseStrength*2);
+		}
+		
+	}
+	
+	private void displaySelectedGO(){
+		
+
+		
+	}
+	
+	
+	/*
+	 * 
+	 * 		Method for drawing background circle
+	 * 		for easy to distinguish hierarchy
+	 * 
+	 */
+	private void drawBackCircle(){
+		
+		int edgeLength = (int) cp5.getController("Edge length").getValue();
+		
+		pushMatrix();
+/*		for(int h=15; h>0; h--){
+			fill(255-h*15,0,h*15,10);
+			stroke(80);
+			ellipseMode(CENTER);
+			ellipse(width/2,height/2,h*edgeLength,h*edgeLength);
+		}*/
+		fill(0,64);
+		noStroke();
+		//Rect area for go info
+		rect(width-290,height-190,270,170);
+		
+		popMatrix();
+		
+	}
+		
+	private boolean flagCheck(int value){
+		if(value>0)
+			return true;
+		return false;
+	}
+	
+	private void displayGOInfo(){
+		
+		int startX = width-320;
+		int starrY = height-270;
+		
+		int nodeSize = (int) cp5.getController("Node size").getValue();
+		
+	 	//Finding particle under mouse
+	 	Vec2D mousePos = new Vec2D(mouseX,mouseY);
+	 	for(int i=0; i<cluster.getNodes().size();i++){
+	 		Node node = cluster.getNodes().get(i);
+	 		if(mousePos.distanceToSquared(node)<nodeSize*nodeSize/2){
+	 			
+	 			GeneOntology go = node.getGO();
+	 			Textlabel goID = (Textlabel) cp5.getController("goIDDisplay");
+	 			Textlabel goName = (Textlabel) cp5.getController("goNameDisplay");
+
+	 			goID.setText(go.getGo_id());
+	 			goName.setText(go.getTerm());
+	 			textareaGODef.setText(go.getDefinition());
+			}
+		}
+	}
+	
+	/*
+	 * 		Method finding certain EGO
+	 */
+	
+	private EnrichedGeneOntology getEGO(String goID){
+		for(EnrichedGeneOntology ego : goList){
+			if(ego.getGoId().matches(goID))
+				return ego;
+		}
+		return null;
 	}
 	
 	//Running method
-	public static void run(GOGraph g, EnrichedGeneOntology[] gl, Communicator c) {
+	public static void run(GOGraph g, EnrichedGeneOntology[] gl) {
         PApplet.main(new String[] { GUI.GOVisualize.class.getName() });
         goGraph =g;
         goList = gl;
-        communicator = c;
     }
 	
 	//Instance Variables
@@ -176,11 +426,17 @@ public class GOVisualize extends PApplet{
 	float scaleLevel;
 	static GOGraph goGraph;
 	static EnrichedGeneOntology[] goList;
-	static Communicator communicator;
+	private Communicator communicator;
 	private VerletPhysics2D physics;
 	private VerletParticle2D selectedParticle;
+	private Textarea textareaGODef;
 	GOCluster cluster;
 	float edgeLength;		//length of edge
 	float edgeLimit;
+	
+	//flag
+	boolean displayNode;
+	boolean displayEdge;
+	boolean displayGOID;
 
 }

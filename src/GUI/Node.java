@@ -25,6 +25,8 @@ public class Node extends VerletParticle2D{
 		go = g;
 		this.size = size;
 		this.color = color;
+		hierarchy = -1;
+		count = 0;
 	}
 
 	//public methods
@@ -47,9 +49,24 @@ public class Node extends VerletParticle2D{
 		p.noStroke();
 		p.ellipse(x,y,size,size);
 		
-		if(goName)
-			p.text(go.getGo_id(),x,y);
+		//Printing GO_ID
+		if(goName){
+			p.pushMatrix();
+			p.textAlign(p.CENTER);
+			p.text(go.getGo_id(),x,y-5);
+			p.popMatrix();
+		}
 		
+	}
+	
+	public void highLight(){
+		count = (count+1)%30;
+		p.pushMatrix();
+		p.stroke(255,255-count*9);
+		p.ellipse(x,y,size+count,size+count);
+		p.strokeWeight(2);
+		
+		p.popMatrix();
 	}
 	
 	public void setNodeSize(int size){
@@ -60,6 +77,14 @@ public class Node extends VerletParticle2D{
 		this.color = color;
 	}
 
+	public void setHierarchy(int h){
+		hierarchy = h;
+	}
+	
+	public int getHierarchy(){
+		return hierarchy;
+	}
+	
 	public GeneOntology getGO(){
 		return go;
 	}
@@ -69,6 +94,8 @@ public class Node extends VerletParticle2D{
 	private GeneOntology go;
 	private int size;
 	private int color;
+	private int hierarchy;
+	private int count;
 	
 	//ColorConstant
 	public static int RED = 0;
