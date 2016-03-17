@@ -523,10 +523,7 @@ public class MainWindow extends PApplet{
 		}
 		
 		public void button_testClicked(GButton source, GEvent event){ //_CODE_:button_heatmapVis:452216:
-			
-			
 			//Test button Event method
-			
 		}
 		
 	/**************************************
