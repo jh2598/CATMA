@@ -73,24 +73,33 @@ public class GOCluster {
 			//Creates new graph with ego by finding up its parents
 			nodes = linkParent(nodeEGO,nodes,egoGraph);
 		}
-		
-		System.out.println("List of GO:");
-		Iterator iterator = egoGraph.iterator();
-		while(iterator.hasNext()){
-			Node n = (Node) iterator.next();
-			System.out.println(n.getGO().getGo_id());
-		}
-		
 
-		System.out.println("\nList of GO marking:");
+		searchGraph(nodes.get(15));
+		
+		
 		//marking graph hierarchy to nodes 
-		markHierarchy(rootNode, 0);
+		//markHierarchy(rootNode, 0);
 
 		for(Node n : nodes)
 			System.out.println(n.getGO().getGo_id()+","+n.getHierarchy());
 		
 		System.out.println("graph vertex:"+egoGraph.vertexSet().size()+" / edge:"+egoGraph.edgeSet().size());
 		System.out.println("GOCluster>> Clustering Finished. Number of node: "+nodes.size()+" | Number of edges: "+physics.springs.size());
+	}
+	
+	public void searchGraph(Node root){
+		
+		Set<DefaultEdge> childEdgeSet = egoGraph.outgoingEdgesOf(root);
+		Object[] childEdges = childEdgeSet.toArray();
+		
+		System.out.println("Outgoing Edges of "+root.getGO().getGo_id()+":");
+		for(int i=0; i<childEdges.length; i++){
+			//Getting child node of parent
+			DefaultEdge e = (DefaultEdge)childEdges[i];
+			Node child = egoGraph.getEdgeTarget(e);
+			System.out.println(child.getGO().getGo_id());	
+		}
+		
 	}
 	
 	
@@ -121,8 +130,7 @@ public class GOCluster {
 			//Getting child node of parent
 			DefaultEdge e = (DefaultEdge)childEdges[i];
 			Node child = egoGraph.getEdgeTarget(e);
-			System.out.println(child.getGO().getGo_id());
-			
+			System.out.println(child.getGO().getGo_id());	
 		}
 		
 		for(int i=0; i<childEdges.length; i++){
@@ -149,6 +157,13 @@ public class GOCluster {
 		Set<DefaultEdge> parentEdgesSet = graph.getBp().incomingEdgesOf(child.getGO());
 		Object[] parentEdges = parentEdgesSet.toArray();
 
+		System.out.println("\nParent of "+child.getGO().getGo_id()+": (size "+parentEdges.length+")");
+		for(Object e : parentEdges){
+			GeneOntology parent = graph.getBp().getEdgeSource((DefaultEdge) e);
+			Node parentNode = isGOExist(parent.getGo_id(), n);
+			System.out.println(parent.getGo_id());
+		}
+		
 		//For every parent
 		for(Object e : parentEdges){
 			GeneOntology parent = graph.getBp().getEdgeSource((DefaultEdge) e);
@@ -168,7 +183,8 @@ public class GOCluster {
 			}
 			//If parent already exist in Node, just add spring
 			else{
-				physics.addSpring(new VerletSpring2D(parentNode,child,diameter,0.0001f));
+				//Only if it is not itself
+				physics.addSpring(new VerletSpring2D(parentNode,child,diameter,0.1f));
 				g.addEdge(parentNode, child);
 			}
 		}
