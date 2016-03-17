@@ -52,7 +52,7 @@ public class GOCluster {
 		System.out.println("\nGOCluster>> Processing : linking nodes...");
 		
 		nodes = new ArrayList<Node>();
-		egoGraph = new DirectedAcyclicGraph<Node, DefaultEdge>(DefaultEdge.class);
+		egoGraph = new DirectedAcyclicGraph<Node, RelationToEdge>(RelationToEdge.class);
 		
 		//Adding Root Node-[GO:0008150] and its children
 		GeneOntology rootGO = graph.getGoMap().get("GO:0008150");
@@ -114,13 +114,13 @@ public class GOCluster {
 		parent.addBehavior(repulse);
 		
 		//Place position and link child
-		Set<DefaultEdge> childEdgeSet = egoGraph.outgoingEdgesOf(parent);
+		Set<RelationToEdge> childEdgeSet = egoGraph.outgoingEdgesOf(parent);
 		Object[] childEdges = childEdgeSet.toArray();
 		
 		System.out.println("Outgoing Edges of "+parent.getGO().getGo_id()+":");
 		for(int i=0; i<childEdges.length; i++){
 			//Getting child node of parent
-			DefaultEdge e = (DefaultEdge)childEdges[i];
+			RelationToEdge e = (RelationToEdge)childEdges[i];
 			Node child = egoGraph.getEdgeTarget(e);
 			System.out.println(child.getGO().getGo_id());
 			
@@ -129,7 +129,7 @@ public class GOCluster {
 		for(int i=0; i<childEdges.length; i++){
 			
 			//Getting child node of parent
-			DefaultEdge e = (DefaultEdge)childEdges[i];
+			RelationToEdge e = (RelationToEdge)childEdges[i];
 			Node child = egoGraph.getEdgeTarget(e);
 			child.set(new Vec2D(p.width/2,currentH*30+30));
 			if(child.getHierarchy()<currentH+1)
@@ -138,13 +138,13 @@ public class GOCluster {
 	}
 	
 	//Recursive-Function linking nodes to parent
-	private ArrayList<Node> linkParent(Node child, ArrayList<Node> n, DirectedAcyclicGraph<Node, DefaultEdge> g){
+	private ArrayList<Node> linkParent(Node child, ArrayList<Node> n, DirectedAcyclicGraph<Node, RelationToEdge> egoGraph2){
 		
 		//Add child to node[]
 		n.add(child);
 		physics.addParticle(child);
-		if(!g.containsVertex(child))
-			g.addVertex(child);
+		if(!egoGraph2.containsVertex(child))
+			egoGraph2.addVertex(child);
 
 		//Finding Parents of child
 		Set<RelationToEdge> parentEdgesSet = graph.getBp().incomingEdgesOf(child.getGO());
@@ -161,16 +161,16 @@ public class GOCluster {
 				//Link(spring) with child
 				parentNode = new Node(child.add(Vec2D.randomVector().normalize()),parent,p);
 				physics.addSpring(new VerletSpring2D(parentNode,child,diameter,0.1f));
-				g.addVertex(parentNode);
-				g.addEdge(parentNode,child);
+				egoGraph2.addVertex(parentNode);
+				egoGraph2.addEdge(parentNode,child);
 				
 				//***Recall Function*****
-				linkParent(parentNode,n,g);
+				linkParent(parentNode,n,egoGraph2);
 			}
 			//If parent already exist in Node, just add spring
 			else{
 				physics.addSpring(new VerletSpring2D(parentNode,child,diameter,0.0001f));
-				g.addEdge(parentNode, child);
+				egoGraph2.addEdge(parentNode, child);
 			}
 		}
 		return n;
@@ -293,7 +293,7 @@ public class GOCluster {
 		return nodes;
 	}
 	
-	public DirectedAcyclicGraph<Node, DefaultEdge> getEgoGraph(){
+	public DirectedAcyclicGraph<Node, RelationToEdge> getEgoGraph(){
 		return egoGraph;
 	};
 	
@@ -302,7 +302,7 @@ public class GOCluster {
 	private PApplet p;
 	private GOGraph graph;
 	private EnrichedGeneOntology[] goList;
-	private DirectedAcyclicGraph<Node, DefaultEdge> egoGraph;
+	private DirectedAcyclicGraph<Node, RelationToEdge> egoGraph;
 	private ArrayList<VerletSpring2D> removedSprings;
 	private Vec2D center;
 

@@ -99,7 +99,6 @@ public class GOGraph implements Serializable{
 			//currentOntology의 Parent를 전부 조회해서 godb상에서의 id를 배열로 전달.
 			int[] children = db.retrieveChildrenOf(currentOntology, parent);
 			String[] relationships = db.retrieveRelationshipOf(currentOntology, parent);
-//			System.out.println("Parent:"+bpMap.get(tmp));
 			for(int j=0;j<children.length;j++){
 				RelationToEdge edge = go_graph.addEdge(ontologyMap.get(parent), ontologyMap.get(children[j]));
 				edge.setType(relationships[j]);
@@ -110,7 +109,6 @@ public class GOGraph implements Serializable{
 		System.out.println("CC Offspring size:"+cc.edgeSet().size());
 		System.out.println("MF Offspring size:"+mf.edgeSet().size());
 	}
-	//TODO : GO.db에서 Relationship To 부분을 읽어와야 할 것 같다.
 	private static int currentOntology=-1; // 현재 어떤 ontology가 작업중인지 makeEdge에 알려주는 용도의 변수
 	public void makeAllEdge() throws SQLException, CycleFoundException{
 		//GO Term끼리의 children 관계를 확인해서 Graph의 Edge를 만들어서 연결 
