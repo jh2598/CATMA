@@ -160,7 +160,7 @@ public class GOCluster {
 
 		System.out.println("\nParent of "+child.getGO().getGo_id()+": (size "+parentEdges.length+")");
 		for(Object e : parentEdges){
-			GeneOntology parent = graph.getBp().getEdgeSource((DefaultEdge) e);
+			GeneOntology parent = graph.getBp().getEdgeSource((RelationToEdge) e);
 			Node parentNode = isGOExist(parent.getGo_id(), n);
 			System.out.println(parent.getGo_id());
 		}
