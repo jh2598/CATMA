@@ -267,14 +267,23 @@ public class DataProcess implements Serializable{
 		}
 		return str;
 	}
-	public String[] getSampleNames(){
+	public String[] getFromSample(String col){
 		try {
-			x = c.eval("colnames(esetSel)");
+			x = c.eval(col);
 			return x.asStrings();
 		} catch (RserveException | REXPMismatchException e) {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	public String[] getCelFileNames(){
+		return getFromSample("colnames(esetSel)");
+	}
+	public String[] getSampleNames(){
+		return getFromSample("pheno[,2]");
+	}
+	public String[] getGroup(){
+		return getFromSample("pheno[,3]");
 	}
 	public int getSampleNumber(){//# of Samples
 		try {

@@ -63,7 +63,7 @@ public class DatabaseHelper implements Serializable{
 	public void createSampleTable(){
 		try {
 			//Read Sample Info from R
-			String[] sampleName = dataProcess.getSampleNames();
+			String[] sampleName = dataProcess.getCelFileNames();
 
 			//Table Create.
 			stmt = conn.createStatement();
@@ -172,7 +172,7 @@ public class DatabaseHelper implements Serializable{
 		System.out.println("Retrieving Sample table Operation done successfully");
 		return sampleArray;
 	}
-	public String[] getSampleNames(){
+	public String[] getCelFileNames(){
 		//Sample Column Names
 		//.Cel 포맷 파일의 이름들...
 		String name;
@@ -188,6 +188,7 @@ public class DatabaseHelper implements Serializable{
 			for(int i=0;i<rs.getMetaData().getColumnCount();i++){
 				name = rs.getMetaData().getColumnLabel(i);
 				names[i] = name;
+				System.out.println(name);
 			}
 			rs.close();
 			stmt.close();

@@ -14,6 +14,7 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException;
 import org.jgrapht.graph.DefaultEdge;
 
+import Data.UserDefinedType.EnrichedGeneOntology;
 import Data.UserDefinedType.GeneOntology;
 import Data.UserDefinedType.RelationToEdge;
 import sun.font.CreatedFontTracker;
@@ -162,5 +163,16 @@ public class GOGraph implements Serializable{
 	public static String getDir(){
 		System.out.println(DataProcess.getUserDir(allGoDataFileName));
 		return DataProcess.getUserDir(allGoDataFileName);
+	}
+	public GeneOntology getGeneOntology(EnrichedGeneOntology ego){
+		return go_map.get(ego.getGoId());
+	}
+	public EnrichedGeneOntology getEnrichedGeneOntology(GeneOntology go, EnrichedGeneOntology[] egoArray){
+		for(int i=0;i<egoArray.length;i++){
+			if(go.getGo_id().compareTo(egoArray[i].getGoId())==0){
+				return egoArray[i];
+			}
+		}
+		return null;
 	}
 }

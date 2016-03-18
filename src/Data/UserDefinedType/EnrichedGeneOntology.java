@@ -7,19 +7,19 @@ public class EnrichedGeneOntology implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 328503157585636240L;
-	private String goId;
-	private String description;
-	private String geneRatio;
-	private String bgRatio;
-	private String pValue;
-	private String pAdjust;
-	private String qValue;
-	private String geneId;
-	private String count;
+	protected String goId;
+	protected String description;
+	protected String geneRatio;
+	protected String bgRatio;
+	protected String pValue;
+	protected String pAdjust;
+	protected String qValue;
+	protected String geneId;
+	protected String count;
 	
-	private String[] geneList;
+	protected String[] geneList;
 	
-	public EnrichedGeneOntology(String goId, String description, String geneRatio, String bgRatio, String pValue, String pAdjust, String qValue, String geneId, String count){
+	public EnrichedGeneOntology(String goId, String description, String geneRatio, String bgRatio, String pValue, String pAdjust, String qValue, String geneId, String count){	
 		this.goId = goId;
 		this.description = description;
 		this.geneRatio = geneRatio;
