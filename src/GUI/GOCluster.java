@@ -63,7 +63,6 @@ public class GOCluster {
 		//nodes.get(0).addBehavior(new AttractionBehavior(nodes.get(0),1280,-1));
 		physics.addParticle(rootNode);
 		egoGraph.addVertex(rootNode);
-
 		
 		//Creating new graph with ego
 		for(EnrichedGeneOntology ego : goList){
@@ -72,14 +71,11 @@ public class GOCluster {
 			Node nodeEGO = new Node(center.add(Vec2D.randomVector()),go,Node.BLUE,p);
 					
 			//Creates new graph with ego by finding up its parents
-			nodes = linkParent(nodeEGO,nodes,egoGraph);
+			linkParent(nodeEGO,egoGraph);
 		}
-
-		searchGraph(nodes.get(15));
-		
 		
 		//marking graph hierarchy to nodes 
-		//markHierarchy(rootNode, 0);
+		markHierarchy(rootNode, 0);
 
 		for(Node n : nodes)
 			System.out.println(n.getGO().getGo_id()+","+n.getHierarchy());
@@ -90,16 +86,8 @@ public class GOCluster {
 	
 	public void searchGraph(Node root){
 		
-		Set<DefaultEdge> childEdgeSet = egoGraph.outgoingEdgesOf(root);
-		Object[] childEdges = childEdgeSet.toArray();
 		
-		System.out.println("Outgoing Edges of "+root.getGO().getGo_id()+":");
-		for(int i=0; i<childEdges.length; i++){
-			//Getting child node of parent
-			DefaultEdge e = (DefaultEdge)childEdges[i];
-			Node child = egoGraph.getEdgeTarget(e);
-			System.out.println(child.getGO().getGo_id());	
-		}
+
 		
 	}
 	
@@ -146,10 +134,10 @@ public class GOCluster {
 	}
 	
 	//Recursive-Function linking nodes to parent
-	private ArrayList<Node> linkParent(Node child, ArrayList<Node> n, DirectedAcyclicGraph<Node, DefaultEdge> g){
+	private void linkParent(Node child, DirectedAcyclicGraph<Node, DefaultEdge> g){
 		
 		//Add child to node[]
-		n.add(child);
+		nodes.add(child);
 		physics.addParticle(child);
 		if(!g.containsVertex(child))
 			g.addVertex(child);
@@ -161,17 +149,20 @@ public class GOCluster {
 		System.out.println("\nParent of "+child.getGO().getGo_id()+": (size "+parentEdges.length+")");
 		for(Object e : parentEdges){
 			GeneOntology parent = graph.getBp().getEdgeSource((RelationToEdge) e);
-			Node parentNode = isGOExist(parent.getGo_id(), n);
+			Node parentNode = isGOExist(parent.getGo_id(), nodes);
 			System.out.println(parent.getGo_id());
 		}
 		
 		//For every parent
 		for(Object e : parentEdges){
 			GeneOntology parent = graph.getBp().getEdgeSource((RelationToEdge) e);
-			Node parentNode = isGOExist(parent.getGo_id(), n);
+			Node parentNode = isGOExist(parent.getGo_id(), nodes);
 			
 			//If parent doesn't exist in node[]
 			if(parentNode==null){
+				
+				System.out.println("\nAdding Node:"+parent.getGo_id());
+				System.out.println("Linking Node:"+parent.getGo_id()+"-"+child.getGO().getGo_id());
 				
 				//Link(spring) with child
 				parentNode = new Node(child.add(Vec2D.randomVector().normalize()),parent,p);
@@ -180,16 +171,16 @@ public class GOCluster {
 				g.addEdge(parentNode,child);
 				
 				//***Recall Function*****
-				linkParent(parentNode,n,g);
+				linkParent(parentNode,g);
 			}
 			//If parent already exist in Node, just add spring
 			else{
 				//Only if it is not itself
+				System.out.println("Linking Node:"+parent.getGo_id()+"-"+child.getGO().getGo_id());
 				physics.addSpring(new VerletSpring2D(parentNode,child,diameter,0.1f));
 				g.addEdge(parentNode, child);
 			}
 		}
-		return n;
 	}
 	
 	private Node isGOExist(String goID, ArrayList<Node> n){
