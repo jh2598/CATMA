@@ -14,14 +14,16 @@ public class EGOGraph implements Serializable{
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> bp;
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> cc;
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> mf;
-	HashMap<String, EnrichedGeneOntology> ego_map;
+	HashMap<String, EnrichedGeneOntology> egoMap;
 	
 	public EGOGraph(EnrichedGeneOntology[] egoArray){
+		System.out.println("EGO Array Size : "+ egoArray.length);
+		egoMap = new HashMap<>();
 		bp = new DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge>(RelationToEdge.class);
 		cc = new DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge>(RelationToEdge.class);
 		mf = new DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge>(RelationToEdge.class);
 		for(int i=0;i<egoArray.length;i++){
-			ego_map.put(egoArray[i].getGoId(), egoArray[i]);
+			egoMap.put(egoArray[i].getGoId(), egoArray[i]);
 			if(egoArray[i].getOntologyType() == GOdb.BP){
 				bp.addVertex(egoArray[i]);
 			}else if(egoArray[i].getOntologyType() == GOdb.CC){
@@ -39,9 +41,12 @@ public class EGOGraph implements Serializable{
 				addChildrenIntoGraphFromArray(egoArray[i], egoArray, mf);
 			}
 		}
-		System.out.println("ego bp graph size :: "+bp.vertexSet().size());
-		System.out.println("ego cc graph size :: "+cc.vertexSet().size());
-		System.out.println("ego mf graph size :: "+mf.vertexSet().size());
+		System.out.println("ego bp graph v size :: "+bp.vertexSet().size());
+		System.out.println("ego bp graph e size :: "+bp.edgeSet().size());
+		System.out.println("ego bp graph v size :: "+cc.vertexSet().size());
+		System.out.println("ego bp graph e size :: "+cc.edgeSet().size());
+		System.out.println("ego bp graph v size :: "+mf.vertexSet().size());
+		System.out.println("ego bp graph e size :: "+mf.edgeSet().size());
 	}
 	//해당 ego의 children을 살펴봐서 egoArray에 들어있다면 bp에 추가.
 	//추가하면서 edge에 relation type을 명시해줌.
@@ -68,6 +73,6 @@ public class EGOGraph implements Serializable{
 	}	
 	//GO id로 ego 객체를 찾아냄.
 	public EnrichedGeneOntology getEgoObjectFromOther(Ontology other){
-		return ego_map.get(other.getGoId());
+		return egoMap.get(other.getGoId());
 	}
 }
