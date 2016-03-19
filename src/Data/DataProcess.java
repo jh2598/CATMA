@@ -17,7 +17,7 @@ public class DataProcess implements Serializable{
 	
 	static private RConnection c;
 	public Session session;
-	public String GOdbPath;
+	public static String GOdbPath;
 	public DatabaseHelper db;
 	public EnrichedGeneOntology[] ego = null;
 	static REXP x;
@@ -81,7 +81,7 @@ public class DataProcess implements Serializable{
 		System.out.println("R :: GO db file : "+GOdbPath);
 		System.out.println("R :: Sample info path is setted.");
 	}
-	public String getDBPath(){
+	public static String getDBPath(){
 		try {
 			x = c.eval("library(GO.db)");
 			x = c.eval("GO_dbfile()");

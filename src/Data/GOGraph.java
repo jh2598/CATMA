@@ -26,7 +26,6 @@ public class GOGraph implements Serializable{
 	private static final long serialVersionUID = 109972010880313132L;
 	private GeneOntology[] allTerm;
 	private static GOGraph allGo = null;
-	GOdb db;
 	HashMap<Integer, GeneOntology> bpMap;
 	HashMap<Integer, GeneOntology> ccMap;
 	HashMap<Integer, GeneOntology> mfMap;
@@ -36,7 +35,7 @@ public class GOGraph implements Serializable{
 	private DirectedAcyclicGraph<GeneOntology, RelationToEdge> mf;
 
 	public static final String allGoDataFileName = "AllGoData.dat";
-	public GOGraph(GOdb db) {
+	public GOGraph(GOdb godb) {
 		// TODO Auto-generated constructor stub
 		EdgeFactory<GeneOntology, RelationToEdge> ef = new EdgeFactory<GeneOntology, RelationToEdge>() {
 			@Override
@@ -49,12 +48,13 @@ public class GOGraph implements Serializable{
 		cc = new DirectedAcyclicGraph<GeneOntology, RelationToEdge>(RelationToEdge.class);
 		mf = new DirectedAcyclicGraph<GeneOntology, RelationToEdge>(RelationToEdge.class);
 		go_map = new HashMap<String, GeneOntology>();
-		this.db = db;
 		try {
-			allTerm = db.getAllTerm();
+			allTerm = godb.getAllTerm();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.println(e.getSQLState());
+			System.exit(0);
 		}
 		termClassification();
 		try {
@@ -69,7 +69,7 @@ public class GOGraph implements Serializable{
 		bpMap = new HashMap<Integer,GeneOntology>();
 		ccMap = new HashMap<Integer,GeneOntology>();
 		mfMap = new HashMap<Integer,GeneOntology>();
-		System.out.println("GO Term Classficating...");
+		System.out.println("GO Term Classificating...");
 		for(int i=0;i<allTerm.length;i++){
 			if(allTerm[i].getOntology().compareTo("BP")==0){
 				bp.addVertex(allTerm[i]);
@@ -92,20 +92,20 @@ public class GOGraph implements Serializable{
 	}
 	public void makeEdge(DirectedAcyclicGraph<GeneOntology, RelationToEdge> go_graph, HashMap<Integer,GeneOntology> ontologyMap) throws SQLException{
 		Iterator<Integer> iter = ontologyMap.keySet().iterator();
-		System.out.println("Linking "+ go_graph.hashCode() +" children relation...");
+		System.out.println("Linking children relation...");
 		while(iter.hasNext()){
 			int parent = iter.next();
 			if(currentOntology == -1){
 				System.err.println("Current ontology is not setted.");;
 			}
-			/*			Ontology의 Constructor에서 이 부분을 처리하는 쪽으로 바꿨음.
+
 			//currentOntology의 Parent를 전부 조회해서 godb상에서의 id를 배열로 전달.
-//			int[] children = db.retrieveChildrenOf(currentOntology, parent);
-//			String[] relationships = db.retrieveRelationshipOf(currentOntology, parent);
-			 */
+			int[] children = GOdb.getInstance().retrieveChildrenOf(currentOntology, parent);
+			String[] relationships = GOdb.getInstance().retrieveRelationshipOf(currentOntology, parent);
+
 			//			System.out.println("Parent:"+bpMap.get(tmp));
-			int[] children = ontologyMap.get(parent).getChildrenId();
-			String[] relationships = ontologyMap.get(parent).getChildrenRelation();
+//			int[] children = ontologyMap.get(parent).getChildrenId();
+//			String[] relationships = ontologyMap.get(parent).getChildrenRelation();
 
 			for(int j=0;j<children.length;j++){
 				RelationToEdge edge = go_graph.addEdge(ontologyMap.get(parent), ontologyMap.get(children[j]));

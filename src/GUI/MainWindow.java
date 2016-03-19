@@ -485,7 +485,7 @@ public class MainWindow extends PApplet{
 
 		public void button_goFindingClicked(GButton source, GEvent event) { //_CODE_:button_goFinding:481867:
 		  try{
-			  godb = GOdb.getInstance(process.getDBPath());
+			  godb = GOdb.getInstance();
 		  }catch(NullPointerException e){
 			  e.printStackTrace();
 		  }
@@ -525,7 +525,7 @@ public class MainWindow extends PApplet{
 			//Test button Event method
 			System.out.println("::::TEST:::: GO.db instance created.");
 			  try{
-				  godb = GOdb.getInstance(process.getDBPath());
+				  godb = GOdb.getInstance();
 				  System.out.println("godb::"+godb);
 			  }catch(NullPointerException e){
 				  e.printStackTrace();

@@ -1,6 +1,7 @@
 package Data;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
@@ -24,6 +25,15 @@ public class EGOGraph implements Serializable{
 		mf = new DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge>(RelationToEdge.class);
 		for(int i=0;i<egoArray.length;i++){
 			egoMap.put(egoArray[i].getGoId(), egoArray[i]);
+			GOdb godb = GOdb.getInstance();
+			try {
+				egoArray[i].setOntologyType(godb.getOntologyTypeOf(egoArray[i].getGoId()));//GO ID에서 Ontology Type을 알아냄.
+				egoArray[i].setChildrenId(godb.retrieveChildrenOf(egoArray[i].getOntologyType(), godb.getIdFromGoId(egoArray[i].getGoId())));
+				egoArray[i].setChildrenRelation(godb.retrieveRelationshipOf(egoArray[i].getOntologyType(), godb.getIdFromGoId(egoArray[i].getGoId())));
+				egoArray[i].setId(godb.getIdFromGoId(egoArray[i].getGoId()));
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			if(egoArray[i].getOntologyType() == GOdb.BP){
 				bp.addVertex(egoArray[i]);
 			}else if(egoArray[i].getOntologyType() == GOdb.CC){
