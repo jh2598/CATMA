@@ -2,7 +2,7 @@ package Data.UserDefinedType;
 
 import java.io.Serializable;
 
-public class EnrichedGeneOntology implements Serializable{
+public class EnrichedGeneOntology extends Ontology implements Serializable{
 	/**
 	 * 
 	 */
@@ -19,8 +19,9 @@ public class EnrichedGeneOntology implements Serializable{
 	
 	protected String[] geneList;
 	
-	public EnrichedGeneOntology(String goId, String description, String geneRatio, String bgRatio, String pValue, String pAdjust, String qValue, String geneId, String count){	
-		this.goId = goId;
+	public EnrichedGeneOntology(String GoID, String description, String geneRatio, String bgRatio, String pValue, String pAdjust, String qValue, String geneId, String count){	
+		super(GoID);
+		this.goId = GoID;
 		this.description = description;
 		this.geneRatio = geneRatio;
 		this.bgRatio = bgRatio;

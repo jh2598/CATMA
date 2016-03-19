@@ -2,7 +2,7 @@ package Data.UserDefinedType;
 
 import java.io.Serializable;
 
-public class GeneOntology implements Serializable{
+public class GeneOntology extends Ontology implements Serializable{
 	/**
 	 * 
 	 */
@@ -14,9 +14,10 @@ public class GeneOntology implements Serializable{
 	protected String ontology;
 	protected String definition;
 	public boolean visited;
-	public GeneOntology(int id, String go_id, String term, String ontology, String definition){
+	public GeneOntology(int id, String GoID, String term, String ontology, String definition){
+		super(GoID);
 		this.id = id;
-		this.goId = go_id;
+		this.goId = GoID;
 		this.term = term;
 		this.ontology = ontology;
 		this.definition = definition;

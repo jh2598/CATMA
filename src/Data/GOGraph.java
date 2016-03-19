@@ -16,6 +16,7 @@ import org.jgrapht.graph.DefaultEdge;
 
 import Data.UserDefinedType.EnrichedGeneOntology;
 import Data.UserDefinedType.GeneOntology;
+import Data.UserDefinedType.Ontology;
 import Data.UserDefinedType.RelationToEdge;
 import sun.font.CreatedFontTracker;
 public class GOGraph implements Serializable{
@@ -33,7 +34,7 @@ public class GOGraph implements Serializable{
 	private DirectedAcyclicGraph<GeneOntology, RelationToEdge> bp;
 	private DirectedAcyclicGraph<GeneOntology, RelationToEdge> cc;
 	private DirectedAcyclicGraph<GeneOntology, RelationToEdge> mf;
-	
+
 	public static final String allGoDataFileName = "AllGoData.dat";
 	public GOGraph(GOdb db) {
 		// TODO Auto-generated constructor stub
@@ -97,10 +98,15 @@ public class GOGraph implements Serializable{
 			if(currentOntology == -1){
 				System.err.println("Current ontology is not setted.");;
 			}
+			/*			Ontology의 Constructor에서 이 부분을 처리하는 쪽으로 바꿨음.
 			//currentOntology의 Parent를 전부 조회해서 godb상에서의 id를 배열로 전달.
-			int[] children = db.retrieveChildrenOf(currentOntology, parent);
-			String[] relationships = db.retrieveRelationshipOf(currentOntology, parent);
-//			System.out.println("Parent:"+bpMap.get(tmp));
+//			int[] children = db.retrieveChildrenOf(currentOntology, parent);
+//			String[] relationships = db.retrieveRelationshipOf(currentOntology, parent);
+			 */
+			//			System.out.println("Parent:"+bpMap.get(tmp));
+			int[] children = ontologyMap.get(parent).getChildrenId();
+			String[] relationships = ontologyMap.get(parent).getChildrenRelation();
+
 			for(int j=0;j<children.length;j++){
 				RelationToEdge edge = go_graph.addEdge(ontologyMap.get(parent), ontologyMap.get(children[j]));
 				edge.setType(relationships[j]);
@@ -124,14 +130,14 @@ public class GOGraph implements Serializable{
 		System.out.println("BP children size:"+bp.edgeSet().size());
 		System.out.println("CC children size:"+cc.edgeSet().size());
 		System.out.println("MF children size:"+mf.edgeSet().size());
-		
+
 		System.out.println("Making graph is done.");
 	}
-	
+
 	public GeneOntology[] getAllTerm(){
 		return allTerm;
 	}
-	
+
 	public DirectedAcyclicGraph<GeneOntology, RelationToEdge> getBp() {
 		return bp;
 	}
@@ -144,28 +150,28 @@ public class GOGraph implements Serializable{
 	public HashMap<String, GeneOntology> getGoMap() {
 		return go_map;
 	}
-	
+
 	public void save(){
 		//자신을 직렬화해서 filePath에 저장
 		System.out.println("GO_GRAPH_SAVED");
-				try{
-					FileOutputStream fos = new FileOutputStream(getDir());
-					ObjectOutput oos = new ObjectOutputStream(fos);
-					oos.writeObject(this);
-					oos.flush(); 
-					fos.close();
-					oos.close();
-				}catch(IOException e){
-					System.err.println(e);
-					e.printStackTrace();
-				}
+		try{
+			FileOutputStream fos = new FileOutputStream(getDir());
+			ObjectOutput oos = new ObjectOutputStream(fos);
+			oos.writeObject(this);
+			oos.flush(); 
+			fos.close();
+			oos.close();
+		}catch(IOException e){
+			System.err.println(e);
+			e.printStackTrace();
+		}
 	}
 	public static String getDir(){
 		System.out.println(DataProcess.getUserDir(allGoDataFileName));
 		return DataProcess.getUserDir(allGoDataFileName);
 	}
-	public GeneOntology getGeneOntology(EnrichedGeneOntology ego){
-		return go_map.get(ego.getGoId());
+	public GeneOntology getGoObjectFromOther(Ontology other){
+		return go_map.get(other.getGoId());
 	}
 	public EnrichedGeneOntology getEnrichedGeneOntology(GeneOntology go, EnrichedGeneOntology[] egoArray){
 		for(int i=0;i<egoArray.length;i++){

@@ -31,8 +31,8 @@ public class DataProcess implements Serializable{
 			x = c.eval("R.version.string");
 			System.out.println("R Connected successfully :: " + x.asString());
 		} catch (RserveException | REXPMismatchException e) {
-			System.out.println("RConnection not Constructed. Please check Rserve running.");
-			e.printStackTrace();
+			System.err.println("RConnection not Constructed. Please check Rserve running.");
+			//e.printStackTrace();
 		}
 	}
 	public void init(){
@@ -199,6 +199,7 @@ public class DataProcess implements Serializable{
 			System.out.println("R Source code(GO OverRepresentation) is executed successfully.");
 			this.ego = selectEnrichedGeneOntolgy();
 			session.ego = this.ego;
+			session.egoGraph = new EGOGraph(ego);
 		} catch (RserveException | REXPMismatchException e) {
 			e.printStackTrace();
 		}

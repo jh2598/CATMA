@@ -33,7 +33,8 @@ public class DatabaseHelper implements Serializable{
 		this.dataProcess = dataProcess;
 	}
 	public DatabaseHelper(String dbname){
-		//이 생성자를 쓰면 Retrieve 이외의 메소드는 DataProcess가 없어서 NullPointerException
+		//XXX:이 생성자를 쓰면 Retrieve 이외의 메소드는 DataProcess 객체가 없어서 NullPointerException이 뜰 수도 있음.
+		//TODO:위 문제를 처리할 것.
 		this.dbName = dbname;
 		try {
 			Class.forName("org.sqlite.JDBC");

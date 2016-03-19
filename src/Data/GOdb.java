@@ -17,7 +17,14 @@ public class GOdb implements Serializable{
 	static Connection conn = null;
 	static Statement stmt = null;
 	String sql;
-	public GOdb(String GOdb_Path){
+	private static GOdb instance = null;
+	
+	//Ontology 구분을 위해 아무 값이나 할당, retrieveParentsOf에서 사용됨.
+	public static final int BP = 1;
+	public static final int CC = 2;
+	public static final int MF = 3;
+	
+	private GOdb(String GOdb_Path){
 		try {
 			//Register JDBC driver
 			Class.forName("org.sqlite.JDBC");
@@ -40,7 +47,47 @@ public class GOdb implements Serializable{
 			e.printStackTrace();
 			System.exit(0);
 		}
+		instance = this;
+		System.out.println("instance:"+instance);
 	}
+	public static GOdb getInstance(String GOdb_Path){
+		if(instance != null){
+			return instance;
+		}
+		instance = new GOdb(GOdb_Path);
+		return instance;
+	}
+	public static GOdb getInstance(){
+		if(instance == null){
+			System.err.println("GO.db is null.");
+			return null;
+		}
+		return instance;
+	}
+//	public GOdb(String GOdb_Path){
+//		try {
+//			//Register JDBC driver
+//			Class.forName("org.sqlite.JDBC");
+//			//Open a connection
+//			conn = DriverManager.getConnection("jdbc:sqlite:"+GOdb_Path);
+//			conn.setAutoCommit(false);
+//			System.out.println("GO.db :: Opened GO.db successfully");
+//			//Execute the query
+//			stmt = conn.createStatement();
+//			System.out.println("GO.db :: Create Statement.");
+//
+//			//stmt.close();
+//			//conn.close();
+//			//System.out.println("GO.db :: Operation done successfully");
+//		}catch(SQLException se){
+//			//Handle errors for JDBC
+//			se.printStackTrace();
+//		}catch (Exception e ) {
+//			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+//			e.printStackTrace();
+//			System.exit(0);
+//		}
+//	}
 	public void selectOntology() throws SQLException{
 		//go_ontology print
 		sql = "SELECT * FROM go_ontology;";
@@ -89,10 +136,22 @@ public class GOdb implements Serializable{
 		rs.close();
 		return go;
 	}
-	//Ontology 구분을 위해 아무 값이나 할당, retrieveParentsOf에서 사용됨.
-	static final int BP = 1;
-	static final int CC = 2;
-	static final int MF = 3;
+
+	//GO ID를 받아서 해당 GO가 어떤 Ontology Type(BP, CC, MF)인지 반환해준다.
+	public int getOntologyTypeOf(String GoID) throws SQLException{
+		String query = "SELECT ontology FROM go_term WHERE go_id = '"+GoID+"';";
+		ResultSet rs = stmt.executeQuery(query);
+		String ontologyType = rs.getString("ontology");
+		return getOntologyTypeInteger(ontologyType);
+	}
+	//GO ID를 받아서 그에 해당하는 GO.db의 go_term의 _id를 반환
+	public int getIdFromGoId(String GO_id) throws SQLException{
+		String query = "SELECT _id FROM go_term WHERE go_id = '"+GO_id+"';";
+		ResultSet rs = stmt.executeQuery(query);
+		int id = rs.getInt("_id");
+		return id;
+	}
+	
 	//bpChildren, ccChildren, mfChildren에서 자신의 Ontology를 인자로 삼아 호출
 	//각 Ontology에 맞게 DB의 go_XX_parents에서 인자로 전달받은 id를 부모로 가지는 term을 찾아서 그 term들의 id 전체를 배열로 반환
 	public int[] retrieveChildrenOf(int ontologyType, int parentId) throws SQLException{	
@@ -131,7 +190,8 @@ public class GOdb implements Serializable{
 		}
 		return relationships;
 	}
-	public String getOntologyTypeString(int ontologyType){
+	public static String getOntologyTypeString(int ontologyType){
+		//GOdb.BP 등의 static 변수를 인자로 받아서 그에 해당하는 GO.db의 column의 문자열 반환
 		String ontology = null;//Ontology Type에 따른 임시변수
 		if(ontologyType == BP){
 			ontology = "go_bp_parents";
@@ -143,6 +203,19 @@ public class GOdb implements Serializable{
 			System.err.println("retrieveChildrenOf ONTOLOGY TYPE:"+ontologyType+"? <- Ontology type is invalid.");
 		}
 		return ontology;
+	}
+	public static int getOntologyTypeInteger(String ontologyType){
+		//반환값이 -1이면 실패.
+		if(ontologyType.compareTo("BP")==0){
+			return GOdb.BP;
+		}else if(ontologyType.compareTo("CC")==0){
+			return GOdb.CC;
+		}else if(ontologyType.compareTo("MF")==0){
+			return GOdb.MF;
+		}else{
+			System.err.println("ONTOLOGY TYPE:"+ontologyType+"? <- Ontology type is invalid.");
+			return -1;
+		}
 	}
 	
 	public int getMfRootId() throws SQLException{
