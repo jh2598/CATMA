@@ -7,7 +7,10 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
+
 import Data.UserDefinedType.EnrichedGeneOntology;
+import Data.UserDefinedType.RelationToEdge;
 
 public class Session implements Serializable {
 	private static final long serialVersionUID = -4961998355515742346L;
@@ -25,7 +28,7 @@ public class Session implements Serializable {
 	public DatabaseHelper db;
 
 	public EnrichedGeneOntology[] ego = null;
-
+	public EGOGraph egoGraph;
 	public Session(String name, String celPath, String samplePath){
 		System.out.println("Session Created. :: "+this);
 		this.name = name;

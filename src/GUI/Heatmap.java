@@ -367,7 +367,7 @@ public class Heatmap extends PApplet{
 		}
 		DatabaseHelper db = new DatabaseHelper(s);
 		db.retrieveSampleTable();
-		db.getSampleNames();
+		db.getCelFileNames();
 	}
 	
 	//Running Method

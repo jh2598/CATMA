@@ -69,3 +69,4 @@ tab = rbind(up,down)
 
 esetSel = exprs(eset)
 esetSel = esetSel[c(rownames(tab)),]
+colnames(esetSel) = pheno[,2]

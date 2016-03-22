@@ -10,6 +10,8 @@ public class RelationToEdge extends DefaultEdge {
 	public static final int POSITIVELY_REGULATE_RELATION = 4;
 	public static final int NEGATIVELY_REGULATE_RELATION = 5;
 	public static final int OTHER_RELATION = 6;
+	//Source is Parent
+	//Target is Child
 	@Override
 	protected Object getSource() {
 		// TODO Auto-generated method stub
