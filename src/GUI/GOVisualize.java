@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import Data.EGOGraph;
 import Data.GOGraph;
 import Data.UserDefinedType.EnrichedGeneOntology;
 import Data.UserDefinedType.GeneOntology;
@@ -42,7 +43,7 @@ public class GOVisualize extends PApplet{
 		noStroke();
 		initControlP5();
 		
-		Table table = loadTable("D:/David/Ajou Undergraduate/2015-2/CATMA/모임자료/DEG_bY-R/GO.list.csv");
+/*		Table table = loadTable("D:/David/Ajou Undergraduate/2015-2/CATMA/모임자료/DEG_bY-R/GO.list.csv");
 		
 		String[] list = new String[table.getRowCount()];
 		for(int i=0; i<list.length; i++){
@@ -61,7 +62,7 @@ public class GOVisualize extends PApplet{
 			}
 		}
 		
-		goList = temp;
+		goList = temp;*/
 		
 		//init. variables
 		loop = 0;
@@ -73,7 +74,7 @@ public class GOVisualize extends PApplet{
 		displayGOID = true;
 		communicator = Communicator.getCommunicator();
 		//Begin Clustering
-		cluster = new GOCluster(goGraph,temp,edgeLength,new Vec2D(width/2,height/2),physics,this);
+		cluster = new GOCluster(egoGraph,physics,this);
 		
 		//for(int i=0; i<goList.length; i++)
 			//System.out.println(goList[i].getGoId());
@@ -83,20 +84,14 @@ public class GOVisualize extends PApplet{
 		
 		loop++;
 		background(0);
-		drawBackCircle();
 		stroke(255);
 		noFill();
 		//Loop method
 		
-		physics.update();
-		cluster.display(displayNode,displayEdge,displayGOID);
-		updateGraphDisplay();
-		displayGOInfo();
-		
 	}
 	
 	//Mouse Event Handlers
-	public void mousePressed(){
+/*	public void mousePressed(){
 		int nodeSize = (int) cp5.getController("Node size").getValue();
 		
 		Vec2D mousePos=new Vec2D(mouseX,mouseY);
@@ -113,16 +108,6 @@ public class GOVisualize extends PApplet{
 		int nodeSize = (int) cp5.getController("Node size").getValue();
 		
 		Vec2D mousePos=new Vec2D(mouseX,mouseY);
-		for(int i=1; i<cluster.getNodes().size(); i++) {
-			Node n = cluster.getNodes().get(i);
-			if (mousePos.distanceToSquared(n)<nodeSize*nodeSize/2) {
-				EnrichedGeneOntology ego = getEGO(n.getGO().getGo_id());
-				if(ego != null){
-					communicator.getSelectedGO().add(ego);
-					System.out.println("GO Selected:"+ego.getGoId());
-				}
-			}
-		}
 	}
 	
 	public void keyPressed(KeyEvent event){
@@ -145,7 +130,7 @@ public class GOVisualize extends PApplet{
 		    selectedParticle.unlock();
 		    selectedParticle=null;
 		}
-	}
+	}*/
 
 	private void initControlP5(){
 		
@@ -289,6 +274,12 @@ public class GOVisualize extends PApplet{
 		
 	}
 	
+	/*******************************
+	 * 
+	 * 		Custom Methods
+	 * 
+	 *******************************/
+	
 	private void updateGraphDisplay(){
 		
 		//Receiving graph control values
@@ -337,46 +328,20 @@ public class GOVisualize extends PApplet{
 		
 	}
 	
-	private void displaySelectedGO(){
-		
-
-		
-	}
-	
-	
 	/*
 	 * 
 	 * 		Method for drawing background circle
 	 * 		for easy to distinguish hierarchy
 	 * 
 	 */
-	private void drawBackCircle(){
-		
-		int edgeLength = (int) cp5.getController("Edge length").getValue();
-		
-		pushMatrix();
-/*		for(int h=15; h>0; h--){
-			fill(255-h*15,0,h*15,10);
-			stroke(80);
-			ellipseMode(CENTER);
-			ellipse(width/2,height/2,h*edgeLength,h*edgeLength);
-		}*/
-		fill(0,64);
-		noStroke();
-		//Rect area for go info
-		rect(width-290,height-190,270,170);
-		
-		popMatrix();
-		
-	}
-		
+
 	private boolean flagCheck(int value){
 		if(value>0)
 			return true;
 		return false;
 	}
 	
-	private void displayGOInfo(){
+/*	private void displayGOInfo(){
 		
 		int startX = width-320;
 		int starrY = height-270;
@@ -398,25 +363,17 @@ public class GOVisualize extends PApplet{
 	 			textareaGODef.setText(go.getDefinition());
 			}
 		}
-	}
+	}*/
 	
 	/*
 	 * 		Method finding certain EGO
 	 */
-	
-	private EnrichedGeneOntology getEGO(String goID){
-		for(EnrichedGeneOntology ego : goList){
-			if(ego.getGoId().matches(goID))
-				return ego;
-		}
-		return null;
-	}
-	
+
 	//Running method
-	public static void run(GOGraph g, EnrichedGeneOntology[] gl) {
+	public static void run(GOGraph g, EGOGraph eg) {
         PApplet.main(new String[] { GUI.GOVisualize.class.getName() });
         goGraph =g;
-        goList = gl;
+        egoGraph = eg;
     }
 	
 	//Instance Variables
@@ -424,8 +381,8 @@ public class GOVisualize extends PApplet{
 	private Accordion accordion;
 	private int loop;
 	float scaleLevel;
-	static GOGraph goGraph;
-	static EnrichedGeneOntology[] goList;
+	private static GOGraph goGraph;
+	private static EGOGraph egoGraph;
 	private Communicator communicator;
 	private VerletPhysics2D physics;
 	private VerletParticle2D selectedParticle;

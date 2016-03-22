@@ -515,7 +515,7 @@ public class MainWindow extends PApplet{
 		public void button_goVisClicked(GButton source, GEvent event) throws RserveException, REXPMismatchException { //_CODE_:button_heatmapVis:452216:
 			//If goGraph Object is not Null, send it to GO Visualzation Window
 			if(session.allGo!=null){
-				GOVisualize.run(session.allGo,session.ego);
+				GOVisualize.run(session.allGo,session.egoGraph);
 			}
 			else
 				System.err.println("MainWindow>> Error : Please run GeneOntology clustering");

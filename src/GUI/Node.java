@@ -2,33 +2,23 @@ package GUI;
 
 import toxi.geom.Vec2D;
 import toxi.physics2d.VerletParticle2D;
+import Data.UserDefinedType.EnrichedGeneOntology;
 import Data.UserDefinedType.GeneOntology;
+import Data.UserDefinedType.Ontology;
 import processing.core.*;
 
 public class Node extends VerletParticle2D{
-
-	public Node(Vec2D pos, PApplet parent){
-		this(pos, null, 3, YELLOW, parent);
-	}
 	
-	public Node(Vec2D pos, GeneOntology g, PApplet parent){
-		this(pos, g, 3, YELLOW, parent);
-	}
-	
-	public Node(Vec2D pos, GeneOntology g, int color, PApplet parent){
-		this(pos, g, 3, color, parent);
-	}
-	
-	public Node(Vec2D pos, GeneOntology g, int size, int color, PApplet parent) {
+	public Node(Vec2D pos, EnrichedGeneOntology g, int color, PApplet parent){
 		super(pos);
 		p = parent;
 		go = g;
-		this.size = size;
+		size = 10;
 		this.color = color;
 		hierarchy = -1;
 		count = 0;
 	}
-
+	
 	//public methods
 	public void display(boolean goName){
 		
@@ -53,7 +43,7 @@ public class Node extends VerletParticle2D{
 		if(goName){
 			p.pushMatrix();
 			p.textAlign(p.CENTER);
-			p.text(go.getGo_id(),x,y-5);
+			p.text(go.getDescription(),x,y-5);
 			p.popMatrix();
 		}
 		
@@ -85,13 +75,13 @@ public class Node extends VerletParticle2D{
 		return hierarchy;
 	}
 	
-	public GeneOntology getGO(){
+	public EnrichedGeneOntology getGO(){
 		return go;
 	}
 	
 	//Instance Variables
 	private PApplet p;
-	private GeneOntology go;
+	private EnrichedGeneOntology go;
 	private int size;
 	private int color;
 	private int hierarchy;

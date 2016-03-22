@@ -15,7 +15,7 @@ public class EGOGraph implements Serializable{
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> bp;
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> cc;
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> mf;
-	HashMap<String, EnrichedGeneOntology> egoMap;
+	public HashMap<String, EnrichedGeneOntology> egoMap;
 	
 	public EGOGraph(EnrichedGeneOntology[] egoArray){
 		System.out.println("EGO Array Size : "+ egoArray.length);

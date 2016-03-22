@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import Data.GOdb;
+import toxi.geom.Vec2D;
 
 public class Ontology implements Serializable{
 	/**
@@ -59,4 +60,5 @@ public class Ontology implements Serializable{
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 }
