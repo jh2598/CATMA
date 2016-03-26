@@ -523,6 +523,8 @@ public class MainWindow extends PApplet{
 		
 		public void button_testClicked(GButton source, GEvent event){ //_CODE_:button_heatmapVis:452216:
 			//Test button Event method
+			
+			//TODO:GO db instance check. 이부분을 프로그램 시작하면서 반드시 하도록 해야함.
 			System.out.println("::::TEST:::: GO.db instance created.");
 			  try{
 				  godb = GOdb.getInstance();

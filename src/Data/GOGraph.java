@@ -71,18 +71,18 @@ public class GOGraph implements Serializable{
 		mfMap = new HashMap<Integer,GeneOntology>();
 		System.out.println("GO Term Classificating...");
 		for(int i=0;i<allTerm.length;i++){
-			if(allTerm[i].getOntology().compareTo("BP")==0){
+			if(allTerm[i].getOntologyTypeString().compareTo("BP")==0){
 				bp.addVertex(allTerm[i]);
 				bpMap.put(allTerm[i].getId(), allTerm[i]);
-				go_map.put(allTerm[i].getGo_id(), allTerm[i]);
-			}else if(allTerm[i].getOntology().compareTo("CC")==0){
+				go_map.put(allTerm[i].getGoId(), allTerm[i]);
+			}else if(allTerm[i].getOntologyTypeString().compareTo("CC")==0){
 				cc.addVertex(allTerm[i]);
 				ccMap.put(allTerm[i].getId(), allTerm[i]);
-				go_map.put(allTerm[i].getGo_id(), allTerm[i]);
-			}else if(allTerm[i].getOntology().compareTo("MF")==0){
+				go_map.put(allTerm[i].getGoId(), allTerm[i]);
+			}else if(allTerm[i].getOntologyTypeString().compareTo("MF")==0){
 				mf.addVertex(allTerm[i]);
 				mfMap.put(allTerm[i].getId(), allTerm[i]);
-				go_map.put(allTerm[i].getGo_id(), allTerm[i]);
+				go_map.put(allTerm[i].getGoId(), allTerm[i]);
 			}
 		}
 		System.out.println("Classfication done.");
@@ -116,7 +116,6 @@ public class GOGraph implements Serializable{
 		System.out.println("CC Offspring size:"+cc.edgeSet().size());
 		System.out.println("MF Offspring size:"+mf.edgeSet().size());
 	}
-	//TODO : GO.db에서 Relationship To 부분을 읽어와야 할 것 같다.
 	private static int currentOntology=-1; // 현재 어떤 ontology가 작업중인지 makeEdge에 알려주는 용도의 변수
 	public void makeAllEdge() throws SQLException, CycleFoundException{
 		//GO Term끼리의 children 관계를 확인해서 Graph의 Edge를 만들어서 연결 
@@ -149,6 +148,37 @@ public class GOGraph implements Serializable{
 	public HashMap<String, GeneOntology> getGoMap() {
 		return go_map;
 	}
+	
+	public GeneOntology getGo(String GoId){
+		return go_map.get(GoId);
+	}
+	public GeneOntology getGo(int id){
+		GOdb godb = GOdb.getInstance();
+		String goId = null;
+		try {
+			goId = godb.getGoIdFromId(id);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return go_map.get(goId);
+	}
+	
+	public DirectedAcyclicGraph<GeneOntology, RelationToEdge> getGoGraph(String GoId) throws SQLException{
+		GeneOntology selectedGo = go_map.get(GoId);
+//		GOdb godb = GOdb.getInstance();
+//		selectedGo.setOntologyType(godb.getOntologyTypeOf(GoId));
+		if(selectedGo.getOntologyType()==GOdb.BP){
+			return bp;
+		}else if(selectedGo.getOntologyType()==GOdb.CC){
+			return cc;
+		}else if(selectedGo.getOntologyType()==GOdb.MF){
+			return mf;
+		}else{
+			return null;
+		}
+	}
+	
 
 	public void save(){
 		//자신을 직렬화해서 filePath에 저장
@@ -174,7 +204,7 @@ public class GOGraph implements Serializable{
 	}
 	public EnrichedGeneOntology getEnrichedGeneOntology(GeneOntology go, EnrichedGeneOntology[] egoArray){
 		for(int i=0;i<egoArray.length;i++){
-			if(go.getGo_id().compareTo(egoArray[i].getGoId())==0){
+			if(go.getGoId().compareTo(egoArray[i].getGoId())==0){
 				return egoArray[i];
 			}
 		}

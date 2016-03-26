@@ -20,7 +20,8 @@ public class EnrichedGeneOntology extends Ontology implements Serializable{
 	protected String[] geneList;
 	
 	public EnrichedGeneOntology(String GoID, String description, String geneRatio, String bgRatio, String pValue, String pAdjust, String qValue, String geneId, String count){	
-		super(GoID);
+		super();
+		super.setGoId(GoID);
 		this.goId = GoID;
 		this.description = description;
 		this.geneRatio = geneRatio;

@@ -8,10 +8,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import Data.UserDefinedType.GeneOntology;
+import Data.UserDefinedType.Ontology;
 
 public class GOdb implements Serializable{
 	/**
-	 * 
+	 * 여기저기서 참조하기 쉽도록 singleton으로 만들었는데 그러면 동시에 두가지 작업이 안 됨.
+	 * TODO:유일한 객체가 존재하도록 하지 말고 스레드를 새로 만들어서 돌릴 수 있또록 해야함
 	 */
 	private static final long serialVersionUID = -220889749439050555L;
 	static Connection conn = null;
@@ -139,11 +141,17 @@ public class GOdb implements Serializable{
 		int id = rs.getInt("_id");
 		return id;
 	}
-
+	//ID를 받아서 GO ID를 반환
+	public String getGoIdFromId(int id) throws SQLException{
+		String query = "SELECT go_id FROM go_term WHERE _id = '"+id+"';";
+		ResultSet rs = stmt.executeQuery(query);
+		String goId = rs.getString("go_id");
+		return goId;
+	}
 	//bpChildren, ccChildren, mfChildren에서 자신의 Ontology를 인자로 삼아 호출
 	//각 Ontology에 맞게 DB의 go_XX_parents에서 인자로 전달받은 id를 부모로 가지는 term을 찾아서 그 term들의 id 전체를 배열로 반환
 	public int[] retrieveChildrenOf(int ontologyType, int parentId) throws SQLException{	
-		String ontology = getOntologyTypeString(ontologyType);
+		String ontology = changeOntologyTypeToTableColumn(ontologyType);
 		ArrayList<Integer> childrenList = new ArrayList<>();//정수 배열 반환을 위한 임시 리스트
 		String query = "SELECT _id FROM "+ontology+" WHERE _parent_id = "+parentId+";";
 		ResultSet rs = stmt.executeQuery(query);
@@ -161,10 +169,11 @@ public class GOdb implements Serializable{
 		}
 		return children;		
 	}
+
 	//retrieveChildrenOf와 함께 쓰임
 	//같은 순서로 is-a 관계인지 part-of 관계인지 그 외인지를 반환한다.
 	public String[] retrieveRelationshipOf(int ontologyType, int parentId) throws SQLException {
-		String ontology = getOntologyTypeString(ontologyType);
+		String ontology = changeOntologyTypeToTableColumn(ontologyType);
 		ArrayList<String> relationshipList = new ArrayList<>();
 		String query = "SELECT relationship_type FROM "+ontology+" WHERE _parent_id = "+parentId+";";
 		ResultSet rs = stmt.executeQuery(query);
@@ -179,24 +188,41 @@ public class GOdb implements Serializable{
 		return relationships;
 	}
 	//id
-	public int retrieveParentOf(int ontologyType, int id) throws SQLException{	
-		String ontology = getOntologyTypeString(ontologyType);
+	public int[] retrieveParentOf(int ontologyType, int id) throws SQLException{	
+		String ontology = changeOntologyTypeToTableColumn(ontologyType);
 		String query = "SELECT _parent_id FROM "+ontology+" WHERE _id = "+id+";";
 		ResultSet rs = stmt.executeQuery(query);
-		int parentId = rs.getInt("_parent_id");
+		ArrayList<Integer> parentList = new ArrayList();
+		while(rs.next()){
+			int parentId = rs.getInt("_parent_id");
+			parentList.add(parentId);
+		}
+		int[] parentsId = new int[parentList.size()];
+		for(int i=0;i<parentList.size();i++){
+			parentsId[i] = parentList.get(i);
+		}
 		rs.close();
-		return parentId;		
+		return parentsId;		
 	}
-	public String retrieveRelationshipOfParent(int ontologyType, int id, int parentId) throws SQLException {
-		String ontology = getOntologyTypeString(ontologyType);
-		String query = "SELECT relationship_type FROM "+ontology+" WHERE _parent_id = "+parentId+" AND _id = "+id+";";
-		ResultSet rs = stmt.executeQuery(query);
-		String relationship = rs.getString("relationship_type");
-		return relationship;
+	public String[] retrieveRelationshipOfParent(int ontologyType, int id, int[] parentId) throws SQLException {
+		String ontology = changeOntologyTypeToTableColumn(ontologyType);
+		ArrayList<String> relationshipList = new ArrayList();
+		for(int i=0;i<parentId.length;i++){
+			String query = "SELECT relationship_type FROM "+ontology+" WHERE _parent_id = "+parentId[i]+" AND _id = "+id+";";
+			ResultSet rs = stmt.executeQuery(query);
+			rs.next();
+			String relationship = rs.getString("relationship_type");
+			relationshipList.add(relationship);
+		}
+		String[] relationships = new String[relationshipList.size()];
+		for(int i=0;i<relationshipList.size();i++){
+			relationships[i] = relationshipList.get(i).toString();
+		}
+		return relationships;
 	}
 
 
-	public static String getOntologyTypeString(int ontologyType){
+	public static String changeOntologyTypeToTableColumn(int ontologyType){
 		//GOdb.BP 등의 static 변수를 인자로 받아서 그에 해당하는 GO.db의 column의 문자열 반환
 		String ontology = null;//Ontology Type에 따른 임시변수
 		if(ontologyType == BP){
@@ -223,7 +249,32 @@ public class GOdb implements Serializable{
 			return -1;
 		}
 	}
-
+	public static boolean isRoot(String GoId){
+		if(GoId.compareTo("GO:003674")==0){
+			return true;
+		}
+		if(GoId.compareTo("GO:005575")==0){
+			return true;
+		}
+		if(GoId.compareTo("GO:008150")==0){
+			return true;
+		}
+		return false;
+	}
+	public static boolean isRoot(Ontology geneOntology){
+		if(geneOntology.getGoId().compareTo("GO:003674")==0){
+			return true;
+		}
+		if(geneOntology.getGoId().compareTo("GO:005575")==0){
+			return true;
+		}
+		if(geneOntology.getGoId().compareTo("GO:008150")==0){
+			return true;
+		}
+		return false;
+	}
+	
+	
 	public int getMfRootId() throws SQLException{
 		ResultSet rs = stmt.executeQuery( "SELECT _id FROM go_term WHERE go_id = "+"'GO:0003674'"+";" );
 		ArrayList<Integer> arr = new ArrayList<Integer>();

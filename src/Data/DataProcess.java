@@ -1,6 +1,10 @@
 package Data;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
+import java.sql.SQLException;
 
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
@@ -82,6 +86,14 @@ public class DataProcess implements Serializable{
 		System.out.println("R :: Sample info path is setted.");
 	}
 	public static String getDBPath(){
+		if(c == null){
+			try {
+				c = new RConnection();
+			} catch (RserveException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		try {
 			x = c.eval("library(GO.db)");
 			x = c.eval("GO_dbfile()");
@@ -199,7 +211,12 @@ public class DataProcess implements Serializable{
 			System.out.println("R Source code(GO OverRepresentation) is executed successfully.");
 			this.ego = selectEnrichedGeneOntolgy();
 			session.ego = this.ego;
-			session.egoGraph = new EGOGraph(ego);
+			try {
+				session.egoGraph = new EGOGraph(session);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (RserveException | REXPMismatchException e) {
 			e.printStackTrace();
 		}
@@ -225,7 +242,7 @@ public class DataProcess implements Serializable{
 	//ego list에서 인자로 받은 go를 찾아서 그에 해당하는 gene list를 반환
 	public String[] getGeneListOf(GeneOntology go){
 		for(int i=0;i<ego.length;i++){
-			if(ego[i].getGoId() == go.getGo_id()){
+			if(ego[i].getGoId() == go.getGoId()){
 				return ego[i].getGeneList();
 			}
 		}
