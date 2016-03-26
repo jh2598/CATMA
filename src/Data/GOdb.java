@@ -18,35 +18,38 @@ public class GOdb implements Serializable{
 	static Statement stmt = null;
 	String sql;
 	private static GOdb instance = null;
-	
+
 	//Ontology 구분을 위해 아무 값이나 할당, retrieveParentsOf에서 사용됨.
 	public static final int BP = 1;
 	public static final int CC = 2;
 	public static final int MF = 3;
+	public static final String BP_STRING = "BP";
+	public static final String CC_STRING = "CC";
+	public static final String MF_STRING = "MF";
 	
-//	public GOdb(String GOdb_Path){
-//		try {
-//			//Register JDBC driver
-//			Class.forName("org.sqlite.JDBC");
-//			//Open a connection
-//			conn = DriverManager.getConnection("jdbc:sqlite:"+GOdb_Path);
-//			conn.setAutoCommit(false);
-//			System.out.println("GO.db :: Opened GO.db successfully");
-//			//Execute the query
-//			stmt = conn.createStatement();
-//			System.out.println("GO.db :: Create Statement.");
-//			//stmt.close();
-//			//conn.close();
-//			//System.out.println("GO.db :: Operation done successfully");
-//		}catch(SQLException se){
-//			//Handle errors for JDBC
-//			se.printStackTrace();
-//		}catch (Exception e ) {
-//			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-//			e.printStackTrace();
-//			System.exit(0);
-//		}
-//	}
+	//	public GOdb(String GOdb_Path){
+	//		try {
+	//			//Register JDBC driver
+	//			Class.forName("org.sqlite.JDBC");
+	//			//Open a connection
+	//			conn = DriverManager.getConnection("jdbc:sqlite:"+GOdb_Path);
+	//			conn.setAutoCommit(false);
+	//			System.out.println("GO.db :: Opened GO.db successfully");
+	//			//Execute the query
+	//			stmt = conn.createStatement();
+	//			System.out.println("GO.db :: Create Statement.");
+	//			//stmt.close();
+	//			//conn.close();
+	//			//System.out.println("GO.db :: Operation done successfully");
+	//		}catch(SQLException se){
+	//			//Handle errors for JDBC
+	//			se.printStackTrace();
+	//		}catch (Exception e ) {
+	//			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+	//			e.printStackTrace();
+	//			System.exit(0);
+	//		}
+	//	}
 	private GOdb(){
 		try {
 			//Register JDBC driver
@@ -79,30 +82,30 @@ public class GOdb implements Serializable{
 		}
 		return instance;
 	}
-//	public GOdb(String GOdb_Path){
-//		try {
-//			//Register JDBC driver
-//			Class.forName("org.sqlite.JDBC");
-//			//Open a connection
-//			conn = DriverManager.getConnection("jdbc:sqlite:"+GOdb_Path);
-//			conn.setAutoCommit(false);
-//			System.out.println("GO.db :: Opened GO.db successfully");
-//			//Execute the query
-//			stmt = conn.createStatement();
-//			System.out.println("GO.db :: Create Statement.");
-//
-//			//stmt.close();
-//			//conn.close();
-//			//System.out.println("GO.db :: Operation done successfully");
-//		}catch(SQLException se){
-//			//Handle errors for JDBC
-//			se.printStackTrace();
-//		}catch (Exception e ) {
-//			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-//			e.printStackTrace();
-//			System.exit(0);
-//		}
-//	}
+	//	public GOdb(String GOdb_Path){
+	//		try {
+	//			//Register JDBC driver
+	//			Class.forName("org.sqlite.JDBC");
+	//			//Open a connection
+	//			conn = DriverManager.getConnection("jdbc:sqlite:"+GOdb_Path);
+	//			conn.setAutoCommit(false);
+	//			System.out.println("GO.db :: Opened GO.db successfully");
+	//			//Execute the query
+	//			stmt = conn.createStatement();
+	//			System.out.println("GO.db :: Create Statement.");
+	//
+	//			//stmt.close();
+	//			//conn.close();
+	//			//System.out.println("GO.db :: Operation done successfully");
+	//		}catch(SQLException se){
+	//			//Handle errors for JDBC
+	//			se.printStackTrace();
+	//		}catch (Exception e ) {
+	//			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+	//			e.printStackTrace();
+	//			System.exit(0);
+	//		}
+	//	}
 	public GeneOntology[] getAllTerm() throws SQLException{
 		String query = "SELECT * FROM go_term;";
 		ResultSet rs = stmt.executeQuery(query);
@@ -136,7 +139,7 @@ public class GOdb implements Serializable{
 		int id = rs.getInt("_id");
 		return id;
 	}
-	
+
 	//bpChildren, ccChildren, mfChildren에서 자신의 Ontology를 인자로 삼아 호출
 	//각 Ontology에 맞게 DB의 go_XX_parents에서 인자로 전달받은 id를 부모로 가지는 term을 찾아서 그 term들의 id 전체를 배열로 반환
 	public int[] retrieveChildrenOf(int ontologyType, int parentId) throws SQLException{	
@@ -175,6 +178,24 @@ public class GOdb implements Serializable{
 		}
 		return relationships;
 	}
+	//id
+	public int retrieveParentOf(int ontologyType, int id) throws SQLException{	
+		String ontology = getOntologyTypeString(ontologyType);
+		String query = "SELECT _parent_id FROM "+ontology+" WHERE _id = "+id+";";
+		ResultSet rs = stmt.executeQuery(query);
+		int parentId = rs.getInt("_parent_id");
+		rs.close();
+		return parentId;		
+	}
+	public String retrieveRelationshipOfParent(int ontologyType, int id, int parentId) throws SQLException {
+		String ontology = getOntologyTypeString(ontologyType);
+		String query = "SELECT relationship_type FROM "+ontology+" WHERE _parent_id = "+parentId+" AND _id = "+id+";";
+		ResultSet rs = stmt.executeQuery(query);
+		String relationship = rs.getString("relationship_type");
+		return relationship;
+	}
+
+
 	public static String getOntologyTypeString(int ontologyType){
 		//GOdb.BP 등의 static 변수를 인자로 받아서 그에 해당하는 GO.db의 column의 문자열 반환
 		String ontology = null;//Ontology Type에 따른 임시변수
@@ -202,7 +223,7 @@ public class GOdb implements Serializable{
 			return -1;
 		}
 	}
-	
+
 	public int getMfRootId() throws SQLException{
 		ResultSet rs = stmt.executeQuery( "SELECT _id FROM go_term WHERE go_id = "+"'GO:0003674'"+";" );
 		ArrayList<Integer> arr = new ArrayList<Integer>();

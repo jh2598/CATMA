@@ -6,18 +6,19 @@ import java.sql.SQLException;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import Data.GOdb;
-import toxi.geom.Vec2D;
 
 public class Ontology implements Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	String goId;
-	private int id;
-	private int ontologyType = -1; //GOdb.BP/CC/MF를 받아서 저장.
-	private int[] childrenId;
-	private String[] childrenRelation;
+	protected int id;
+	protected String goId;
+	protected int ontologyType = -1; //GOdb.BP/CC/MF를 받아서 저장.
+	protected int[] childrenId;
+	protected String[] childrenRelation;
+	protected int parentId;
+	protected String parentRelation;
 	//Ontology를 상속받은 그래프의 각 서브그래프가 됨. 자식에 대한 정보만 저장
 	DirectedAcyclicGraph<? extends Ontology, RelationToEdge> children;
 	public Ontology(String goId){
@@ -60,5 +61,16 @@ public class Ontology implements Serializable{
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+	public int getParentId() {
+		return parentId;
+	}
+	public void setParentId(int parentId) {
+		this.parentId = parentId;
+	}
+	public String getParentRelation() {
+		return parentRelation;
+	}
+	public void setParentRelation(String parentRelation) {
+		this.parentRelation = parentRelation;
+	}
 }

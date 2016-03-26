@@ -98,12 +98,11 @@ public class GOGraph implements Serializable{
 			if(currentOntology == -1){
 				System.err.println("Current ontology is not setted.");;
 			}
-
+			GOdb godb = GOdb.getInstance();
 			//currentOntology의 Parent를 전부 조회해서 godb상에서의 id를 배열로 전달.
 			int[] children = GOdb.getInstance().retrieveChildrenOf(currentOntology, parent);
 			String[] relationships = GOdb.getInstance().retrieveRelationshipOf(currentOntology, parent);
-
-			//			System.out.println("Parent:"+bpMap.get(tmp));
+//			System.out.println("Parent:"+bpMap.get(tmp));
 //			int[] children = ontologyMap.get(parent).getChildrenId();
 //			String[] relationships = ontologyMap.get(parent).getChildrenRelation();
 

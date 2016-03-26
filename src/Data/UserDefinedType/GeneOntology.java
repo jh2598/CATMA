@@ -2,6 +2,8 @@ package Data.UserDefinedType;
 
 import java.io.Serializable;
 
+import Data.GOdb;
+
 public class GeneOntology extends Ontology implements Serializable{
 	/**
 	 * 
@@ -11,7 +13,7 @@ public class GeneOntology extends Ontology implements Serializable{
 	protected int id;
 	protected String goId;
 	protected String term;
-	protected String ontology;
+	protected String ontologyTypeString;
 	protected String definition;
 	public boolean visited;
 	public GeneOntology(int id, String GoID, String term, String ontology, String definition){
@@ -19,7 +21,16 @@ public class GeneOntology extends Ontology implements Serializable{
 		this.id = id;
 		this.goId = GoID;
 		this.term = term;
-		this.ontology = ontology;
+		this.ontologyTypeString = ontology;
+		if(ontologyTypeString.compareTo(GOdb.BP_STRING)==0){
+			super.setOntologyType(GOdb.BP);
+		}else if((ontologyTypeString.compareTo(GOdb.CC_STRING)==0)){
+			super.setOntologyType(GOdb.CC);
+		}else if((ontologyTypeString.compareTo(GOdb.MF_STRING)==0)){
+			super.setOntologyType(GOdb.MF);
+		}else{
+			super.setOntologyType(-1);
+		}
 		this.definition = definition;
 		this.visited = false;
 	}
@@ -30,7 +41,7 @@ public class GeneOntology extends Ontology implements Serializable{
 		return term;
 	}
 	public String getOntology() {
-		return ontology;
+		return ontologyTypeString;
 	}
 	public String getDefinition() {
 		return definition;

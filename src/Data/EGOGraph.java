@@ -10,8 +10,17 @@ import Data.UserDefinedType.EnrichedGeneOntology;
 import Data.UserDefinedType.Ontology;
 import Data.UserDefinedType.RelationToEdge;
 
+//EGO 배열을 받아서 해당 EGO에서부터 Root까지 가는 GO 그래프를 만듬
 public class EGOGraph implements Serializable{
 	private static final long serialVersionUID = 5385450819385802517L;
+	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> bp;
+	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> cc;
+	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> mf;
+	public HashMap<String, EnrichedGeneOntology> egoMap;
+	public EGOGraph(EnrichedGeneOntology[] ego){
+		
+	}
+	/*
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> bp;
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> cc;
 	private DirectedAcyclicGraph<EnrichedGeneOntology, RelationToEdge> mf;
@@ -27,6 +36,7 @@ public class EGOGraph implements Serializable{
 			egoMap.put(egoArray[i].getGoId(), egoArray[i]);
 			GOdb godb = GOdb.getInstance();
 			try {
+				//Enriched Gene Ontology 각각의 인스턴스 배리어블에 값을 할당.
 				egoArray[i].setOntologyType(godb.getOntologyTypeOf(egoArray[i].getGoId()));//GO ID에서 Ontology Type을 알아냄.
 				egoArray[i].setChildrenId(godb.retrieveChildrenOf(egoArray[i].getOntologyType(), godb.getIdFromGoId(egoArray[i].getGoId())));
 				egoArray[i].setChildrenRelation(godb.retrieveRelationshipOf(egoArray[i].getOntologyType(), godb.getIdFromGoId(egoArray[i].getGoId())));
@@ -85,4 +95,5 @@ public class EGOGraph implements Serializable{
 	public EnrichedGeneOntology getEgoObjectFromOther(Ontology other){
 		return egoMap.get(other.getGoId());
 	}
+	*/
 }
