@@ -4,3 +4,4 @@
 .project
 *.db
 temp.txt
+*.dat
